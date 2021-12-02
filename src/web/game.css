@@ -1,0 +1,65 @@
+/*card containers*/
+#board
+{
+    width: 1150px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 200px 200px 200px 200px 200px;
+    grid-template-rows: 120px 120px 120px 120px 120px;
+    grid-gap: 30px;
+}
+
+/*cards*/
+.card
+{
+    width:200px;
+    height:120px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin:10px;
+}
+
+.neutral
+{
+
+    background-color: tan;
+    border: sienna dashed 3px;
+    border-radius:10px;
+}
+
+.blueTeam
+{
+    background-color: #3399ff;
+    border: darkblue dashed 3px;
+    border-radius:10px;
+}
+
+.redTeam
+{
+    background-color: #ff5050;
+    border: darkred dashed 3px;
+    border-radius:10px;
+}
+
+.bombCard
+{
+    background-color: #5e5e5e;
+    border:#1f1f1f dashed 3px;
+    border-radius: 10px;
+}
+
+.card p
+{
+    font-size:1.4em;
+}
+
+/*side panel*/
+.sidePanel{
+    position:absolute;
+    right:0;
+    top:0;
+    background-color: darkred;
+    width:25%;
+    height:100%;
+}
