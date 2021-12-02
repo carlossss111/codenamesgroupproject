@@ -12,7 +12,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap" rel="stylesheet"> 
-    
+    <script src="../src/web/board.js"></script>
     <title>Nottingham Codenames</title>
 </head>
 <body>
@@ -21,83 +21,17 @@
         <a href="../index.html">to main page</a>
         <h1>Codenames</h1>
         <div id="board">
-            <!-- PLACEHOLDERS BELOW, TO BE REPLACED BY SCRIPT-GENERATED CARDS-->
-            <div class="card neutral">
-                <p>Word Here</p>
-            </div>
-            <div class="card redTeam">
-                <p>Word Here</p>
-            </div>
-            <div class="card blueTeam">
-                <p>Word Here</p>
-            </div>
-            <div class="card bombCard">
-                <p>Word Here</p>
-            </div>
-            <div class="card neutral">
-                <p>Word Here</p>
-            </div>
-            <div class="card neutral">
-                <p>Word Here</p>
-            </div>
-            <div class="card neutral">
-                <p>Word Here</p>
-            </div>
-            <div class="card neutral">
-                <p>Word Here</p>
-            </div>
-            <div class="card neutral">
-                <p>Word Here</p>
-            </div>
-            <div class="card neutral">
-                <p>Word Here</p>
-            </div>
-            <div class="card neutral">
-                <p>Word Here</p>
-            </div>
-            <div class="card neutral">
-                <p>Word Here</p>
-            </div>
-            <div class="card neutral">
-                <p>Word Here</p>
-            </div>
-            <div class="card neutral">
-                <p>Word Here</p>
-            </div>
-            <div class="card neutral">
-                <p>Word Here</p>
-            </div>
-            <div class="card neutral">
-                <p>Word Here</p>
-            </div>
-            <div class="card neutral">
-                <p>Word Here</p>
-            </div>
-            <div class="card neutral">
-                <p>Word Here</p>
-            </div>
-            <div class="card neutral">
-                <p>Word Here</p>
-            </div>
-            <div class="card neutral">
-                <p>Word Here</p>
-            </div>
-            <div class="card neutral">
-                <p>Word Here</p>
-            </div>
-            <div class="card neutral">
-                <p>Word Here</p>
-            </div>
-            <div class="card neutral">
-                <p>Word Here</p>
-            </div>
-            <div class="card neutral">
-                <p>Word Here</p>
-            </div>
-            <div class="card neutral">
-                <p>Word Here</p>
-            </div>
-            <!-- PLACEHOLDERS ABOVE, TO BE REPLACED BY SCRIPT-GENERATED CARDS-->
+            <script>
+                //TODO: make array etc
+                new Card("neutral", "forest");
+                new Card("blueTeam", "word2");
+                new Card("redTeam", "ocean");
+                new Card("bombCard", "code");
+                new Card("neutral", "forest");
+                for(let i = 0; i < 20; i++){
+                    new Card("neutral", "word");
+                }
+            </script>
         </div>
     </div>
     <div class="sidePanel"><p style="color:white;">To do! Here will be the chatbox and other things.</p></div>

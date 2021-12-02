@@ -7,7 +7,6 @@ class Card
     
     constructor(colour, word)
     {
-        console.log("test");
         this.colour = colour;
         this.word = word;
         this.isRevealed = false;
@@ -17,7 +16,8 @@ class Card
         else this.imageURL = "../../rsc/images/bomb.jpg";
         let newDiv = document.createElement("div");
         const currentDiv = document.getElementById("board");
-        currentDiv.setAttribute("class","card neutral");
+        newDiv.setAttribute("class",`card ${colour}`);
+        newDiv.innerHTML = "<p>" + word + "</p>";
         currentDiv.appendChild(newDiv);
 
     }
