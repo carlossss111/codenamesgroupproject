@@ -10,7 +10,7 @@ class Server{
     constructor(){
         //connect and disconnect listeners
         this.connectedToServer();
-        this.disconnectedFromServer 
+        this.disconnectedFromServer();
 
         //receieve listener and update observers
         this.receiveFromServer();
