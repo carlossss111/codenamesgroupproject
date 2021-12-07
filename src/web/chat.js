@@ -14,7 +14,7 @@ class Chatbox extends Observer{
 
     //send message
     sendChat(message){
-        server.sendToServer("chat",message);
+        server.sendToServer("chat",`Protocol : chat\r\nmessage : ${message}`);
     }
 
     //update message when server receives message
