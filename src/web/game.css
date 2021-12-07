@@ -63,3 +63,10 @@
     width:25%;
     height:100%;
 }
+
+.chatbox{
+    margin: 3rem auto;
+    width: 20rem;
+    height: 40rem;
+    background-color: white;
+}

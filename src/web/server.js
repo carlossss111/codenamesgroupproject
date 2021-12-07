@@ -61,3 +61,5 @@ class Observer{
         console.log("Abstract update() called!");
     }
 }
+
+const server = new Server();
