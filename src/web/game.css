@@ -30,6 +30,7 @@
 
 .blueTeam
 {
+    background-image: url("");
     background-color: #3399ff;
     border: darkblue dashed 3px;
     border-radius:10px;
@@ -40,6 +41,11 @@
     background-color: #ff5050;
     border: darkred dashed 3px;
     border-radius:10px;
+}
+
+.revealed
+{
+    background-image: url('../../rsc/images/neutral.jpg') ;
 }
 
 .bombCard
