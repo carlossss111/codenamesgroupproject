@@ -3,8 +3,7 @@ class Card
     colour;
     word; 
     isRevealed; 
-    imageURL;
-
+    imageURL;   
     
     constructor(colour, word)
     {
@@ -23,21 +22,22 @@ class Card
 
         else
             this.imageURL = "../../rsc/images/bomb.jpg";
-        let newDiv = document.createElement("div");
-        const currentDiv = document.getElementById("board");
-        newDiv.setAttribute("class",`card ${colour}`); 
-        newDiv.innerHTML = "<p>" + word + "</p>";
-        newDiv.style.backgroundImage = "url('../../rsc/images/neutral.jpg')";
-        currentDiv.appendChild(newDiv);
-        //document.getElementsByClassName("card").style.backgroundImage = "url('../../rsc/images/neutral.jpg')";
-    
-
+        let cardDiv = document.createElement("div");
+        let boardDiv = document.getElementById("board");
+        cardDiv.setAttribute("class",`card ${colour}`); 
+        cardDiv.innerHTML = "<p>" + word + "</p>";
+        cardDiv.style.backgroundImage = "url('../../rsc/images/neutral.jpg')";
+        boardDiv.appendChild(cardDiv);
+        cardDiv.addEventListener("click",this.revealCard);
     }
     
-    revealCard()
+    revealCard(event)
     {
+        let cardDiv = event.target;
         this.isRevealed = true;
         this.colour = "redTeam";
+        console.log(cardDiv); 
+        cardDiv.style.backgroundImage = "";
     }
 }
 
@@ -45,9 +45,9 @@ function click() {
     alert('clicked');
 }
 
-class boardState {
+class BoardState {
 
-    cards = [1,2,3,4,5][1,2,3,4,5];
+    cards = [[]];
     clueWord;
     numOfGuesses;
     redScore;
@@ -58,25 +58,32 @@ class boardState {
         'role' : null
     };
 
-    constructor(cards)
+    constructor()
     {
         this.clueWord = null;
         this.numOfGuesses = null;
         this.redScore = 0;
         this.blueScore = 0; 
-        for(i=0;i<5;i++)
-            for(j=0;j<5;j++)
+        let bombX = Math.floor(Math.random() * 4);
+        let bombY = Math.floor(Math.random() * 4);
+        for(var i=0;i<5;i++){
+            for(var j=0;j<5;j++)
             {
-                value = Math.floor(Math.random() * 3);
-                if(value < 2) this.cards[i][j] = new Card("neutral","forest");
-                else if(value == 2) this.cards[i][j] = new Card("redTeam","forest");
+                this.cards.push([]);
+                
+                if(i == bombX && j == bombY){
+                    this.cards[bombX][bombY] = new Card("bombCard","bomb");
+                    continue;
+                }
+
+                var value = Math.floor(Math.random() * 3);
+                if(value < 1) this.cards[i][j] = new Card("neutral","forest");
+                else if(value < 2) this.cards[i][j] = new Card("redTeam","forest");
                 else this.cards[i][j] = new Card("blueTeam","forest");
-                if(cards[i][j].colour = "redTeam") this.redScore++;
-                else if(cards[i][j].colour = "blueTeam") this.blueScore++;
+                if(this.cards[i][j].colour = "redTeam") this.redScore++;
+                else if(this.cards[i][j].colour = "blueTeam") this.blueScore++;
             }
-        x = Math.floor(Math.random() * 4);
-        y = Math.floor(Math.random() * 4);
-        this.cards[x][y] = new Card("bombCard","bomb");
+        }
     }
 
     validateClick(cardSelected,turn){
@@ -123,3 +130,5 @@ class boardState {
         else return; 
     }
 }
+
+new BoardState();

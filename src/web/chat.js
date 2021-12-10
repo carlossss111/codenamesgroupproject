@@ -23,7 +23,7 @@ class Chatbox extends Observer{
             return;
 
         var newMessage = document.createElement("p");
-        newMessage.innerHTML = "test";
+        newMessage.innerHTML = args;
         this.messagebox.appendChild(newMessage);
     }
 }

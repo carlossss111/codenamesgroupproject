@@ -20,6 +20,14 @@
     margin:10px;
 }
 
+.card p
+{
+    font-weight: bold;
+    font-size:2em;
+    text-transform: uppercase;
+    background-color: whitesmoke;
+}
+
 .neutral
 {
 
@@ -53,11 +61,6 @@
     background-color: #5e5e5e;
     border:#1f1f1f dashed 3px;
     border-radius: 10px;
-}
-
-.card p
-{
-    font-size:1.4em;
 }
 
 /*side panel*/
