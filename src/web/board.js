@@ -45,7 +45,7 @@ function click() {
     alert('clicked');
 }
 
-class BoardState {
+class BoardState extends Observer{
 
     cards = [];
     clueWord;
@@ -64,6 +64,7 @@ class BoardState {
 
     constructor()
     {
+        super();
         this.clueWord = null;
         this.numOfGuesses = null;
         this.redScore = 0;
@@ -118,7 +119,7 @@ class BoardState {
             throw new Error("Card selected not found!")
         
         //send board to server
-        server.sendToServer(
+        server.sendToServer("sendBoardState",
             {
             "Protocol" : "sendBoardState",
             "clue" : this.clueWord,
@@ -147,7 +148,7 @@ class BoardState {
         var maxGuesses = 2;
 
         //send to server
-        server.sendToServer(
+        server.sendToServer("forwardClue",
             {
                 "Protocol" : "forwardClue",
                 "clue" : clue,
@@ -162,13 +163,38 @@ class BoardState {
     //(Observer Class Override!)
     update(eventName, args){
         if(eventName == "receiveBoardState"){
+            /*
+            var example_cards = [];
+            for(var i = 0; i < 5; i++){
+                example_cards.push([]);
+                for(var j = 0; j < 5; j++){
+                    var randomizer1 = Math.floor(Math.random() * 3);//0-2
+                    var randomizer2 = Math.floor(Math.random() * 2);//0-1
+                    var example_colours = ["redTeam","blueTeam","neutral"];
+                    example_cards[i][j] = {"colour" : "", "word" : "placeholder", "isRevealed" : ""};
+                    example_cards[i][j].colour = example_colours[randomizer1];
+                    randomizer2 ? example_cards[i][j].isRevealed = true : example_cards[i][j].isRevealed = false;
+                }
+            }
+            const example_args = { Protocol: "receiveBoardState", clue: "placeholder", numberOfGuesses: 1, 
+                                    redScore: 1, blueScore: 1, timerLength: 100, 
+                                    turn: { team: "blue", role: "spymaster" }, cards : example_cards}
+            args = example_args;
             console.log(args);
+            */
+
             /*
             UPDATE CLIENT BOARD STATE HERE!
             */
         }
-        else if(eventName == "forwardGuess"){
+        else if(eventName == "forwardClue"){
+            /*
+            const example_args = { Protocol: "forwardClue", clue: "placeholder", 
+                            numberOfGuesses: 2, turn: { team: "blue", role: "spymaster" } }
+            args = example_args;
             console.log(args);
+            */
+
             /*
             UPDATE CLUE WORD AND DISPLAY HERE!
             */
@@ -189,11 +215,21 @@ class BoardState {
         }
         else return; 
     }
+
+}
+
+//randomizes the board (not cards) for debug purposes
+function DEBUG_boardRandomizer(board){
+    board.clueWord = "word";
+    board.numOfGuesses = Math.floor(Math.random() * 5); //0-4
+    board.redScore = Math.floor(Math.random() * 11); //0-10
+    board.blueScore = Math.floor(Math.random() * 11); //0-10
+    board.timer = 100;
+    Math.floor(Math.random() * 2) ? board.player.team = "red" : board.player.team = "blue" ;
+    Math.floor(Math.random() * 2) ? board.player.role = "spy" : board.player.role = "spymaster" ;
+    Math.floor(Math.random() * 2) ? board.turn.team = "red"   : board.turn.team = "blue" ;
+    Math.floor(Math.random() * 2) ? board.turn.role = "spy"   : board.turn.role = "spymaster" ;
 }
 
 var board = new BoardState();
-//board.sendBoardState(board.cards[1][3]);
-
-//board.turn = {team : "blue", role : "spymaster"};
-//board.player = {team : "blue", role : "spymaster"};
-//board.forwardClue();
+server.registerObserver(board);

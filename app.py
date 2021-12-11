@@ -24,28 +24,72 @@ def chat_broadcast_message(messageReceived):
     print("Chat Message Received!")
     #define protocol and message
     protocol = 'chat'
-    messageToSend = {   'Protocol' : protocol,\
-                        'message' : messageReceived['message']}
+    messageToSend = {
+                        'Protocol' : protocol,\
+                        'message' : messageReceived['message']\
+                    }
     #send to client
     emit(protocol, messageToSend, broadcast=True)
 
-@socket_.on('my_broadcast_event', namespace='/test')
-def test_broadcast_message(message):
-    session['receive_count'] = session.get('receive_count', 0) + 1
-    emit('my_response',
-         {'data': message['data'], 'count': session['receive_count']},
-         broadcast=True)
+"""
+forwardClue Protocol
+Forwards clue sent from a spymaster client to all other clients.
+Changes the turn.
+"""
+@socket_.on('forwardClue', namespace='/')
+def clue_broadcast_message(messageReceived):
+    print("Clue Received!")
 
-@socket_.on('disconnect_request', namespace='/test')
-def disconnect_request():
-    @copy_current_request_context
-    def can_disconnect():
-        disconnect()
+    #####################
+    #CALCULATE NEXT TURN#
+    #####################
+    nextTurn = {"team" : "?", "role" : "?"}
+    #####################
 
-    session['receive_count'] = session.get('receive_count', 0) + 1
-    emit('my_response',
-         {'data': 'Disconnected!', 'count': session['receive_count']},
-         callback=can_disconnect)
+    #define protocol and message
+    protocol = 'forwardClue'
+    messageToSend = {
+                        'Protocol' : protocol,\
+                        'clue' : messageReceived['clue'],\
+                        'numberOfGuesses' : messageReceived['numberOfGuesses'],\
+                        'turn' : nextTurn\
+                    }
+    #send to client
+    emit(protocol, messageToSend, broadcast=True)
+
+"""
+send/receive BoardState Protocol
+"""
+@socket_.on('sendBoardState', namespace='/')
+def chat_broadcast_message(boardReceived):
+    print("Board State Received!")
+
+    ###########################
+    #CALCULATE NEW BOARD STATE#
+    ###########################
+    numOfGuesses = 1
+    redScore = 1
+    blueScore = 1
+    nextTurn = {"team" : "?", "role" : "?"}
+
+    ###########################
+    
+    #define protocol and message
+    protocol = 'receiveBoardState'
+    messageToSend = {   
+                        'Protocol' : protocol,\
+                        'clue' : boardReceived['clue'],\
+                        'numberOfGuesses' : numOfGuesses,\
+                        'redScore' : redScore,\
+                        'blueScore' : blueScore,\
+                        'timerLength' : boardReceived['timerLength'],\
+                        'turn' : nextTurn,\
+                        'cards' : "2d array of cards"\
+                    }
+    #send to client
+    emit(protocol, messageToSend, broadcast=True)
+
+
 
 
 if __name__ == '__main__':
