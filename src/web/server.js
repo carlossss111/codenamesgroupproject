@@ -40,7 +40,7 @@ class Server{
 
     //receive data from server and update oberservers
     receiveFromServer(){
-        socket.onAny((eventName, ...args) => {
+        socket.onAny((eventName, args) => {
             console.log("Message Received!");
             this.observers.forEach(element => {
                 element.update(eventName, args);

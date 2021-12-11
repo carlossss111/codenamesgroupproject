@@ -42,7 +42,7 @@ class Chatbox extends Observer{
         var chatboxReceive = document.getElementById("chatboxReceive");
         var newMessage = document.createElement("p");
 
-        newMessage.innerHTML = args;
+        newMessage.innerHTML = args['message'];
         chatboxReceive.appendChild(newMessage);
     }
 }

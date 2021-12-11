@@ -15,11 +15,21 @@ thread_lock = Lock()
 def index():
     return render_template('html/index.html', async_mode=socket_.async_mode)
 
-#CHAT PROTOCOL
+"""
+Chat Protocol
+Forwards message sent from a client to all other clients.
+"""
 @socket_.on('chat', namespace='/')
-def chat_broadcast_message(message):
+def chat_broadcast_message(messageReceived):
     print("Chat Message Received!")
-    emit('chat', message['message'], broadcast=True)
+
+    #define protocol and message
+    protocol = 'chat'
+    messageToSend = {   'Protocol' : protocol,\
+                        'message' : messageReceived['message']}
+
+    #send to client
+    emit(protocol, messageToSend, broadcast=True)
 
 @socket_.on('my_broadcast_event', namespace='/test')
 def test_broadcast_message(message):
