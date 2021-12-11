@@ -22,12 +22,10 @@ Forwards message sent from a client to all other clients.
 @socket_.on('chat', namespace='/')
 def chat_broadcast_message(messageReceived):
     print("Chat Message Received!")
-
     #define protocol and message
     protocol = 'chat'
     messageToSend = {   'Protocol' : protocol,\
                         'message' : messageReceived['message']}
-
     #send to client
     emit(protocol, messageToSend, broadcast=True)
 
