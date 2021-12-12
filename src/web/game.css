@@ -28,6 +28,38 @@
     background-color: whitesmoke;
 }
 
+.clueBox
+{
+    width: 400px;
+    margin: 0 auto;
+}
+
+.clueBox input {
+  width: 150px;
+  margin: 5px 10px 5px 0;
+  padding: 10px;
+  border-radius: 7px;
+
+}
+
+.clueBox button {
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 7px;
+
+}
+
+.clueBox button:hover {
+  background-color: lightGreen;
+}
+
+#maxClues{
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 7px;
+
+}
+
 .neutral
 {
 
@@ -42,6 +74,7 @@
     background-color: #3399ff;
     border: darkblue dashed 3px;
     border-radius:10px;
+
 }
 
 .redTeam
@@ -79,3 +112,4 @@
     height: 40rem;
     background-color: white;
 }
+

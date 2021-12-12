@@ -4,46 +4,46 @@ class Card
     word; 
     isRevealed; 
     imageURL;   
-    
+
     constructor(colour, word)
     {
         this.colour = colour;
         this.word = word;
         this.isRevealed = false;
 
-        if(this.colour = "redTeam")
-            this.imageURL = "../../rsc/images/redteam.jpg";
-
-        else if(this.colour = "blueTeam")
-            this.imageURL = "../../rsc/images/blueteam.jpg";
-
-        else if(this.colour = "neutral")
-            this.imageURL = "../../rsc/images/neutral.jpg";
-
-        else
-            this.imageURL = "../../rsc/images/bomb.jpg";
         let cardDiv = document.createElement("div");
         let boardDiv = document.getElementById("board");
         cardDiv.setAttribute("class",`card ${colour}`); 
         cardDiv.innerHTML = "<p>" + word + "</p>";
-        cardDiv.style.backgroundImage = "url('../../rsc/images/neutral.jpg')";
         boardDiv.appendChild(cardDiv);
-        cardDiv.addEventListener("click",this.revealCard);
+        cardDiv.addEventListener("click", this.revealCard);
+        cardDiv.colour = this.colour;
     }
     
+
+    //Had to pass this.colour as passing the card caused issues with the variables
+    //later fix to either pass all elements of the card fix to make the card itself work
     revealCard(event)
     {
+        var colour = event.currentTarget.colour;
         let cardDiv = event.target;
+        //call validateClick()
         this.isRevealed = true;
-        this.colour = "redTeam";
-        console.log(cardDiv); 
-        cardDiv.style.backgroundImage = "";
+        console.log(colour);
+    
+        if(colour == "redTeam") 
+            cardDiv.style.backgroundImage = "url('../../rsc/images/redteam.jpg')";
+        else if(colour == "blueTeam") 
+            cardDiv.style.backgroundImage = "url('../../rsc/images/blueteam.jpg')";
+        else if(colour == "neutral") 
+            cardDiv.style.backgroundImage = "url('../../rsc/images/neutral.jpg')";
+        else if(colour == "bombCard")
+            cardDiv.style.backgroundImage = "url('../../rsc/images/bomb.jpg')";
+        //call sendBoardState()
     }
 }
 
-function click() {
-    alert('clicked');
-}
+
 
 
 class BoardState extends Observer{
@@ -140,24 +140,36 @@ class BoardState extends Observer{
         //check that it is this player's turn and it is the spymaster's turn
         if(!this.isPlayersTurn || this.turn.role != "spymaster")
             return;
-        
+
         /*
         DEFINE THE CLUE HERE & VALIDATE HERE!
         */
+        else{
+            let clue = document.getElementById("clue").value;
+            let maxGuesses = document.getElementById("maxClues").value;
+            let valid = true;
 
-        var clue = "placeholder";
-        var maxGuesses = 2;
+            for (let i = 0; i < cards.length; i++) {
+                if(clue == cards[i]){
+                    valid = false;
+                    console.log("card cannot be same as word on board");
+                    break;
+                }
+            }
 
-        //send to server
-        server.sendToServer("forwardClue",
+            if (valid)
             {
-                "Protocol" : "forwardClue",
-                "clue" : clue,
-                "numberOfGuesses" : maxGuesses,
-                "player" : this.player,
-                "turn" : this.turn
-            })
-
+                //send to server
+                server.sendToServer("forwardClue",
+                {
+                    "Protocol" : "forwardClue",
+                    "clue" : clue,
+                    "numberOfGuesses" : maxGuesses,
+                    "player" : this.player,
+                    "turn" : this.turn
+                })
+            }
+        }
     }
 
     //Updates when receiving server communications
@@ -181,21 +193,27 @@ class BoardState extends Observer{
                                     redScore: 1, blueScore: 1, timerLength: 100, 
                                     turn: { team: "blue", role: "spymaster" }, cards : example_cards}
             args = example_args;
-            console.log(args);
 
-            /*
-            UPDATE CLIENT BOARD STATE HERE!
-            */
+            clueWord = args.clue;
+            numOfGuesses = args.numberOfGuesses;
+            redScore = args.redScore;
+            blueScore = args.blueScore;
+            timer = args.timerLength;
+            turn.team = args.turn.team;
+            turn.role = args.turn.role;
+            for(i=0;i<5;i++)
+                for(j=0;j<5;j++)
+                    cards[i][j] = args.cards[i][j];
         }
         else if(eventName == "forwardClue"){
             const example_args = { Protocol: "forwardClue", clue: "placeholder", 
                             numberOfGuesses: 2, turn: { team: "blue", role: "spymaster" } }
             args = example_args;
-            console.log(args);
 
-            /*
-            UPDATE CLUE WORD AND DISPLAY HERE!
-            */
+            clueWord = args.clue;
+            numOfGuesses = args.numberOfGuesses;
+            turn.team = args.turn.team;
+            turn.role = args.turn.role;
         }
     }
 
@@ -231,3 +249,4 @@ function DEBUG_boardRandomizer(board){
 
 var board = new BoardState();
 server.registerObserver(board);
+
