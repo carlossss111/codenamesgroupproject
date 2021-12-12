@@ -13,7 +13,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap" rel="stylesheet"> 
     <script src="../src/web/board.js" defer></script>
-    <script>var a = new BoardState()</script>
     <script src="https://cdn.socket.io/4.4.0/socket.io.min.js" integrity="sha384-1fOn6VtTq3PWwfsOrk45LnYcGosJwzMHv+Xh/Jx5303FVOXzEnw0EpLv30mtjmlj" crossorigin="anonymous"></script>
     <script src="../src/web/server.js"></script>
     <script src="../src/web/chat.js" defer></script>
@@ -27,7 +26,7 @@
 
 
         <!-- clue Box temp max clues in future should only show max clues up to the amount of cards left --->
-        <form class="clueBox" action="#" onsubmit="a.forwardClue()">
+        <form class="clueBox" action="#" onsubmit="board.forwardClue()">
             <input type="text" id="clue" placeholder="Enter clue"></input>
             <select name="max" id="maxClues">
                 <option value="1">1</option>

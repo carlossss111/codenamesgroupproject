@@ -147,16 +147,25 @@ class BoardState extends Observer{
             let maxGuesses = document.getElementById("maxClues").value;
             let valid = true;
 
-            for (let i = 0; i < cards.length; i++) {
-                if(clue == cards[i]){
-                    valid = false;
-                    console.log("card cannot be same as word on board");
-                    break;
+            for (let i = 0; i < this.cards.length; i++) {
+                for (let j = 0; j < this.cards[0].length; j++){
+                    if(clue == this.cards[i][j].word){
+                        valid = false;
+                        console.log("card cannot be same as word on board");
+                        break;
+                    }
                 }
             }
 
             if (valid)
             {
+                console.log( {
+                    "Protocol" : "forwardClue",
+                    "clue" : clue,
+                    "numberOfGuesses" : maxGuesses,
+                    "player" : this.player,
+                    "turn" : this.turn
+                });
                 //send to server
                 server.sendToServer("forwardClue",
                 {
@@ -192,26 +201,29 @@ class BoardState extends Observer{
                                     turn: { team: "blue", role: "spymaster" }, cards : example_cards}
             args = example_args;
 
-            clueWord = args.clue;
-            numOfGuesses = args.numberOfGuesses;
-            redScore = args.redScore;
-            blueScore = args.blueScore;
-            timer = args.timerLength;
-            turn.team = args.turn.team;
-            turn.role = args.turn.role;
-            for(i=0;i<5;i++)
-                for(j=0;j<5;j++)
-                    cards[i][j] = args.cards[i][j];
+            this.clueWord = args.clue;
+            this.numOfGuesses = args.numberOfGuesses;
+            this.redScore = args.redScore;
+            this.blueScore = args.blueScore;
+            this.timer = args.timerLength;
+            this.turn.team = args.turn.team;
+            this.turn.role = args.turn.role;
+            for(i=0;i<5;i++){
+                for(j=0;j<5;j++){
+                    this.cards[i][j] = args.cards[i][j];
+                }
+            }
+            console.log(board);
         }
         else if(eventName == "forwardClue"){
             const example_args = { Protocol: "forwardClue", clue: "placeholder", 
                             numberOfGuesses: 2, turn: { team: "blue", role: "spymaster" } }
             args = example_args;
 
-            clueWord = args.clue;
-            numOfGuesses = args.numberOfGuesses;
-            turn.team = args.turn.team;
-            turn.role = args.turn.role;
+            this.clueWord = args.clue;
+            this.numOfGuesses = args.numberOfGuesses;
+            this.turn.team = args.turn.team;
+            this.turn.role = args.turn.role;
         }
     }
 
@@ -245,6 +257,15 @@ function DEBUG_boardRandomizer(board){
     Math.floor(Math.random() * 2) ? board.turn.role = "spy"   : board.turn.role = "spymaster" ;
 }
 
+//TESTING SECTION, REMOVE/ADD STATEMENTS AS NEEDED
 var board = new BoardState();
-server.registerObserver(board);
+board.player = {team: "red",role : "spymaster"}
+board.turn = {team: "red",role : "spymaster"}
+//server.registerObserver(board);
+document.addEventListener("keydown",() => {
+    console.log("test");
+    board.update("forwardClue","");
+    //board.update("receiveBoardState","");
+    console.log(board);
+});
 
