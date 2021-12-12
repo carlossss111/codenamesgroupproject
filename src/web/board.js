@@ -22,7 +22,7 @@ class Card
     
 
     //Had to pass this.colour as passing the card caused issues with the variables
-    //later fix to either pass all elements of the card fix to make the card itself work
+    //later fix to either pass all elements of the card fix to make the card itself wor
     revealCard(event)
     {
         var colour = event.currentTarget.colour;
@@ -141,9 +141,7 @@ class BoardState extends Observer{
         if(!this.isPlayersTurn || this.turn.role != "spymaster")
             return;
 
-        /*
-        DEFINE THE CLUE HERE & VALIDATE HERE!
-        */
+        //checks if clue is on the board if it is then break and not send to server
         else{
             let clue = document.getElementById("clue").value;
             let maxGuesses = document.getElementById("maxClues").value;
