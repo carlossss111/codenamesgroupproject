@@ -1,15 +1,14 @@
 #author:AoLi,2021.12.9
 import numpy as np
 
-
-class Computer:
+"""
+       this is only for the spymaster AI
+"""
+class AImove:
     
     def __init__(self, board):
         """
-        Parameters
-        ----------
-        board: json
-            The current board state
+        This is the constructor.
         """
         self.board = board
         self.distribution = self.get_distribution()
@@ -17,7 +16,7 @@ class Computer:
 
     def get_types(self):
         """
-        Extract the types from the cards
+        get the type of cards and classified storage in blue red neutral
         """
         blue = []
         red = []
