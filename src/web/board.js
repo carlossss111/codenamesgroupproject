@@ -22,7 +22,7 @@ class Card
     
 
     //Had to pass this.colour as passing the card caused issues with the variables
-    //later fix to either pass all elements of the card fix to make the card itself wor
+    //later fix to either pass all elements of the card fix to make the card itself work
     revealCard(event)
     {
         var colour = event.currentTarget.colour;
@@ -32,13 +32,13 @@ class Card
         console.log(colour);
     
         if(colour == "redTeam") 
-            cardDiv.style.backgroundImage = "url('../../rsc/images/redteam.jpg')";
+            cardDiv.style.backgroundImage = "url('../rsc/images/redteam.jpg')";
         else if(colour == "blueTeam") 
-            cardDiv.style.backgroundImage = "url('../../rsc/images/blueteam.jpg')";
+            cardDiv.style.backgroundImage = "url('../rsc/images/blueteam.jpg')";
         else if(colour == "neutral") 
-            cardDiv.style.backgroundImage = "url('../../rsc/images/neutral.jpg')";
+            cardDiv.style.backgroundImage = "url('../rsc/images/neutral.jpg')";
         else if(colour == "bombCard")
-            cardDiv.style.backgroundImage = "url('../../rsc/images/bomb.jpg')";
+            cardDiv.style.backgroundImage = "url('../rsc/images/bomb.jpg')";
         //call sendBoardState()
     }
 }
@@ -85,10 +85,8 @@ class BoardState extends Observer{
 
                 var value = Math.floor(Math.random() * 3);
                 if(value < 1) this.cards[i][j] = new Card("neutral","forest");
-                else if(value < 2) this.cards[i][j] = new Card("redTeam","forest");
-                else this.cards[i][j] = new Card("blueTeam","forest");
-                if(this.cards[i][j].colour = "redTeam") this.redScore++;
-                else if(this.cards[i][j].colour = "blueTeam") this.blueScore++;
+                else if(value < 2) {this.cards[i][j] = new Card("redTeam","forest"); this.redScore++;}
+                else {this.cards[i][j] = new Card("blueTeam","forest"); this.blueScore++;}
             }
         }
     }
@@ -201,29 +199,28 @@ class BoardState extends Observer{
                                     turn: { team: "blue", role: "spymaster" }, cards : example_cards}
             args = example_args;
 
-            this.clueWord = args.clue;
-            this.numOfGuesses = args.numberOfGuesses;
-            this.redScore = args.redScore;
-            this.blueScore = args.blueScore;
-            this.timer = args.timerLength;
-            this.turn.team = args.turn.team;
-            this.turn.role = args.turn.role;
+            let currentDiv = document.getElementById("board");
+            currentDiv.clueWord = args.clue;
+            currentDiv.numOfGuesses = args.numberOfGuesses;
+            currentDiv.redScore = args.redScore;
+            currentDiv.blueScore = args.blueScore;
+            currentDiv.timer = args.timerLength;
+            currentDiv.turn = args.turn;
             for(i=0;i<5;i++){
                 for(j=0;j<5;j++){
-                    this.cards[i][j] = args.cards[i][j];
+                    currentDiv.cards = args.cards;
                 }
             }
-            console.log(board);
         }
         else if(eventName == "forwardClue"){
             const example_args = { Protocol: "forwardClue", clue: "placeholder", 
                             numberOfGuesses: 2, turn: { team: "blue", role: "spymaster" } }
             args = example_args;
 
-            this.clueWord = args.clue;
-            this.numOfGuesses = args.numberOfGuesses;
-            this.turn.team = args.turn.team;
-            this.turn.role = args.turn.role;
+            document.getElementById("clue").value = args.clue;
+            document.getElementById("maxClues").value = args.numberOfGuesses;
+            let currentDiv = document.getElementById("board");
+            currentDiv.turn = args.turn;
         }
     }
 
@@ -266,6 +263,7 @@ document.addEventListener("keydown",() => {
     console.log("test");
     board.update("forwardClue","");
     //board.update("receiveBoardState","");
+    //board.finishGame(1);
     console.log(board);
 });
 
