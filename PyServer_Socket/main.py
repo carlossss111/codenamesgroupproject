@@ -1,3 +1,7 @@
+"""
+this is a learning file for us to develop socket server, not for real-use
+"""
+
 import socket
 import urllib.parse
 from routes import route_index

@@ -1,3 +1,6 @@
+# Code idea coming from: https://github.com/Pbatch/Codenames
+# Refactoring and rebuild the source code to satisfy our json and html pages
+
 import numpy as np
 
 
