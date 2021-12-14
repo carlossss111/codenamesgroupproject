@@ -23,6 +23,7 @@ class Card
         boardDiv.appendChild(cardDiv);
         cardDiv.addEventListener("click", this.revealCard);
         cardDiv.colour = this.colour;
+        cardDiv.word = this.word;
     }
     
 
@@ -38,7 +39,7 @@ later fix to either pass all elements of the card fix to make the card itself wo
     {
         var colour = event.currentTarget.colour;
         let cardDiv = event.target;
-        //call validateClick()
+        new BoardState().validateClick(event.target,event);
         this.isRevealed = true;
         console.log(colour);
     
@@ -50,7 +51,7 @@ later fix to either pass all elements of the card fix to make the card itself wo
             cardDiv.style.backgroundImage = "url('../rsc/images/neutral.jpg')";
         else if(colour == "bombCard")
             cardDiv.style.backgroundImage = "url('../rsc/images/bomb.jpg')";
-        //call sendBoardState()
+        new BoardState().sendBoardState(cardDiv);
     }
 }
 
@@ -117,9 +118,10 @@ class BoardState extends Observer{
     If it is the correct player then the board will update.
     */
     validateClick(cardSelected,turn){
+        console.log("hello");
         if(cardSelected.isRevealed == true) return false;
-        else if(turn.team != boardState.player.team) return false;
-        else if(turn.role != boardState.player.role) return false;
+        else if(turn.team != this.player.team) return false;
+        else if(turn.role != this.player.role) return false;
         return true;
     }
     
@@ -128,14 +130,22 @@ class BoardState extends Observer{
     on the board and made sure it is the correct player.
     */
     sendBoardState(cardSelected) {
+        console.log(cardSelected.word);
         //find index of cardSelected
         var i;
+        var j = -1;
+
         for (i = 0; i < this.cards.length; i++)
-        {
-            var j = this.cards[i].indexOf(cardSelected);
-            if(j != -1)
-                break;
+        {  
+            var alpha = this.cards[i];
+            for (var k = 0; k < alpha.length; k++){
+                if(alpha[k].word == cardSelected.word){
+                    j = 1;
+                }
+            }
+
         }
+        
         if(j == -1)
             throw new Error("Card selected not found!")
         
