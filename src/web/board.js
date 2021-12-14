@@ -1,3 +1,8 @@
+/*
+Card class, this is where the card is created using a colour and a word and is given
+an action listener to check for when it has been clicked
+
+*/
 class Card
 {
     colour;
@@ -21,8 +26,14 @@ class Card
     }
     
 
-    //Had to pass this.colour as passing the card caused issues with the variables
-    //later fix to either pass all elements of the card fix to make the card itself work
+/*
+revealCard is used to reveal the caard on the screen to the clients when the card is clicked
+Will call other functions such as validateClick to make sure the click is done only by the
+correct client and not anyone.
+
+Had to pass this.colour as passing the card caused issues with the variables
+later fix to either pass all elements of the card fix to make the card itself work
+*/
     revealCard(event)
     {
         var colour = event.currentTarget.colour;
@@ -45,7 +56,10 @@ class Card
 
 
 
-
+/*
+BoardState class holds the state of the board at any given time while also holding the score
+and the players turn. Done so every client has the correct copy of the board at the right time
+*/
 class BoardState extends Observer{
 
     cards = [];
@@ -97,6 +111,11 @@ class BoardState extends Observer{
             &&      this.player["role"] === this.turn["role"]);
     }
 
+    /*
+    used to see whether the player who clicked the card is the player who is supposed
+    to be taking there turn right now. if not then it will not do anything to the board
+    If it is the correct player then the board will update.
+    */
     validateClick(cardSelected,turn){
         if(cardSelected.isRevealed == true) return false;
         else if(turn.team != boardState.player.team) return false;
@@ -104,7 +123,10 @@ class BoardState extends Observer{
         return true;
     }
     
-    //sends the board state to the server
+    /*
+    sends the board state to the server, done when the player has clicked a card
+    on the board and made sure it is the correct player.
+    */
     sendBoardState(cardSelected) {
         //find index of cardSelected
         var i;
@@ -131,9 +153,13 @@ class BoardState extends Observer{
             "cardChosen" : `${i},${j}`,
             "cards" : this.cards
             });
-        }
+    }
 
-    //forwards to the server (and then to the other players)
+    /*
+    
+    Makes sure clue is not already one on the board and then forwards the clue to the 
+    server(and then to the other players) 
+    */
     forwardClue(){
         //check that it is this player's turn and it is the spymaster's turn
         if(!this.isPlayersTurn || this.turn.role != "spymaster")
@@ -154,7 +180,7 @@ class BoardState extends Observer{
                     }
                 }
             }
-
+            //if clue is valid then send to the server
             if (valid)
             {
                 console.log( {
@@ -177,8 +203,9 @@ class BoardState extends Observer{
         }
     }
 
-    //Updates when receiving server communications
-    //(Observer Class Override!)
+    /*
+    Receives information from the server ad will update when necessary for all clients
+    */
     update(eventName, args){
         if(eventName == "receiveBoardState"){
             
@@ -224,6 +251,10 @@ class BoardState extends Observer{
         }
     }
 
+    /*
+    When game is finished this is what happens after, 
+    temporary implementation 
+    */
     finishGame(hasWon)
     {
         if(hasWon)
