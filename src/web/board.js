@@ -55,14 +55,11 @@ later fix to either pass all elements of the card fix to make the card itself wo
     }
 }
 
-
-
 /*
 BoardState class holds the state of the board at any given time while also holding the score
 and the players turn. Done so every client has the correct copy of the board at the right time
 */
 class BoardState extends Observer{
-
     cards = [];
     clueWord;
     numOfGuesses;
@@ -124,7 +121,7 @@ class BoardState extends Observer{
         else if(turn.role != this.player.role) return false;
         return true;
     }
-    
+
     /*
     sends the board state to the server, done when the player has clicked a card
     on the board and made sure it is the correct player.
@@ -144,7 +141,20 @@ class BoardState extends Observer{
                 }
             }
 
-        }
+        //send board to server
+        server.sendToServer("sendBoardState",
+            {
+            "Protocol" : "sendBoardState",
+            "clue" : this.clueWord,
+            "numberOfGuesses" : this.numOfGuesses,
+            "redScore" : this.redScore,
+            "blueScore" : this.blueScore,
+            "timerLength" : this.timer,
+            "player" : this.player,
+            "turn" : this.turn,
+            "cardChosen" : `${i},${j}`,
+            "cards" : this.cards
+            });
         
         if(j == -1)
             throw new Error("Card selected not found!")
@@ -163,6 +173,7 @@ class BoardState extends Observer{
             "cardChosen" : `${i},${j}`,
             "cards" : this.cards
             });
+        }
     }
 
     /*
@@ -172,9 +183,9 @@ class BoardState extends Observer{
     */
     forwardClue(){
         //check that it is this player's turn and it is the spymaster's turn
-        if(!this.isPlayersTurn || this.turn.role != "spymaster")
+        if(!this.isPlayersTurn || this.turn.role != "spymaster"){
             return;
-
+        }
         //checks if clue is on the board if it is then break and not send to server
         else{
             let clue = document.getElementById("clue").value;
@@ -218,7 +229,6 @@ class BoardState extends Observer{
     */
     update(eventName, args){
         if(eventName == "receiveBoardState"){
-            
             var example_cards = [];
             for(var i = 0; i < 5; i++){
                 example_cards.push([]);
@@ -258,6 +268,7 @@ class BoardState extends Observer{
             document.getElementById("maxClues").value = args.numberOfGuesses;
             let currentDiv = document.getElementById("board");
             currentDiv.turn = args.turn;
+            console.log(args);
         }
     }
 
@@ -280,7 +291,9 @@ class BoardState extends Observer{
         else return; 
     }
 
+
 }
+
 
 //randomizes the board (not cards) for debug purposes
 function DEBUG_boardRandomizer(board){
@@ -295,16 +308,5 @@ function DEBUG_boardRandomizer(board){
     Math.floor(Math.random() * 2) ? board.turn.role = "spy"   : board.turn.role = "spymaster" ;
 }
 
-//TESTING SECTION, REMOVE/ADD STATEMENTS AS NEEDED
 var board = new BoardState();
-board.player = {team: "red",role : "spymaster"}
-board.turn = {team: "red",role : "spymaster"}
-//server.registerObserver(board);
-document.addEventListener("keydown",() => {
-    console.log("test");
-    board.update("forwardClue","");
-    //board.update("receiveBoardState","");
-    //board.finishGame(1);
-    console.log(board);
-});
-
+server.registerObserver(board);
