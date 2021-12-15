@@ -8,16 +8,13 @@ sk.bind(ip_port)
 
 class generateBoard:
 
-    def __init__(self, files):
+    def __init__(self, i):
         """
             This is the constructor.
         """
-        self.files = files
+
         self.board = self.createWordList()
-        self.numOfGuesses = 1
-        self.redScore = 1
-        self.blueScore = 1
-        self.nextTurn = {"team": "?", "role": "?"}
+        self.numOfGuesses, self.redScore, self.blueScore, self.nextTurn = self.reset(i)
 
     def createWordList(self):
         global colour
@@ -60,3 +57,15 @@ class generateBoard:
             board.append(word_details)
         print(board)
         return board
+
+    def reset(self, i):
+        a = self.numOfGuesses
+        b = self.redScore
+        c = self.blueScore
+        d = self.nextTurn
+        if i:
+            a = 1
+            b = 1
+            c = 1
+            d = {"team": "?", "role": "?"}
+        return a, b, c, d
