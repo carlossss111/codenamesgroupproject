@@ -1,4 +1,10 @@
 import random
+import socket
+
+ip_port = ('127.0.0.1', 8000)
+sk = socket.socket
+sk.bind(ip_port)
+
 
 class generateBoard:
 
@@ -37,16 +43,16 @@ class generateBoard:
             n = n - 1
             type = typeList[t]
             del typeList[t]
-            if type == 'red':
+            if type == 'blue':
                 colour = "#0080FF"
-            elif type == 'blue':
+            elif type == 'red':
                 colour = "#FF0000"
             elif type == 'neutral':
                 colour = "#D0D0D0"
             elif type == 'assassin':
                 colour = "#202020"
             word = wordlist[i]
-            word_details = {"name": word, "type": type, "colour": colour, "active": False,"id":i+1}
+            word_details = {"name": word, "type": type, "colour": colour, "active": False, "id": i + 1}
             board.append(word_details)
         print(board)
         return board

@@ -2,6 +2,7 @@ from flask import Flask, render_template, request
 
 app = Flask(__name__)
 
+
 @app.route('/', methods=["POST", "GET"])
 def index():
     """
@@ -33,7 +34,7 @@ def clue():
     Generate a clue
     """
     return clue
-    
+
 
 @app.route("/instructions", methods=["GET"])
 def instructions():
