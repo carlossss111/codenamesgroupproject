@@ -23,8 +23,22 @@
         To do!
         <a href="../index.html">to main page</a>
         <h1>Codenames</h1>
-        <div id="board">
 
+
+        <!-- clue Box temp max clues in future should only show max clues up to the amount of cards left --->
+        <form class="clueBox" action="#" onsubmit="board.forwardClue()">
+            <input type="text" id="clue" placeholder="Enter clue"></input>
+            <select name="max" id="maxClues">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+            </select>
+            <button type="submit">Give Clue</button>
+        </form>
+
+
+        <div id="board">
         </div>
     </div>
     <div class="sidePanel">
