@@ -35,13 +35,16 @@ class Server{
 
     //send data to server
     sendToServer(eventName, data){
+        console.log("MESSAGE SENT:");
+        console.log(data);
         socket.emit(eventName, data);
     }
 
     //receive data from server and update oberservers
     receiveFromServer(){
         socket.onAny((eventName, args) => {
-            console.log("Message Received!");
+            console.log("MESSAGE RECEIVED:");
+            console.log(args);
             this.observers.forEach(element => {
                 element.update(eventName, args);
             });

@@ -5,6 +5,7 @@ an action listener to check for when it has been clicked
 */
 class Card
 {
+    div;
     colour;
     word; 
     isRevealed; 
@@ -19,30 +20,31 @@ class Card
         let cardDiv = document.createElement("div");
         let boardDiv = document.getElementById("board");
         cardDiv.setAttribute("class",`card ${colour}`); 
+        //cardDiv.setAttribute("class",`card neutral`); 
         cardDiv.innerHTML = "<p>" + word + "</p>";
         boardDiv.appendChild(cardDiv);
-        cardDiv.addEventListener("click", this.revealCard);
+        //cardDiv.addEventListener("click", this.revealCard);
         cardDiv.colour = this.colour;
         cardDiv.word = this.word;
+        this.div = cardDiv;
     }
-    
 
-/*
-revealCard is used to reveal the caard on the screen to the clients when the card is clicked
-Will call other functions such as validateClick to make sure the click is done only by the
-correct client and not anyone.
+    /*
+    revealCard is used to reveal the caard on the screen to the clients when the card is clicked
+    Will call other functions such as validateClick to make sure the click is done only by the
+    correct client and not anyone.
 
-Had to pass this.colour as passing the card caused issues with the variables
-later fix to either pass all elements of the card fix to make the card itself work
-*/
-    revealCard(event)
+    Had to pass this.colour as passing the card caused issues with the variables
+    later fix to either pass all elements of the card fix to make the card itself work
+    */
+    revealCard()
     {
-        var colour = event.currentTarget.colour;
-        let cardDiv = event.target;
-        new BoardState().validateClick(event.target,event);
+        var colour = this.colour;
+        let cardDiv = this.div;
         this.isRevealed = true;
-        console.log(colour);
+        this.div.innerHTML = "";
     
+        cardDiv.style.backgroundSize = "cover";
         if(colour == "redTeam") 
             cardDiv.style.backgroundImage = "url('../rsc/images/redteam.jpg')";
         else if(colour == "blueTeam") 
@@ -51,9 +53,21 @@ later fix to either pass all elements of the card fix to make the card itself wo
             cardDiv.style.backgroundImage = "url('../rsc/images/neutral.jpg')";
         else if(colour == "bombCard")
             cardDiv.style.backgroundImage = "url('../rsc/images/bomb.jpg')";
-        new BoardState().sendBoardState(cardDiv);
     }
 }
+
+var demoSet = [[
+    new Card("blueTeam","water"), new Card("redTeam","bulb"), new Card("neutral","crown"),
+    new Card("neutral","frog"), new Card("neutral","crystal")],[
+    new Card("redTeam","trunk"), new Card("redTeam","slip"), new Card("bombCard","boom"), 
+    new Card("blueTeam","bolt"), new Card("redTeam","boxer")],[
+    new Card("blueTeam","coach"), new Card("redTeam","fan"), new Card("neutral","skyscraper"), 
+    new Card("redTeam","gold"), new Card("blueTeam","snowman")],[
+    new Card("neutral","america"), new Card("blueTeam","pizza"), new Card("neutral","park"),
+    new Card("blueTeam","flat"), new Card("blueTeam","carrot")],[
+    new Card("blueTeam","whistle"), new Card("neutral","hide"), new Card("neutral","ball"), 
+    new Card("blueTeam","bond"), new Card("neutral","tower")]
+]
 
 /*
 BoardState class holds the state of the board at any given time while also holding the score
@@ -82,25 +96,33 @@ class BoardState extends Observer{
         this.numOfGuesses = null;
         this.redScore = 0;
         this.blueScore = 0; 
-        let bombX = Math.floor(Math.random() * 4);
-        let bombY = Math.floor(Math.random() * 4);
+        //let bombX = Math.floor(Math.random() * 4);
+        //let bombY = Math.floor(Math.random() * 4);
+        this.cards = demoSet;
         for(var i = 0; i < 5; i++){
-            this.cards.push([]);
-            for(var j = 0;j < 5; j++)
+            //this.cards.push([]);
+            for(var j = 0; j < 5; j++)
             {
-                
-                if(i == bombX && j == bombY)
-                {
-                    this.cards[bombX][bombY] = new Card("bombCard","bomb");
-                    continue;
-                }
+                //randomizer temporarily removed for the demo
 
-                var value = Math.floor(Math.random() * 3);
-                if(value < 1) this.cards[i][j] = new Card("neutral","forest");
-                else if(value < 2) {this.cards[i][j] = new Card("redTeam","forest"); this.redScore++;}
-                else {this.cards[i][j] = new Card("blueTeam","forest"); this.blueScore++;}
+                //add event listener
+                this.cards[i][j].div.addEventListener("click", this.cardListener.bind(this));
             }
         }
+    }
+
+    cardListener(event){
+        var card = null;
+        for(var i = 0; i < this.cards.length; i++){
+            for(var j = 0; j < this.cards[0].length; j++){
+                if(event.target == this.cards[i][j].div){
+                    card = this.cards[i][j];
+                    break;
+                }
+            }
+        }
+        card.revealCard();
+        this.sendBoardState(card);
     }
 
     //return true if it is this client's turn
@@ -115,7 +137,6 @@ class BoardState extends Observer{
     If it is the correct player then the board will update.
     */
     validateClick(cardSelected,turn){
-        console.log("hello");
         if(cardSelected.isRevealed == true) return false;
         else if(turn.team != this.player.team) return false;
         else if(turn.role != this.player.role) return false;
@@ -127,7 +148,6 @@ class BoardState extends Observer{
     on the board and made sure it is the correct player.
     */
     sendBoardState(cardSelected) {
-        console.log(cardSelected.word);
         //find index of cardSelected
         var i;
         var j = -1;
@@ -135,11 +155,14 @@ class BoardState extends Observer{
         for (i = 0; i < this.cards.length; i++)
         {  
             var alpha = this.cards[i];
-            for (var k = 0; k < alpha.length; k++){
-                if(alpha[k].word == cardSelected.word){
+            for (var k = 0; k < alpha.length; k++)
+            {
+                if(alpha[k].word == cardSelected.word)
+                {
                     j = 1;
                 }
             }
+        }
 
         //send board to server
         server.sendToServer("sendBoardState",
@@ -161,7 +184,7 @@ class BoardState extends Observer{
         
         //send board to server
         server.sendToServer("sendBoardState",
-            {
+        {
             "Protocol" : "sendBoardState",
             "clue" : this.clueWord,
             "numberOfGuesses" : this.numOfGuesses,
@@ -172,8 +195,7 @@ class BoardState extends Observer{
             "turn" : this.turn,
             "cardChosen" : `${i},${j}`,
             "cards" : this.cards
-            });
-        }
+        });
     }
 
     /*
@@ -204,13 +226,6 @@ class BoardState extends Observer{
             //if clue is valid then send to the server
             if (valid)
             {
-                console.log( {
-                    "Protocol" : "forwardClue",
-                    "clue" : clue,
-                    "numberOfGuesses" : maxGuesses,
-                    "player" : this.player,
-                    "turn" : this.turn
-                });
                 //send to server
                 server.sendToServer("forwardClue",
                 {
@@ -229,46 +244,26 @@ class BoardState extends Observer{
     */
     update(eventName, args){
         if(eventName == "receiveBoardState"){
-            var example_cards = [];
-            for(var i = 0; i < 5; i++){
-                example_cards.push([]);
-                for(var j = 0; j < 5; j++){
-                    var randomizer1 = Math.floor(Math.random() * 3);//0-2
-                    var randomizer2 = Math.floor(Math.random() * 2);//0-1
-                    var example_colours = ["redTeam","blueTeam","neutral"];
-                    example_cards[i][j] = {"colour" : "", "word" : "placeholder", "isRevealed" : ""};
-                    example_cards[i][j].colour = example_colours[randomizer1];
-                    randomizer2 ? example_cards[i][j].isRevealed = true : example_cards[i][j].isRevealed = false;
-                }
-            }
-            const example_args = { Protocol: "receiveBoardState", clue: "placeholder", numberOfGuesses: 1, 
-                                    redScore: 1, blueScore: 1, timerLength: 100, 
-                                    turn: { team: "blue", role: "spymaster" }, cards : example_cards}
-            args = example_args;
-
-            let currentDiv = document.getElementById("board");
-            currentDiv.clueWord = args.clue;
-            currentDiv.numOfGuesses = args.numberOfGuesses;
-            currentDiv.redScore = args.redScore;
-            currentDiv.blueScore = args.blueScore;
-            currentDiv.timer = args.timerLength;
-            currentDiv.turn = args.turn;
-            for(i=0;i<5;i++){
-                for(j=0;j<5;j++){
-                    currentDiv.cards = args.cards;
+            this.clueWord = args.clue;
+            this.numOfGuesses = args.numberOfGuesses;
+            this.redScore = args.redScore;
+            this.blueScore = args.blueScore;
+            this.timer = args.timerLength;
+            this.turn = args.turn;
+            for(var i=0;i<5;i++){
+                for(var j=0;j<5;j++){
+                    if(args.cards[i][j].isRevealed)
+                        this.cards[i][j].revealCard();
+                    this.cards[i][j].colour = args.cards[i][j].colour;
+                    this.cards[i][j].word = args.cards[i][j].word; 
                 }
             }
         }
         else if(eventName == "forwardClue"){
-            const example_args = { Protocol: "forwardClue", clue: "placeholder", 
-                            numberOfGuesses: 2, turn: { team: "blue", role: "spymaster" } }
-            args = example_args;
-
             document.getElementById("clue").value = args.clue;
             document.getElementById("maxClues").value = args.numberOfGuesses;
             let currentDiv = document.getElementById("board");
             currentDiv.turn = args.turn;
-            console.log(args);
         }
     }
 
@@ -290,10 +285,7 @@ class BoardState extends Observer{
         }
         else return; 
     }
-
-
 }
-
 
 //randomizes the board (not cards) for debug purposes
 function DEBUG_boardRandomizer(board){
@@ -308,5 +300,22 @@ function DEBUG_boardRandomizer(board){
     Math.floor(Math.random() * 2) ? board.turn.role = "spy"   : board.turn.role = "spymaster" ;
 }
 
+//TEST FUNCTIONALITY
 var board = new BoardState();
 server.registerObserver(board);
+board.turn = {"team" : "red", "role" : "spymaster"};
+board.player = {"team" : "red", "role" : "spymaster"};
+
+document.getElementById("joinSpy").addEventListener("click", () =>{
+    console.log("spy mode enabled");
+    board.turn.role = "spy";
+    board.player.role = "spy";
+    for(var i = 0; i < board.cards.length; i++){
+        for(var j = 0; j < board.cards[0].length; j++){
+            board.cards[i][j].div.setAttribute("class",`card neutral`); 
+        }
+    }
+
+    document.getElementById("clueButton").style.display = "none";
+    document.getElementById("clue").placeholder = "";
+})

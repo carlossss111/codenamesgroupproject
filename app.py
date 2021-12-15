@@ -10,12 +10,9 @@ from gameDev.src.prediction import Predictor
 async_mode = None
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
-socket_ = SocketIO(app, async_mode=async_mode)
+socket_ = SocketIO(app, async_mode=async_mode, cors_allowed_origins='*') #todo: remove CORS policy when hosted on uni server
 thread = None
 thread_lock = Lock()
-server_ip_port = ('127.0.0.1', 8000)
-sk = socket.socket
-sk.connect(server_ip_port)
 
 """
 create a initial game board
@@ -71,10 +68,6 @@ def clue():
     return clue_details
 
 
-@app.route('/')
-def index():
-    return render_template('html/index.html', async_mode=socket_.async_mode, cors_allowed_origins='*')
-
 
 """
 Chat Protocol
@@ -106,11 +99,8 @@ Changes the turn.
 def clue_broadcast_message(messageReceived):
     print("Clue Received!")
 
-    #####################
-    # CALCULATE NEXT TURN#
-    #####################
-    nextTurn = {"team": "?", "role": "?"}
-    #####################
+    # reassign values
+    nextTurn = {"team": "red", "role": "spymaster"}
 
     # define protocol and message
     protocol = 'forwardClue'
@@ -133,19 +123,11 @@ send/receive BoardState Protocol
 def chat_broadcast_message(boardReceived):
     print("Board State Received!")
 
-    ###########################
-    # CALCULATE NEW BOARD STATE#
-    ###########################
-    numOfGuesses = 1
+    # reassign values
+    numOfGuesses = boardReceived['numberOfGuesses']
     redScore = 1
     blueScore = 1
-    nextTurn = {"team": "?", "role": "?"}
-
-    sk.sendall(numOfGuesses)
-    sk.sendall(redScore)
-    sk.sendall(blueScore)
-    sk.sendall(nextTurn)
-    ###########################
+    nextTurn = {"team": "red", "role": "spymaster"}
 
     # define protocol and message
     protocol = 'receiveBoardState'
@@ -157,7 +139,7 @@ def chat_broadcast_message(boardReceived):
         'blueScore': blueScore, \
         'timerLength': boardReceived['timerLength'], \
         'turn': nextTurn, \
-        'cards': "2d array of cards" \
+        'cards': boardReceived['cards'] \
         }
     # send to client
     emit(protocol, messageToSend, broadcast=True)
