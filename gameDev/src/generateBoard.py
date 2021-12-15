@@ -14,6 +14,10 @@ class generateBoard:
         """
         self.files = files
         self.board = self.createWordList()
+        self.numOfGuesses = 1
+        self.redScore = 1
+        self.blueScore = 1
+        self.nextTurn = {"team": "?", "role": "?"}
 
     def createWordList(self):
         global colour
