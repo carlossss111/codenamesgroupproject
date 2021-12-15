@@ -2,6 +2,12 @@
 # Refactoring and rebuild the source code to satisfy our json and html pages
 
 import numpy as np
+import socket
+
+ip_port = ('127.0.0.1', 8000)
+sk = socket.socket
+sk.bind(ip_port)
+sk.listen()
 
 
 class generateBoard:

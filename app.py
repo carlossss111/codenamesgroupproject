@@ -1,3 +1,4 @@
+import socket
 
 from flask import Flask, render_template, session, copy_current_request_context, json, request, jsonify
 from flask_socketio import SocketIO, emit, disconnect
@@ -12,20 +13,27 @@ app.config['SECRET_KEY'] = 'secret!'
 socket_ = SocketIO(app, async_mode=async_mode)
 thread = None
 thread_lock = Lock()
+server_ip_port = ('127.0.0.1', 8000)
+sk = socket.socket
+sk.connect(server_ip_port)
 
 """
 create a initial game board
 """
+
+
 @app.route('/', methods=["POST", "GET"])
 def index():
     board = generateBoard("gameDev/static/data/words_data").board
-    board.insert(0, {"difficulty": "medium","invalid_guesses": []})
+    board.insert(0, {"difficulty": "medium", "invalid_guesses": []})
     return render_template('pages/game.html', board=board)
 
 
 """
 Continuously update the info for the board
 """
+
+
 @app.route("/update", methods=["POST"])
 def update():
     board = json.loads(request.data)
@@ -35,6 +43,8 @@ def update():
 """
 generate the move of the AI
 """
+
+
 @app.route("/computer_turn", methods=["POST"])
 def computer_turn():
     board = json.loads(request.data)
@@ -42,9 +52,12 @@ def computer_turn():
     json_sequence = jsonify(sequence=sequence)
     return json_sequence
 
+
 """
 generate the clues
 """
+
+
 @app.route("/clue", methods=["POST"])
 def clue():
     board = json.loads(request.data)
@@ -128,6 +141,10 @@ def chat_broadcast_message(boardReceived):
     blueScore = 1
     nextTurn = {"team": "?", "role": "?"}
 
+    sk.sendall(numOfGuesses)
+    sk.sendall(redScore)
+    sk.sendall(blueScore)
+    sk.sendall(nextTurn)
     ###########################
 
     # define protocol and message
@@ -178,3 +195,4 @@ def disconnect_request():
 
 if __name__ == '__main__':
     socket_.run(app, debug=True)
+    app.run(host='127.0.0.1', port=8080, debug=True)

@@ -6,8 +6,10 @@ import numpy as np
 """
        this is only for the spymaster AI
 """
+
+
 class AImove:
-    
+
     def __init__(self, board):
         """
         This is the constructor.
@@ -51,14 +53,13 @@ class AImove:
         """
         Generate a sequence for the computer
         """
-
         sequence = []
         card_type = None
         decay = 1
         while card_type not in {"blue", "neutral"}:
             if len(self.blue) + len(self.red) + len(self.neutral) == 0:
                 break
-            weights = [self.distribution["red"]*decay if len(self.red) > 0 else 0,
+            weights = [self.distribution["red"] * decay if len(self.red) > 0 else 0,
                        self.distribution["blue"] if len(self.blue) > 0 else 0,
                        self.distribution["neutral"] if len(self.neutral) > 0 else 0,
                        self.distribution["none"] if len(sequence) != 0 else 0]
