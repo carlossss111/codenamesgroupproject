@@ -1,13 +1,20 @@
 import random
+import socket
+
+ip_port = ('127.0.0.1', 8000)
+sk = socket.socket
+sk.bind(ip_port)
+
 
 class generateBoard:
 
-    def __init__(self, files):
+    def __init__(self, i):
         """
             This is the constructor.
         """
-        self.files = files
+
         self.board = self.createWordList()
+        self.numOfGuesses, self.redScore, self.blueScore, self.nextTurn = self.reset(i)
 
     def createWordList(self):
         global colour
@@ -50,3 +57,15 @@ class generateBoard:
             board.append(word_details)
         print(board)
         return board
+
+    def reset(self, i):
+        a = self.numOfGuesses
+        b = self.redScore
+        c = self.blueScore
+        d = self.nextTurn
+        if i:
+            a = 1
+            b = 1
+            c = 1
+            d = {"team": "?", "role": "?"}
+        return a, b, c, d
