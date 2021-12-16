@@ -2,8 +2,8 @@ import random
 import socket
 
 ip_port = ('127.0.0.1', 8000)
-sk = socket.socket
-sk.bind(ip_port)
+#sk = socket.socket
+#sk.bind(ip_port)
 
 
 class generateBoard:

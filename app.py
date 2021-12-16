@@ -13,9 +13,6 @@ app.config['SECRET_KEY'] = 'secret!'
 socket_ = SocketIO(app, async_mode=async_mode, cors_allowed_origins='*') #todo: remove CORS policy when hosted on uni server
 thread = None
 thread_lock = Lock()
-server_ip_port = ('127.0.0.1', 8000)
-sk = socket.socket
-sk.connect(server_ip_port)
 
 """
 create a initial game board
@@ -24,7 +21,7 @@ create a initial game board
 
 @app.route('/', methods=["POST", "GET"])
 def index():
-    board = generateBoard.board
+    board = generateBoard("gameDev/static/data/words_data").board
     board.insert(0, {"difficulty": "medium", "invalid_guesses": []})
     return render_template('pages/game.html', board=board)
 
@@ -126,27 +123,23 @@ send/receive BoardState Protocol
 def chat_broadcast_message(boardReceived):
     print("Board State Received!")
 
-    ###########################
-    # CALCULATE NEW BOARD STATE#
-    ###########################
-    generateBoard.reset(True)
-    numOfGuesses = 1
+    # reassign values
+    numOfGuesses = boardReceived['numberOfGuesses']
     redScore = 1
     blueScore = 1
     nextTurn = {"team": "red", "role": "spymaster"}
-    ###########################
 
     # define protocol and message
     protocol = 'receiveBoardState'
     messageToSend = {
         'Protocol': protocol, \
         'clue': boardReceived['clue'], \
-        'numberOfGuesses': generateBoard.numOfGuesses, \
-        'redScore': generateBoard.redScore, \
-        'blueScore': generateBoard.blueScore, \
+        'numberOfGuesses': numOfGuesses, \
+        'redScore': redScore, \
+        'blueScore': blueScore, \
         'timerLength': boardReceived['timerLength'], \
-        'turn': generateBoard.nextTurn, \
-        'cards': "2d array of cards" \
+        'turn': nextTurn, \
+        'cards': boardReceived['cards'] \
         }
     # send to client
     emit(protocol, messageToSend, broadcast=True)
