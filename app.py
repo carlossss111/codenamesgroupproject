@@ -24,7 +24,7 @@ create a initial game board
 
 @app.route('/', methods=["POST", "GET"])
 def index():
-    board = generateBoard("gameDev/static/data/words_data").board
+    board = generateBoard.board
     board.insert(0, {"difficulty": "medium", "invalid_guesses": []})
     return render_template('pages/game.html', board=board)
 
@@ -136,15 +136,11 @@ def chat_broadcast_message(boardReceived):
     ###########################
     # CALCULATE NEW BOARD STATE#
     ###########################
+    generateBoard.reset(True)
     numOfGuesses = 1
     redScore = 1
     blueScore = 1
     nextTurn = {"team": "?", "role": "?"}
-
-    sk.sendall(numOfGuesses)
-    sk.sendall(redScore)
-    sk.sendall(blueScore)
-    sk.sendall(nextTurn)
     ###########################
 
     # define protocol and message
@@ -152,11 +148,11 @@ def chat_broadcast_message(boardReceived):
     messageToSend = {
         'Protocol': protocol, \
         'clue': boardReceived['clue'], \
-        'numberOfGuesses': numOfGuesses, \
-        'redScore': redScore, \
-        'blueScore': blueScore, \
+        'numberOfGuesses': generateBoard.numOfGuesses, \
+        'redScore': generateBoard.redScore, \
+        'blueScore': generateBoard.blueScore, \
         'timerLength': boardReceived['timerLength'], \
-        'turn': nextTurn, \
+        'turn': generateBoard.nextTurn, \
         'cards': "2d array of cards" \
         }
     # send to client
