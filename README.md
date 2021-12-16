@@ -21,8 +21,12 @@ The important concept demonstrated in the above actions is that one client (the 
 To see the raw data sent between the client and the server, open the console window in the browser and view the printed messages.
 
 ### AI Proof-of-concept
+The concept and algorithms of codenames AI is available in **Class Descriptions** file, we have made a simple script for the following functionalities:
+- one AI in each team, the AI could be either spy or spymaster
+- two AIs (one spy and one spymaster) in one team, one AI (could be either) in another team
+- two AIs in each team
 
-TO DO
+These screen recordings demonstrate how it works. Links:
 
 ## Dependencies
 * python3
