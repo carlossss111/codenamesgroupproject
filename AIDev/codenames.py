@@ -1,4 +1,4 @@
-# Much thanks to https://github.com/thomasahle/codenames
+# Many thanks to https://github.com/thomasahle/codenames
 # By Tianxiang Song 15/12/2021
 import random
 import re
