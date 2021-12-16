@@ -26,7 +26,12 @@ The concept and algorithms of codenames AI is available in **Class Descriptions*
 - two AIs (one spy and one spymaster) in one team, one AI (could be either) in another team
 - two AIs in each team
 
-These screen recordings demonstrate how it works. Links:
+These screen recordings demonstrate how it works. Link to directory:
+[recordings](./rsc/recordings/)
+
+To run the program for yourself follow these steps:
+1. Run `sh AIDev/get_glove.sh` from the project root directory. This downloads the wordset.
+1. Run `python3 AIDev/codenames.py`.
 
 ## Dependencies
 * python3
