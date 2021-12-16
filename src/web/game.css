@@ -1,0 +1,114 @@
+/*card containers*/
+#board
+{
+    width: 1150px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 200px 200px 200px 200px 200px;
+    grid-template-rows: 120px 120px 120px 120px 120px;
+    grid-gap: 30px;
+}
+
+/*cards*/
+.card
+{
+    width:200px;
+    height:120px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin:10px;
+}
+
+.card p
+{
+    font-weight: bold;
+    font-size:2em;
+    text-transform: uppercase;
+}
+
+.clueBox
+{
+    width: 400px;
+    margin: 0 auto;
+}
+
+.clueBox input {
+  width: 150px;
+  margin: 5px 10px 5px 0;
+  padding: 10px;
+  border-radius: 7px;
+
+}
+    
+.clueBox button {
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 7px;
+
+}
+
+.clueBox button:hover {
+  background-color: lightGreen;
+}
+
+#maxClues{
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 7px;
+
+}
+
+.neutral
+{
+
+    background-color: tan;
+    border: sienna dashed 3px;
+    border-radius:10px;
+}
+
+.blueTeam
+{
+    background-image: url("");
+    background-color: #3399ff;
+    border: darkblue dashed 3px;
+    border-radius:10px;
+
+}
+
+.redTeam
+{
+    background-color: #ff5050;
+    border: darkred dashed 3px;
+    border-radius:10px;
+}
+
+.revealed
+{
+    background-image: url('../../rsc/images/neutral.jpg') ;
+}
+
+.bombCard
+{
+    background-color: #5e5e5e;
+    border:#1f1f1f dashed 3px;
+    border-radius: 10px;
+}
+
+/*side panel*/
+.sidePanel{
+    position:absolute;
+    right:0;
+    top:0;
+    background-color: darkred;
+    width:25%;
+    height:100%;
+}
+
+.chatbox{
+    margin: 3rem auto;
+    width: 20rem;
+    height: 40rem;
+    background-color: white;
+}
+
