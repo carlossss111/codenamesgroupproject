@@ -3,9 +3,9 @@ import socket
 from flask import Flask, render_template, session, copy_current_request_context, json, request, jsonify
 from flask_socketio import SocketIO, emit, disconnect
 from threading import Lock
-from gameDev.src.AImove import AImove
-from gameDev.src.generateBoard import generateBoard
-from gameDev.src.prediction import Predictor
+from src.game.AImove import AImove
+from src.game.generateBoard import generateBoard
+from src.game.prediction import Predictor
 
 async_mode = None
 app = Flask(__name__)
