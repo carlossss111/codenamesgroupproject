@@ -1,58 +1,73 @@
-/*
-Card class, this is where the card is created using a colour and a word and is given
-an action listener to check for when it has been clicked
+//Symbolic Constants
+RED_IMAGE = "url('../rsc/images/redteam.jpg')";
+BLUE_IMAGE = "url('../rsc/images/blueteam.jpg')";
+NEUTRAL_IMAGE = "url('../rsc/images/neutral.jpg')";
+BOMB_IMAGE = "url('../rsc/images/bomb.jpg')";
 
+/*
+* Card class for each card in the Boardstate class.
+* This keeps track of the colour, word and status of each
+* card and this is where the card is revealed with revealCard().
 */
 class Card
 {
-    div;
     colour;
-    word; 
-    isRevealed; 
-    imageURL;   
+    word;
+    isRevealed;
+    imageURL;
+    div;
 
+    /*
+    * Called when a new card is created.
+    * The new card is added to the board and attributes assigned. 
+    */
     constructor(colour, word)
     {
+        var boardDiv;
+
+        //assign attributes
         this.colour = colour;
         this.word = word;
         this.isRevealed = false;
 
-        let cardDiv = document.createElement("div");
-        let boardDiv = document.getElementById("board");
-        cardDiv.setAttribute("class",`card ${colour}`); 
-        //cardDiv.setAttribute("class",`card neutral`); 
-        cardDiv.innerHTML = "<p>" + word + "</p>";
-        boardDiv.appendChild(cardDiv);
-        //cardDiv.addEventListener("click", this.revealCard);
-        cardDiv.colour = this.colour;
-        cardDiv.word = this.word;
-        this.div = cardDiv;
+        //create card
+        this.div = document.createElement("div");
+        this.div.setAttribute("class",`card ${colour}`);
+        this.div.innerHTML = `<p>${word}</p>`;
+
+        //add card to the board
+        boardDiv = document.getElementById("board");
+        boardDiv.appendChild(this.div);
     }
 
     /*
-    revealCard is used to reveal the caard on the screen to the clients when the card is clicked
-    Will call other functions such as validateClick to make sure the click is done only by the
-    correct client and not anyone.
-
-    Had to pass this.colour as passing the card caused issues with the variables
-    later fix to either pass all elements of the card fix to make the card itself work
+    * Reveals the card on the board by changing the image
+    * and setting isRevealed to true.
+    * This should be called whenever an updated boardstate
+    * is received from the server.
     */
     revealCard()
     {
-        var colour = this.colour;
-        let cardDiv = this.div;
+        //set attributes and remove text
         this.isRevealed = true;
         this.div.innerHTML = "";
     
-        cardDiv.style.backgroundSize = "cover";
-        if(colour == "redTeam") 
-            cardDiv.style.backgroundImage = "url('../rsc/images/redteam.jpg')";
-        else if(colour == "blueTeam") 
-            cardDiv.style.backgroundImage = "url('../rsc/images/blueteam.jpg')";
-        else if(colour == "neutral") 
-            cardDiv.style.backgroundImage = "url('../rsc/images/neutral.jpg')";
-        else if(colour == "bombCard")
-            cardDiv.style.backgroundImage = "url('../rsc/images/bomb.jpg')";
+        //apply the background image
+        switch(this.colour)
+        {
+            case "redTeam":
+                this.div.style.backgroundImage = RED_IMAGE;
+                break;
+            case "blueTeam":
+                this.div.style.backgroundImage = BLUE_IMAGE;
+                break;
+            case "bombCard":
+                this.div.style.backgroundImage = BOMB_IMAGE;
+                break;
+            default:
+                this.div.style.backgroundImage = NEUTRAL_IMAGE;
+        }
+        this.div.style.backgroundSize = "cover";
     }
 }
 
@@ -121,7 +136,8 @@ class BoardState extends Observer{
                 }
             }
         }
-        card.revealCard();
+        //card.revealCard();
+        card.isRevealed = true;
         this.sendBoardState(card);
     }
 
