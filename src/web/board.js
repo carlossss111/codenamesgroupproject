@@ -212,77 +212,78 @@ class BoardState extends Observer
     }
 
     /*
-    
-    Makes sure clue is not already one on the board and then forwards the clue to the 
-    server(and then to the other players) 
+    * Forwards the clue (after validation) to the server.
     */
-    forwardClue(){
-        //check that it is this player's turn and it is the spymaster's turn
-        if(!this.isPlayersTurn || this.turn.role != "spymaster"){
-            return;
-        }
-        //checks if clue is on the board if it is then break and not send to server
-        else{
-            let clue = document.getElementById("clue").value;
-            let maxGuesses = document.getElementById("maxClues").value;
-            let valid = true;
+    forwardClue()
+    {
+        //get the clue and number of guesses from the page
+        var clue = document.getElementById("clue").value;
+        var maxGuesses = document.getElementById("maxClues").value;
 
-            for (let i = 0; i < this.cards.length; i++) {
-                for (let j = 0; j < this.cards[0].length; j++){
-                    if(clue == this.cards[i][j].word){
-                        valid = false;
-                        console.log("card cannot be same as word on board");
-                        break;
-                    }
+        //check that a clue can be forwarded
+        if(!this.isPlayersTurn || this.turn.role != "spymaster")
+            return;
+
+        //check that the clue is not the same as one already in the board
+        this.cards.forEach(row => {
+            row.forEach(card => {
+                if(clue == card.word){
+                    console.log("The clue given cannot be the same as a word on the board.");
+                    return;
                 }
-            }
-            //if clue is valid then send to the server
-            if (valid)
-            {
-                //send to server
-                server.sendToServer("forwardClue",
-                {
-                    "Protocol" : "forwardClue",
-                    "clue" : clue,
-                    "numberOfGuesses" : maxGuesses,
-                    "player" : this.player,
-                    "turn" : this.turn
-                })
-            }
-        }
+            })
+        });
+
+        //send the clue to the server
+        server.sendToServer("forwardClue",
+        {
+            "Protocol" : "forwardClue",
+            "clue" : clue,
+            "numberOfGuesses" : maxGuesses,
+            "player" : this.player,
+            "turn" : this.turn
+        })
     }
 
     /*
-    Receives information from the server ad will update when necessary for all clients
+    * An overriding method of the observer class. This receives either the new board state
+    * or a new clue and updates the client object to reflect any changes.
     */
-    update(eventName, args){
+    update(eventName, incoming)
+    {
         if(eventName == "receiveBoardState"){
-            this.clueWord = args.clue;
-            this.numOfGuesses = args.numberOfGuesses;
-            this.redScore = args.redScore;
-            this.blueScore = args.blueScore;
-            this.timer = args.timerLength;
-            this.turn = args.turn;
-            for(var i=0;i<5;i++){
-                for(var j=0;j<5;j++){
-                    if(args.cards[i][j].isRevealed)
+            //assign new clue, score, turn and timer length to the client board object
+            this.clueWord = incoming.clue;
+            this.numOfGuesses = incoming.numberOfGuesses;
+            this.redScore = incoming.redScore;
+            this.blueScore = incoming.blueScore;
+            this.timer = incoming.timerLength;
+            this.turn = incoming.turn;
+
+            //reveal new cards locally
+            for(let i = 0; i < incoming.cards.length; i++){
+                for(var j = 0; j < incoming.cards[i].length; j++){
+                    if(incoming.cards[i][j].isRevealed)
                         this.cards[i][j].revealCard();
-                    this.cards[i][j].colour = args.cards[i][j].colour;
-                    this.cards[i][j].word = args.cards[i][j].word; 
+                    this.cards[i][j].colour = incoming.cards[i][j].colour;
+                    this.cards[i][j].word = incoming.cards[i][j].word; 
                 }
             }
         }
         else if(eventName == "forwardClue"){
-            document.getElementById("clue").value = args.clue;
-            document.getElementById("maxClues").value = args.numberOfGuesses;
-            let currentDiv = document.getElementById("board");
-            currentDiv.turn = args.turn;
+            //assign new clue and turn to the client board object
+            this.clueWord = incoming.clue;
+            this.numOfGuesses = incoming.numberOfGuesses;
+            this.turn = incoming.turn;
+
+            //print the new clue on screen
+            document.getElementById("clue").value = this.clue;
+            document.getElementById("maxClues").value = this.numberOfGuesses;
         }
     }
 
     /*
-    When game is finished this is what happens after, 
-    temporary implementation 
+    * Temporary implementation for when the game is finished
     */
     finishGame(hasWon)
     {
