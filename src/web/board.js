@@ -4,6 +4,8 @@ BLUE_IMAGE = "url('../rsc/images/blueteam.jpg')";
 NEUTRAL_IMAGE = "url('../rsc/images/neutral.jpg')";
 BOMB_IMAGE = "url('../rsc/images/bomb.jpg')";
 
+DEBUG_SKIP_VALIDATION = true;
+
 /*
 * Card class for each card in the Boardstate class. This keeps track of the colour, 
 * word and status of each card and this is where the card is revealed with revealCard().
@@ -75,7 +77,9 @@ class Card
     */
     cardListener()
     {
-        this.revealCard();
+        if(!board.validateClick(this)) //TODO: replace with board.getInstance singleton method for robustness
+            return;
+        this.revealCard(); //TODO: remove this and replace it with the card being revealed when the server sends something back
         board.sendBoardState(this); //TODO: replace with board.getInstance singleton method for robustness
     }
 }
@@ -130,64 +134,68 @@ class BoardState extends Observer
         this.cards = demoSet; //TODO: replace with a randomly generated set (server side?)
     }
 
-    //return true if it is this client's turn
-    isPlayersTurn(){
+    /*
+    * Returns whether the team and role match
+    */
+    isPlayersTurn()
+    {
         return (    this.player["team"] === this.turn["team"] 
             &&      this.player["role"] === this.turn["role"]);
     }
 
     /*
-    used to see whether the player who clicked the card is the player who is supposed
-    to be taking there turn right now. if not then it will not do anything to the board
-    If it is the correct player then the board will update.
+    * Validates a click to and returns true/false depending on whether the
+    * click is a valid playable move. Should be called by the card object.
+    * Server-side validation is still used, but should not need to be relied on in all cases.
     */
-    validateClick(cardSelected,turn){
-        if(cardSelected.isRevealed == true) return false;
-        else if(turn.team != this.player.team) return false;
-        else if(turn.role != this.player.role) return false;
+    validateClick(cardSelected)
+    {
+        //debug functionality
+        if(DEBUG_SKIP_VALIDATION)
+            return true;
+
+        //check card is not already revealed
+        if(cardSelected.isRevealed)
+            return false;
+
+        //check it is this team's turn
+        if(this.turn.team != this.player.team)
+            return false;
+        if(this.turn.role != this.player.role)
+            return false;
+
+        //check it is the spy's turn
+        if(this.turn != "spymaster")
+            return false;
+
         return true;
     }
 
     /*
-    sends the board state to the server, done when the player has clicked a card
-    on the board and made sure it is the correct player.
+    * Sends the new boardstate and the card chosen to the server.
+    * The server should then reply starting from the update() function.
     */
-    sendBoardState(cardSelected) {
-        //find index of cardSelected
-        var i;
-        var j = -1;
-
-        for (i = 0; i < this.cards.length; i++)
-        {  
-            var alpha = this.cards[i];
-            for (var k = 0; k < alpha.length; k++)
-            {
-                if(alpha[k].word == cardSelected.word)
-                {
-                    j = 1;
+    sendBoardState(cardSelected) 
+    {
+        var i, j, found = false;
+        
+        //find and store indexes of the selected card
+        for(i = 0; i < this.cards.length; i++){
+            for(j = 0; j < this.cards[i].length; j++){
+                if(this.cards[i][j].div == cardSelected.div){
+                    found = true;
+                    break;
                 }
             }
+            if(found)
+                break;
         }
 
-        //send board to server
-        server.sendToServer("sendBoardState",
-            {
-            "Protocol" : "sendBoardState",
-            "clue" : this.clueWord,
-            "numberOfGuesses" : this.numOfGuesses,
-            "redScore" : this.redScore,
-            "blueScore" : this.blueScore,
-            "timerLength" : this.timer,
-            "player" : this.player,
-            "turn" : this.turn,
-            "cardChosen" : `${i},${j}`,
-            "cards" : this.cards
-            });
+        //check the card has been found in the array (critical error if not)
+        if(!found)
+            throw new Error("The card selected cannot not been found in the card array");
         
-        if(j == -1)
-            throw new Error("Card selected not found!")
-        
-        //send board to server
+        //send board including the chosen card position to server
         server.sendToServer("sendBoardState",
         {
             "Protocol" : "sendBoardState",
