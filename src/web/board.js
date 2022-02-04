@@ -77,10 +77,12 @@ class Card
     */
     cardListener()
     {
-        if(!board.validateClick(this)) //TODO: replace with board.getInstance singleton method for robustness
+        var board = BoardState.getInstance();
+
+        if(!board.validateClick(this))
             return;
         this.revealCard(); //TODO: remove this and replace it with the card being revealed when the server sends something back
-        board.sendBoardState(this); //TODO: replace with board.getInstance singleton method for robustness
+        board.sendBoardState(this);
     }
 }
 
@@ -103,6 +105,8 @@ and the players turn. Done so every client has the correct copy of the board at 
 */
 class BoardState extends Observer
 {
+    static boardInstance;
+
     cards = [];
     clueWord;
     numOfGuesses;
@@ -119,6 +123,19 @@ class BoardState extends Observer
     }
 
     /*
+    * Singleton implementation of the BoardState class
+    */
+    static getInstance(){
+        if(this.boardInstance == null){
+            this.boardInstance = new BoardState();
+            return this.boardInstance;
+        }
+        return this.boardInstance;
+    }
+
+    /*
+    * **DO NOT CREATE WITH new(), USE getInstance()**
+    *
     * Called when the game begins and a new board is generated.
     * TODO: the new board needs to be sent to the server at the start.
     */
@@ -315,7 +332,7 @@ function DEBUG_boardRandomizer(board){
 }
 
 //TEST FUNCTIONALITY
-var board = new BoardState();
+var board = BoardState.getInstance();
 server.registerObserver(board);
 board.turn = {"team" : "red", "role" : "spymaster"};
 board.player = {"team" : "red", "role" : "spymaster"};
