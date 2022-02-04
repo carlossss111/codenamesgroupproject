@@ -5,9 +5,8 @@ NEUTRAL_IMAGE = "url('../rsc/images/neutral.jpg')";
 BOMB_IMAGE = "url('../rsc/images/bomb.jpg')";
 
 /*
-* Card class for each card in the Boardstate class.
-* This keeps track of the colour, word and status of each
-* card and this is where the card is revealed with revealCard().
+* Card class for each card in the Boardstate class. This keeps track of the colour, 
+* word and status of each card and this is where the card is revealed with revealCard().
 */
 class Card
 {
@@ -38,13 +37,14 @@ class Card
         //add card to the board
         boardDiv = document.getElementById("board");
         boardDiv.appendChild(this.div);
+
+        //add click listener to card
+        this.div.addEventListener("click", this.cardListener.bind(this));
     }
 
     /*
-    * Reveals the card on the board by changing the image
-    * and setting isRevealed to true.
-    * This should be called whenever an updated boardstate
-    * is received from the server.
+    * Reveals the card on the board by changing the image and setting isRevealed to true. 
+    * This should be called whenever an updated boardstate is received from the server.
     */
     revealCard()
     {
@@ -69,6 +69,15 @@ class Card
         }
         this.div.style.backgroundSize = "cover";
     }
+
+    /*
+    * On click, reveal the card and send that to the server
+    */
+    cardListener()
+    {
+        this.revealCard();
+        board.sendBoardState(this); //TODO: replace with board.getInstance singleton method for robustness
+    }
 }
 
 var demoSet = [[
@@ -88,7 +97,8 @@ var demoSet = [[
 BoardState class holds the state of the board at any given time while also holding the score
 and the players turn. Done so every client has the correct copy of the board at the right time
 */
-class BoardState extends Observer{
+class BoardState extends Observer
+{
     cards = [];
     clueWord;
     numOfGuesses;
@@ -104,41 +114,20 @@ class BoardState extends Observer{
         "role" : null
     }
 
+    /*
+    * Called when the game begins and a new board is generated.
+    * TODO: the new board needs to be sent to the server at the start.
+    */
     constructor()
     {
         super();
+
+        //attribute assignments
         this.clueWord = null;
         this.numOfGuesses = null;
         this.redScore = 0;
         this.blueScore = 0; 
-        //let bombX = Math.floor(Math.random() * 4);
-        //let bombY = Math.floor(Math.random() * 4);
-        this.cards = demoSet;
-        for(var i = 0; i < 5; i++){
-            //this.cards.push([]);
-            for(var j = 0; j < 5; j++)
-            {
-                //randomizer temporarily removed for the demo
-
-                //add event listener
-                this.cards[i][j].div.addEventListener("click", this.cardListener.bind(this));
-            }
-        }
-    }
-
-    cardListener(event){
-        var card = null;
-        for(var i = 0; i < this.cards.length; i++){
-            for(var j = 0; j < this.cards[0].length; j++){
-                if(event.target == this.cards[i][j].div){
-                    card = this.cards[i][j];
-                    break;
-                }
-            }
-        }
-        //card.revealCard();
-        card.isRevealed = true;
-        this.sendBoardState(card);
+        this.cards = demoSet; //TODO: replace with a randomly generated set (server side?)
     }
 
     //return true if it is this client's turn
