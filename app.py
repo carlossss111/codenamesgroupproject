@@ -1,11 +1,10 @@
 import socket
-
-from flask import Flask, render_template, session, copy_current_request_context, json, request, jsonify
+import json
+from flask import Flask, render_template, session, copy_current_request_context, request, jsonify
 from flask_socketio import SocketIO, emit, disconnect
 from threading import Lock
-from src.game.AImove import AImove
-from src.game.generateBoard import generateBoard
-from src.game.prediction import Predictor
+from src.game.generateBoard import *
+from src.game.predictor import *
 
 async_mode = None
 app = Flask(__name__)
@@ -14,59 +13,56 @@ socket_ = SocketIO(app, async_mode=async_mode, cors_allowed_origins='*') #todo: 
 thread = None
 thread_lock = Lock()
 
+
 """
 create a initial game board
 """
-
-
 @app.route('/', methods=["POST", "GET"])
 def index():
-    board = generateBoard("gameDev/static/data/words_data").board
-    board.insert(0, {"difficulty": "medium", "invalid_guesses": []})
-    return render_template('pages/game.html', board=board)
+    board = Boardgen("static/data/codenames_words").board
+    board.insert(0, {"difficulty": "easy", "invalid_guesses": [] })
+    return render_template('html/page.html', board=board)
 
 
 """
 Continuously update the info for the board
 """
-
-
 @app.route("/update", methods=["POST"])
 def update():
     board = json.loads(request.data)
-    return render_template('pages/game.html', board=board)
+    return render_template('html/page.html', board=board)
 
 
 """
-generate the move of the AI
+Generate a clue and target number
 """
-
-
-@app.route("/computer_turn", methods=["POST"])
-def computer_turn():
-    board = json.loads(request.data)
-    sequence = AImove(board).generate_computer_sequence()
-    json_sequence = jsonify(sequence=sequence)
-    return json_sequence
-
-
-"""
-generate the clues
-"""
-
-
 @app.route("/clue", methods=["POST"])
 def clue():
     board = json.loads(request.data)
-    predictor = Predictor(relevant_words_path='gameDev/static/data/train_word_data',
-                          relevant_vectors_path='gameDev/static/data/vectors',
+    spymaster = Predictor_sm(relevant_words_path='static/data/relevant_words',
+                          relevant_vectors_path='static/data/relevant_vectors',
                           board=board[1:],
+                          turn=board[0]["turn"],
                           invalid_guesses=set(board[0]['invalid_guesses']),
                           threshold=0.45)
-    _clue, clue_score, targets = predictor.run()
+
+    _clue, clue_score, targets = spymaster.run()
     clue_details = jsonify(clue=_clue, targets=targets)
     return clue_details
 
+
+"""
+Generate a list of guesses
+"""
+@app.route("/guess", methods=["POST"])
+def guess():
+    board = json.loads(request.data)
+    spy = Predictor_spy(board=board[1:],
+                    clue=board[0]["clue"],
+                    target_num=board[0]["target_num"],
+                    relevant_vectors_path='static/data/relevant_vectors')
+    guesses = jsonify(guesses=spy.run())
+    return guesses
 
 
 """
@@ -176,5 +172,6 @@ def disconnect_request():
 
 
 if __name__ == '__main__':
-    socket_.run(app, debug=True)
+    #socket_.run(app, debug=True)
+    app.config['TEMPLATES_AUTO_RELOAD'] = True
     app.run(host='127.0.0.1', port=8080, debug=True)

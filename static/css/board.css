@@ -1,0 +1,108 @@
+#title {
+  font-family: Courier New, monospace;
+  font-weight: bold;
+  letter-spacing: .1em;
+  font-size: 1em;
+}
+
+#application {
+  text-align: center;
+}
+
+#remaining {
+  font-size: 4em;
+}
+
+#clue_target {
+  padding-top: 0.5em;
+  font-size: 1.5em;
+}
+
+#footer {
+  font-size: 1.5em;
+  margin: 0 15em;
+}
+
+#board {
+  margin: 2em 10em;
+}
+
+.symbol_button_text{
+  font-family: arial;
+  border-radius: 5px;
+  background-color: #ffdede;
+  color: #323032;
+}
+
+.symbol_button_text:hover {
+  box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+  cursor: pointer;
+}
+
+body {
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+  background: #ffdede;
+  color: black;
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', Arial, sans-serif;
+  font-weight: bold;
+}
+
+.remaining_text {
+  color: var(--colour);
+}
+
+.card {
+  height: 100px;
+  background-color: tan;
+  color: black;
+  line-height: 100px;
+  font-size: 150%;
+  border-radius: 15px;
+  text-transform: uppercase;
+}
+
+.card:hover {
+  box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+  cursor: pointer;
+}
+
+.wrapper {
+  display: grid;
+  grid-template-columns: repeat(var(--split), 1fr);
+  text-align: center;
+  row-gap: 10px;
+  column-gap: 10px;
+}
+
+#clue_wrapper {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  background-color: #fff;
+  color: #444;
+  text-align: center;
+  row-gap: 5px;
+  column-gap: 5px;
+}
+
+#dialog {
+  display: none;
+}
+
+#radio {
+  font-size: 0.4em;
+}
+
+#cheat {
+  height: 20px;
+  width: 20px;
+  background-color: white;
+}
+
+#cheat:hover {
+  box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+  cursor: pointer;
+}
