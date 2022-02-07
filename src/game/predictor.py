@@ -100,7 +100,6 @@ class Predictor_sm:
                  relevant_vectors_path,
                  board,
                  turn,
-                 invalid_guesses,
                  threshold=0.4,
                  trials=100):
         """
@@ -112,8 +111,6 @@ class Predictor_sm:
                              : The path to the dictionary of relevant vectors
         board: json
              : The current board state
-        invalid_guesses: set
-                       : Clues which have already been given
         threshold: float (default = 0.4)
            : The threshold before which the similarity is 0
         trials: int (default = 100)
@@ -123,7 +120,6 @@ class Predictor_sm:
         self.relevant_vectors_path = relevant_vectors_path
         self.board = board
         self.turn = turn
-        self.invalid_guesses = invalid_guesses
         self.threshold = threshold
         self.trials = trials
 
@@ -192,9 +188,10 @@ class Predictor_sm:
         with open(self.relevant_words_path, 'rb') as f:
             relevant_words = pickle.load(f)
         potential_guesses = set(chain.from_iterable(relevant_words[w] for w in self.blue))
-        valid_guesses = potential_guesses.difference(self.invalid_guesses)
-
-        return valid_guesses
+        if len(potential_guesses) == 0:
+            print("Generate neutral clue")
+            potential_guesses = set(chain.from_iterable(relevant_words[w] for w in self.neutral))
+        return potential_guesses
 
     def _get_relevant_vectors(self):
         """
@@ -202,6 +199,7 @@ class Predictor_sm:
         """
         with open(self.relevant_vectors_path, 'rb') as f:
             relevant_vectors = pickle.load(f)
+        #print(len(relevant_vectors))
         return relevant_vectors
 
     def _setup(self):

@@ -42,7 +42,6 @@ $(document).ready(function(){
             clue_details = JSON.parse(clue_details);
             clue = clue_details.clue;
             targets = clue_details.targets;
-            board[0]["invalid_guesses"].push(clue);
             board[0]["clue"] = clue;
             board[0]["target_num"] = targets.length;
             $("#clue_text").html(`Clue: ${clue} (${targets.length})`)
@@ -55,6 +54,7 @@ $(document).ready(function(){
   };
 
   function make_clue() {
+    disable_buttons();
     $('#turn_text').html("Make your clue");
     show_type();
     document.getElementById('clue_text').style.display = 'none';
@@ -62,13 +62,28 @@ $(document).ready(function(){
     document.getElementById('clue_button').addEventListener("click", submit_clue);
   }
 
+  function check_clue(clue) {
+    for (i = 1; i < 26; i++) {
+      if (board[i].name == clue) {
+        alert("You can't use board words!");
+        return false;
+      } else if (!board[0]['dict'].includes(clue)) {
+        alert("Word not recognized.");
+        return false;
+      }
+    }
+    return true;
+  }
+
   function submit_clue() {
-    board[0]["clue"] = document.getElementById("clue").value;
+    board[0]["clue"] = document.getElementById("clue").value.toLowerCase();
     board[0]["target_num"] = document.getElementById("target_num").value;
-    document.getElementById('clue_text').style.display = 'block';
-    document.getElementById('clue_input').style.display = 'none';
-    hide_type();
-    generate_guess();
+    if (check_clue(board[0]["clue"]) == true) {
+      document.getElementById('clue_text').style.display = 'block';
+      document.getElementById('clue_input').style.display = 'none';
+      hide_type();
+      generate_guess();
+    }
   }
 
   function generate_guess() {

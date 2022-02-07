@@ -19,8 +19,10 @@ create a initial game board
 """
 @app.route('/', methods=["POST", "GET"])
 def index():
-    board = Boardgen("static/data/codenames_words").board
-    board.insert(0, {"difficulty": "easy", "invalid_guesses": [] })
+    game = Boardgen("static/data/codenames_words")
+    board = game.board
+    word_dict = game.word_dict
+    board.insert(0, {"difficulty": "easy", "dict": word_dict})
     return render_template('html/page.html', board=board)
 
 
@@ -43,9 +45,7 @@ def clue():
                           relevant_vectors_path='static/data/relevant_vectors',
                           board=board[1:],
                           turn=board[0]["turn"],
-                          invalid_guesses=set(board[0]['invalid_guesses']),
                           threshold=0.45)
-
     _clue, clue_score, targets = spymaster.run()
     clue_details = jsonify(clue=_clue, targets=targets)
     return clue_details

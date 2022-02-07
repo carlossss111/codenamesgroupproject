@@ -86,6 +86,7 @@ class Boardgen:
         """
         self.in_file = in_file
         self.board = self.generate_board()
+        self.word_dict = self.get_word_dic()
 
     def generate_board(self):
         """
@@ -126,3 +127,8 @@ class Boardgen:
             board[i]["id"] = i+1
 
         return board
+
+    def get_word_dic(self):
+        with open("static/data/word_dict", 'r') as f:
+            words = [line.rstrip() for line in f]
+            return words
