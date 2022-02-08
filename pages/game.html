@@ -41,7 +41,11 @@
         <div id="board">
         </div>
     </div>
-    <div class="sidePanel">
+
+    <!-- Working on collapsible side panel which is compatabile with mobile // scripts will be moved to a .js after--->
+    <button class="openPanelButton" onclick="openPanel()">open Sidepanel</button>
+    <div id="panel" class="sidePanel">
+        <a href="javascript:void(0)" class="closebtn" onclick="closePanel()">close</a>
         <p style="color:white;">To do! Here will be the chatbox and other things.</p>
         <div class="chatbox">
             <form action="#" id="chatboxSend">
@@ -54,4 +58,15 @@
         </div>
     </div>
 </body>
+
+<script>
+    function openPanel() {
+  document.getElementById("panel").style.width = "25%";
+}
+function closePanel() {
+  document.getElementById("panel").style.width = "0";
+}
+</script>
+
+
 </html>

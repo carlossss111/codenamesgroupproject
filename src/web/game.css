@@ -112,3 +112,19 @@
     background-color: white;
 }
 
+
+
+.sidePanel .closebtn {
+    position: relative;
+    top: 0;
+    font-size: 36px;
+    margin-left: 50px;
+  }
+
+
+.openPanelButton {
+    position:absolute;
+    right:0;
+    top:0;
+ 
+}
