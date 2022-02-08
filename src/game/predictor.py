@@ -84,6 +84,8 @@ class Predictor_spy:
         self._setup()
         x = self._calculate_card_score(self.clue)
         card_score = dict(sorted(x.items(), key=lambda item:item[1], reverse=True))
+        if (self.target_num == 0):
+            self.target_num = 1
         guesses = list(card_score.keys())[:self.target_num]
         print("Using clue:", self.clue)
         for guess in guesses:
