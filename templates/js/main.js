@@ -1,16 +1,19 @@
 $(document).ready(function(){
 
+  //Disable button click on cards
   function disable_buttons(){
     $('.card').css('pointer-events', 'none');
     $('#end_turn').css('pointer-events', 'none');
     $('.switch').css('pointer-events', 'none');
   }
 
+  //Choose your roles on each team
   function choose_role() {
     blue_role = prompt("Choose your role for BLUE team:\n(1 for spy, 2 for spymaster, 3 for AI-team)", "3");
     red_role = prompt("Choose your role for RED team:\n(1 for spy, 2 for spymaster, 3 for AI-team)", "3");
   }
 
+  //Main game loop
   function start_game(turn) {
     board[0]["turn"] = turn;
     if (board[0]["turn"] == "blue") {
@@ -29,6 +32,11 @@ $(document).ready(function(){
     }
   }
   
+  /*
+  AI generate clue and target number
+  ai_guess: true - let AI generate guess for this team
+            false - get user-input guess for this team
+  */
   function generate_clue(ai_guess) {
      $('#turn_text').html("Generating a clue");
      disable_buttons();
@@ -53,6 +61,7 @@ $(document).ready(function(){
     });
   };
 
+  //Get user-input clue and target number
   function make_clue() {
     disable_buttons();
     $('#turn_text').html("Make your clue");
@@ -62,6 +71,7 @@ $(document).ready(function(){
     document.getElementById('clue_button').addEventListener("click", submit_clue);
   }
 
+  //Check if the clue is valid
   function check_clue(clue) {
     for (i = 1; i < 26; i++) {
       if (board[i].name == clue) {
@@ -75,6 +85,7 @@ $(document).ready(function(){
     return true;
   }
 
+  //Submit clue to the system and let AI generate guesses for this team
   function submit_clue() {
     board[0]["clue"] = document.getElementById("clue").value.toLowerCase();
     board[0]["target_num"] = document.getElementById("target_num").value;
@@ -86,6 +97,7 @@ $(document).ready(function(){
     }
   }
 
+  //AI generate guesses
   function generate_guess() {
     $('#turn_text').html("Generating guesses");
     disable_buttons();
@@ -109,6 +121,7 @@ $(document).ready(function(){
     });
   }
 
+  //Get user-input guesses
   function make_guess() {
     $('#turn_text').html("Make your guesses");
     disable_buttons();
@@ -117,6 +130,7 @@ $(document).ready(function(){
     $('.switch').css('pointer-events', 'auto');
   }
 
+  //Make card text different
   function update_card_borders(check) {
     for (i = 0; i < targets.length; i++) {
       id = targets[i];
@@ -133,7 +147,7 @@ $(document).ready(function(){
     }
   }
 
-  //Show types of all cards for spymaster
+  //Show types of all cards in spymaster mode
   function show_type() {
     for (i = 1; i < 26; i++) {
       if (board[i].active == false) {
@@ -144,6 +158,7 @@ $(document).ready(function(){
     }
   }
 
+  //Hide types of all cards in spy mode
   function hide_type() {
     for (i = 1; i < 26; i++) {
       if (board[i].active == false) {
