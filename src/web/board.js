@@ -3,6 +3,25 @@ Card class, this is where the card is created using a colour and a word and is g
 an action listener to check for when it has been clicked
 
 */
+
+//MESSAGE TEST FUNCTIONS
+function testInitial(){
+    console.log("test 1 -createInitialBoardState");
+    server.sendToServer("createInitialBoardState", {
+        "Protocol" : "createInitialBoardState",
+        "TimerLength" : 30,
+        "BombCard" : true,
+        "AiDifficulty" : 2,
+        "NumOfAIs" : 1
+    });
+
+    console.log("test 2 -generateClueAI");
+    server.sendToServer("generateClueAI","?");//im not really sure what to send
+
+    console.log("test 3 -guess");
+    server.sendToServer("guess","?");
+}
+
 class Card
 {
     div;
@@ -91,6 +110,7 @@ class BoardState extends Observer{
 
     constructor()
     {
+        testInitial();
         super();
         this.clueWord = null;
         this.numOfGuesses = null;
