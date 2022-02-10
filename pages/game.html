@@ -17,6 +17,9 @@
     <script src="../src/web/server.js"></script>
     <script src="../src/web/chat.js" defer></script>
     <title>Nottingham Codenames</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
 </head>
 <body>
     <div class="mainContainer">
@@ -43,6 +46,7 @@
     </div>
 
     <!-- Working on collapsible side panel which is compatabile with mobile // scripts will be moved to a .js after--->
+    <input type="checkbox" class="openSidebarMenu" id="openSidebarMenu">
     <button class="openPanelButton" onclick="openPanel()">open Sidepanel</button>
     <div id="panel" class="sidePanel">
         <a href="javascript:void(0)" class="closebtn" onclick="closePanel()">close</a>
@@ -54,7 +58,7 @@
             </form>
             <div id="chatboxReceive">
 
-            </div>
+            </div>  
         </div>
     </div>
 </body>

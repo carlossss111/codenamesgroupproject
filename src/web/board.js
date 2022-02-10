@@ -348,5 +348,7 @@ document.getElementById("joinSpy").addEventListener("click", () =>{
     }
 
     document.getElementById("clueButton").style.display = "none";
+    document.getElementById("clue").readOnly = true;
     document.getElementById("clue").placeholder = "";
+    document.getElementById("maxClues").disabled = true;
 })
