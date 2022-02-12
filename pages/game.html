@@ -22,13 +22,32 @@
 
 </head>
 <body>
+
+    To do!
+    <a href="../index.html">[to main page]</a>
+    <span id="joinSpy" style="color:blue; text-decoration:underline;">[to join spy team]</span>
+
+    <input type="checkbox" class="openSidebarMenu" id="openSidebarMenu">
+    <label for="openSidebarMenu" class="sidebarIconToggle">
+        <div class="spinner diagonal part-1"></div>
+        <div class="spinner horizontal"></div>
+        <div class="spinner diagonal part-2"></div>
+    </label>
+    <div id="sidebarMenu">
+        <p style="color:white;">To do! Here will be the chatbox and other things.</p>
+        <div class="chatbox">
+            <form action="#" id="chatboxSend">
+                <input type="text" ></input>
+                <input type="submit" value="send chat"></input>
+            </form>
+            <div id="chatboxReceive">
+
+            </div>  
+        </div>
+    </div>
+
     <div class="mainContainer">
-        To do!
-        <a href="../index.html">[to main page]</a>
-        <span id="joinSpy" style="color:blue; text-decoration:underline;">[to join spy team]</span>
         <h1>Codenames</h1>
-
-
         <!-- clue Box temp max clues in future should only show max clues up to the amount of cards left --->
         <form class="clueBox" action="#" onsubmit="board.forwardClue()">
             <input type="text" id="clue" placeholder="Enter clue"></input>
@@ -50,16 +69,6 @@
     <button class="openPanelButton" onclick="openPanel()">open Sidepanel</button>
     <div id="panel" class="sidePanel">
         <a href="javascript:void(0)" class="closebtn" onclick="closePanel()">close</a>
-        <p style="color:white;">To do! Here will be the chatbox and other things.</p>
-        <div class="chatbox">
-            <form action="#" id="chatboxSend">
-                <input type="text" ></input>
-                <input type="submit" value="send chat"></input>
-            </form>
-            <div id="chatboxReceive">
-
-            </div>  
-        </div>
     </div>
 </body>
 
