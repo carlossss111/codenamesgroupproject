@@ -22,27 +22,23 @@
 
 </head>
 <body>
-
     To do!
     <a href="../index.html">[to main page]</a>
     <span id="joinSpy" style="color:blue; text-decoration:underline;">[to join spy team]</span>
-
+    <!-- Working on collapsible side panel which is compatabile with mobile // scripts will be moved to a .js after--->
     <input type="checkbox" class="openSidebarMenu" id="openSidebarMenu">
     <label for="openSidebarMenu" class="sidebarIconToggle">
-        <div class="spinner diagonal part-1"></div>
-        <div class="spinner horizontal"></div>
-        <div class="spinner diagonal part-2"></div>
+        <div class="arrow"></div>
     </label>
     <div id="sidebarMenu">
         <p style="color:white;">To do! Here will be the chatbox and other things.</p>
+        <p style ="color: white">Refinement needed; perhaps a tab where the arrow can go?</p>
         <div class="chatbox">
             <form action="#" id="chatboxSend">
                 <input type="text" ></input>
                 <input type="submit" value="send chat"></input>
             </form>
-            <div id="chatboxReceive">
-
-            </div>  
+            <div id="chatboxReceive"></div>  
         </div>
     </div>
 
@@ -63,23 +59,5 @@
         <div id="board">
         </div>
     </div>
-
-    <!-- Working on collapsible side panel which is compatabile with mobile // scripts will be moved to a .js after--->
-    <input type="checkbox" class="openSidebarMenu" id="openSidebarMenu">
-    <button class="openPanelButton" onclick="openPanel()">open Sidepanel</button>
-    <div id="panel" class="sidePanel">
-        <a href="javascript:void(0)" class="closebtn" onclick="closePanel()">close</a>
-    </div>
 </body>
-
-<script>
-    function openPanel() {
-  document.getElementById("panel").style.width = "25%";
-}
-function closePanel() {
-  document.getElementById("panel").style.width = "0";
-}
-</script>
-
-
 </html>

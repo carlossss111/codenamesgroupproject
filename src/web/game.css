@@ -156,11 +156,13 @@
     cursor: pointer;
     text-decoration: none;
 }
-input[type="checkbox"]:checked ~ #sidebarMenu {
+.openSidebarMenu:checked ~ #sidebarMenu {
     transform: translateX(0);
 }
-
-input[type=checkbox] {
+.openSidebarMenu:checked ~ .arrow {
+    transform: translateX(0);
+}
+.openSidebarMenu {
     transition: all 0.3s;
     box-sizing: border-box;
     display: none;
@@ -170,18 +172,14 @@ input[type=checkbox] {
     box-sizing: border-box;
     cursor: pointer;
     position: absolute;
+
     z-index: 99;
     height: 100%;
     width: 100%;
-    top: 22px;
+    top: 50%;
     right: 15px;
     height: 22px;
     width: 22px;
-}
-
-.openSidebarMenu:checked {
-    transform: translateX(250%);
-    transition: transform 250ms ease-in-out;
 }
 .spinner {
     transition: all 0.3s;
@@ -191,42 +189,20 @@ input[type=checkbox] {
     width: 100%;
     background-color: black;
 }
-.horizontal {
-    transition: all 0.3s;
-    box-sizing: border-box;
-    position: relative;
-    float: left;
-    margin-top: 3px;
+.arrow {
+    position: fixed;
+    border-right:5px solid black;
+    border-bottom:5px solid black;
+    width:20px;
+    height:20px;
+    margin-top:40px;
+
+    transform: translateX(0) rotate(135deg);
+    transition: transform 250ms ease-in-out;
 }
-.diagonal.part-1 {
-    position: relative;
-    transition: all 0.3s;
-    box-sizing: border-box;
-    float: left;
-}
-.diagonal.part-2 {
-    transition: all 0.3s;
-    box-sizing: border-box;
-    position: relative;
-    float: left;
-    margin-top: 3px;
-}
-input[type=checkbox]:checked ~ .sidebarIconToggle > .horizontal {
-    transition: all 0.3s;
-    box-sizing: border-box;
-    opacity: 0;
-}
-input[type=checkbox]:checked ~ .sidebarIconToggle > .diagonal.part-1 {
-    transition: all 0.3s;
-    box-sizing: border-box;
-    transform: rotate(135deg);
-    margin-top: 8px;
-}
-input[type=checkbox]:checked ~ .sidebarIconToggle > .diagonal.part-2 {
-    transition: all 0.3s;
-    box-sizing: border-box;
-    transform: rotate(-135deg);
-    margin-top: -9px;
+.openSidebarMenu:checked ~ .sidebarIconToggle > .arrow {
+    transition: all 0.3s ease-in-out;
+    transform: translateX(-300px) rotate(-45deg);
 }
 
 
