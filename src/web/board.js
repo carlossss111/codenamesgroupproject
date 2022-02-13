@@ -3,11 +3,11 @@ Card class, this is where the card is created using a colour and a word and is g
 an action listener to check for when it has been clicked
 */
 
-function boardInitialize() {
+function boardInitialize(isBombCard) {
     server.sendToServer("createInitialBoardState", {
         "Protocol" : "createInitialBoardState",
         //"TimerLength" : 30, This can be set in other ways
-        "BombCard" : true,
+        "BombCard" : isBombCard,
     });
 }
 
@@ -317,8 +317,10 @@ var board = new BoardState();
 server.registerObserver(board);
 
 if (choice == 1) {
+    var isBombCard = prompt("Do you want Bomb Card in the board? (y/n)", 'y');
     while (confirm("If all players joined, press OK to initialize board.") == false);
-    boardInitialize();
+    if (isBombCard == 'y') boardInitialize(true);
+    else boardInitialize(false);
 }
 else {
     alert("Please wait for the host to start game.");

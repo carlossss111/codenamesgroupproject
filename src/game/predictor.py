@@ -212,7 +212,10 @@ class Predictor_sm:
         self.words = self._get_words()
 
         self.blue, self.red, self.neutral, self.assassin = self._get_types()
-        self.bad_words = self.red + [self.assassin] + self.neutral
+        if self.assassin == "":
+            self.bad_words = self.red + self.neutral
+        else:
+            self.bad_words = self.red + [self.assassin] + self.neutral
 
         self.blue_vectors = np.array([self.relevant_vectors[w] for w in self.blue], dtype=np.float32)
         self.bad_vectors = np.array([self.relevant_vectors[w] for w in self.bad_words], dtype=np.float32)

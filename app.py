@@ -21,8 +21,7 @@ create a initial game board
 @socket_.on("createInitialBoardState", namespace='/')
 def index(settings):
     print("Initial game board received!")
-    game = Boardgen("static/data/codenames_words")
-    #wordDict = game.word_dict
+    game = generateBoard("static/data/codenames_words", settings["BombCard"])
     board = game.board
 
     protocol = 'sendInitialBoardState'
