@@ -352,3 +352,18 @@ document.getElementById("joinSpy").addEventListener("click", () =>{
     document.getElementById("clue").placeholder = "";
     document.getElementById("maxClues").disabled = true;
 })
+
+
+
+
+//Moves board left and right to accomodate for the sidepanel
+function MoveBoard() {
+    if(document.getElementById("openSidebarMenu").checked == true){
+        document.getElementById("board").style.transform = "translateX(0)"; 
+    }
+    else if(document.getElementById("openSidebarMenu").checked == false){
+        document.getElementById("board").style.transform = "translateX(15%)"; 
+
+    }
+
+}

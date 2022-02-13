@@ -3,11 +3,13 @@
 {
     max-width: 1150px;
     width: 100%;    
-    margin: 0 auto;
     display: grid;
     grid-template-columns: 200px 200px 200px 200px 200px;
     grid-template-rows: 120px 120px 120px 120px 120px;
     grid-gap: 30px;
+    transform: translateX(15%);
+    transition: transform 250ms ease-in-out;
+
 }
 
 /*cards*/
@@ -42,6 +44,7 @@
   text-align: center;
     margin: 0 auto;
 }
+
 
 .clueBox input {
   width: 150px;
@@ -115,12 +118,25 @@
 
 /*side panel*/
 .chatbox{
-    margin: 3rem auto;
+    margin: 1rem auto;
     width: 80%;
-    height: 30rem;
+    height: 25rem;
     background-color: white;
+    border-radius: 15px;
+
+}
+
+.score{
+    margin: 1rem auto;
+    width: 80%;
+    height: 10rem;
+    background-color: #97CAEF;
+    border-radius: 10px;
+
+
 }
 #sidebarMenu {
+    border-radius: 10px;
     height: 100%;
     position: fixed;
     right: 0;
@@ -159,6 +175,7 @@
 .openSidebarMenu:checked ~ #sidebarMenu {
     transform: translateX(0);
 }
+
 .openSidebarMenu:checked ~ .arrow {
     transform: translateX(0);
 }
@@ -206,11 +223,22 @@
 }
 
 
+#scoreText{
+    text-align: center;
+    font-family: 'Trebuchet MS', sans-serif;
+
+}
+#scores{
+    text-align: center;
+    font-size: 50px;
+}
+
+
 @media only screen and (max-width: 600px) {
 
     body {  
         background-color: lightblue;
-
+            
       }
 
 }
