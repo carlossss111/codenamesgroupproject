@@ -1,25 +1,32 @@
 /*
 Card class, this is where the card is created using a colour and a word and is given
 an action listener to check for when it has been clicked
-
 */
 
-//MESSAGE TEST FUNCTIONS
-function testInitial(){
-    console.log("test 1 -createInitialBoardState");
+function boardInitialize() {
     server.sendToServer("createInitialBoardState", {
         "Protocol" : "createInitialBoardState",
-        "TimerLength" : 30,
+        //"TimerLength" : 30, This can be set in other ways
         "BombCard" : true,
-        "AiDifficulty" : 2,
-        "NumOfAIs" : 1
     });
+}
 
-    console.log("test 2 -generateClueAI");
-    server.sendToServer("generateClueAI","?");//im not really sure what to send
+// Generate a clue and target number (AI)
+function generateClue() {
+    server.sendToServer("generateClue", {
+        "Protocol" : "generateClue",
+        "board" : board,
+        "AIDifficulty" : '???'
+    });
+}
 
-    console.log("test 3 -guess");
-    server.sendToServer("guess","?");
+// Generate a list of guesses (AI)
+function generateGuess() {
+    server.sendToServer("generateGuess", {
+        "Protocal" : "generateGuess",
+        "board" : board,
+        "AIDifficulty" : '???'
+    })
 }
 
 class Card
@@ -36,6 +43,10 @@ class Card
         this.word = word;
         this.isRevealed = false;
 
+        this.initialize(colour, word);
+    }
+
+    initialize(colour, word) {
         let cardDiv = document.createElement("div");
         let boardDiv = document.getElementById("board");
         cardDiv.setAttribute("class",`card ${colour}`); 
@@ -43,8 +54,8 @@ class Card
         cardDiv.innerHTML = "<p>" + word + "</p>";
         boardDiv.appendChild(cardDiv);
         //cardDiv.addEventListener("click", this.revealCard);
-        cardDiv.colour = this.colour;
-        cardDiv.word = this.word;
+        cardDiv.colour = colour;
+        cardDiv.word = word;
         this.div = cardDiv;
     }
 
@@ -75,18 +86,6 @@ class Card
     }
 }
 
-var demoSet = [[
-    new Card("blueTeam","water"), new Card("redTeam","bulb"), new Card("neutral","crown"),
-    new Card("neutral","frog"), new Card("neutral","crystal")],[
-    new Card("redTeam","trunk"), new Card("redTeam","slip"), new Card("bombCard","boom"), 
-    new Card("blueTeam","bolt"), new Card("redTeam","boxer")],[
-    new Card("blueTeam","coach"), new Card("redTeam","fan"), new Card("neutral","skyscraper"), 
-    new Card("redTeam","gold"), new Card("blueTeam","snowman")],[
-    new Card("neutral","america"), new Card("blueTeam","pizza"), new Card("neutral","park"),
-    new Card("blueTeam","flat"), new Card("blueTeam","carrot")],[
-    new Card("blueTeam","whistle"), new Card("neutral","hide"), new Card("neutral","ball"), 
-    new Card("blueTeam","bond"), new Card("neutral","tower")]
-]
 
 /*
 BoardState class holds the state of the board at any given time while also holding the score
@@ -110,7 +109,6 @@ class BoardState extends Observer{
 
     constructor()
     {
-        testInitial();
         super();
         this.clueWord = null;
         this.numOfGuesses = null;
@@ -118,17 +116,11 @@ class BoardState extends Observer{
         this.blueScore = 0; 
         //let bombX = Math.floor(Math.random() * 4);
         //let bombY = Math.floor(Math.random() * 4);
-        this.cards = demoSet;
-        for(var i = 0; i < 5; i++){
-            //this.cards.push([]);
-            for(var j = 0; j < 5; j++)
-            {
-                //randomizer temporarily removed for the demo
-
-                //add event listener
-                this.cards[i][j].div.addEventListener("click", this.cardListener.bind(this));
-            }
+        this.cards = new Array(5);
+        for (var i = 0; i < this.cards.length; i++) {
+            this.cards[i] = new Array(5);
         }
+        console.log(this.cards);
     }
 
     cardListener(event){
@@ -183,21 +175,6 @@ class BoardState extends Observer{
                 }
             }
         }
-
-        //send board to server
-        server.sendToServer("sendBoardState",
-            {
-            "Protocol" : "sendBoardState",
-            "clue" : this.clueWord,
-            "numberOfGuesses" : this.numOfGuesses,
-            "redScore" : this.redScore,
-            "blueScore" : this.blueScore,
-            "timerLength" : this.timer,
-            "player" : this.player,
-            "turn" : this.turn,
-            "cardChosen" : `${i},${j}`,
-            "cards" : this.cards
-            });
         
         if(j == -1)
             throw new Error("Card selected not found!")
@@ -274,16 +251,29 @@ class BoardState extends Observer{
                 for(var j=0;j<5;j++){
                     if(args.cards[i][j].isRevealed)
                         this.cards[i][j].revealCard();
-                    this.cards[i][j].colour = args.cards[i][j].colour;
-                    this.cards[i][j].word = args.cards[i][j].word; 
                 }
             }
         }
         else if(eventName == "forwardClue"){
+            this.clueWord = args.clue;
+            this.numOfGuesses = args.numberOfGuesses;
             document.getElementById("clue").value = args.clue;
             document.getElementById("maxClues").value = args.numberOfGuesses;
             let currentDiv = document.getElementById("board");
             currentDiv.turn = args.turn;
+
+        }
+        else if (eventName == "sendInitialBoardState") {
+            let receivedBoard = args.board;
+            for (let i = 0; i < this.cards.length; i++) {
+                for (let j = 0; j < this.cards[0].length; j++){
+                    let team = receivedBoard[i*this.cards.length+j]["type"];
+                    let word = receivedBoard[i*this.cards.length+j]["name"];
+                    this.cards[i][j] = new Card(team, word);
+                    this.cards[i][j].div.addEventListener("click", this.cardListener.bind(this));
+                }
+            }
+            console.log(this.cards)
         }
     }
 
@@ -321,8 +311,19 @@ function DEBUG_boardRandomizer(board){
 }
 
 //TEST FUNCTIONALITY
+var choice = prompt("Host a game (1) or join a game (2)?");
+
 var board = new BoardState();
 server.registerObserver(board);
+
+if (choice == 1) {
+    while (confirm("If all players joined, press OK to initialize board.") == false);
+    boardInitialize();
+}
+else {
+    alert("Please wait for the host to start game.");
+}
+
 board.turn = {"team" : "red", "role" : "spymaster"};
 board.player = {"team" : "red", "role" : "spymaster"};
 
@@ -339,3 +340,7 @@ document.getElementById("joinSpy").addEventListener("click", () =>{
     document.getElementById("clueButton").style.display = "none";
     document.getElementById("clue").placeholder = "";
 })
+
+//Test AI Button
+document.getElementById("clueButtonAI").onclick = function() {generateClue();};
+document.getElementById("guessButtonAI").onclick = function() {generateGuess();};

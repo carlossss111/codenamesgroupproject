@@ -1,5 +1,6 @@
 import socket
 import json
+import numpy as np
 from flask import Flask, render_template, session, copy_current_request_context, request, jsonify
 from flask_socketio import SocketIO, emit, disconnect
 from threading import Lock
@@ -17,62 +18,27 @@ thread_lock = Lock()
 """
 create a initial game board
 """
-#@app.route('/', methods=["POST", "GET"])
 @socket_.on("createInitialBoardState", namespace='/')
 def index(settings):
+    print("Initial game board received!")
     game = Boardgen("static/data/codenames_words")
+    #wordDict = game.word_dict
     board = game.board
-    word_dict = game.word_dict
-    board.insert(0, {"difficulty": "easy", "dict": word_dict})
-    
-    protocol = 'createInitialBoardState'
+
+    protocol = 'sendInitialBoardState'
     messageToSend = {
         'Protocol': protocol, \
-        'clue': "???", \
-        'numberOfGuesses': "???", \
-        'turn': "???" \
+        'board': board, \
         }
 
     # send to client
     emit(protocol, messageToSend, broadcast=True)
-    #return render_template('html/page.html', board=board)
-
-
-"""
-Continuously update the info for the board
-""" #I think this is done is sendBoardState()
-@app.route("/update", methods=["POST"])
-def update():
-    board = json.loads(request.data)
-    return render_template('html/page.html', board=board)
-
-
-"""
-Generate a list of guesses
-"""
-#@app.route("/guess", methods=["POST"])
-@socket_.on('guess', namespace='/')
-def guess(messageReceived):
-    """ #this needs integrating
-    board = json.loads(request.data)
-    spy = Predictor_spy(board=board[1:],
-                    clue=board[0]["clue"],
-                    target_num=board[0]["target_num"],
-                    relevant_vectors_path='static/data/relevant_vectors')
-    guesses = jsonify(guesses=spy.run())
-    """
-    protocol = "" #not sure which this is?
-    messageToSend = "" #new board state? or something else?
-    emit(protocol, messageToSend, broadcast=True)
-    #return guesses
 
 
 """
 Chat Protocol
 Forwards message sent from a client to all other clients.
 """
-
-
 @socket_.on('chat', namespace='/')
 def chat_broadcast_message(messageReceived):
     print("Chat Message Received!")
@@ -91,7 +57,6 @@ forwardClue Protocol
 Forwards clue sent from a spymaster client to all other clients.
 Changes the turn.
 """
-
 @socket_.on('forwardClue', namespace='/')
 def clue_broadcast_message(messageReceived):
     print("Clue Received!")
@@ -110,39 +75,76 @@ def clue_broadcast_message(messageReceived):
     # send to client
     emit(protocol, messageToSend, broadcast=True)
 
+
 """
 Generate a clue and target number (AI)
 """
-#@app.route("/clue", methods=["POST"])
-@socket_.on("generateClueAI", namespace='/')
+@socket_.on("generateClue", namespace='/')
 def clue_broadcast_message_AI(messageReceived):
-    """" #sorry i commented this out temporarily because I can't make it run
-    board = json.loads(request.data)
+    board = list(chain.from_iterable(messageReceived["board"]["cards"]))
+    turn = messageReceived["board"]["turn"]["team"]
 
     spymaster = Predictor_sm(relevant_words_path='static/data/relevant_words',
                           relevant_vectors_path='static/data/relevant_vectors',
-                          board=board[1:],
-                          turn=board[0]["turn"],
-                          threshold=0.45)
-    _clue, clue_score, targets = spymaster.run()
-    clue_details = jsonify(clue=_clue, targets=targets)
-    """
+                          board=board,
+                          turn=turn)
+    clue, clue_score, targets = spymaster.run()
+    # this should be updated in this block
+    nextTurn = {"team": "red", "role": "spy"}
+
     #emit back to the socket
     protocol = 'forwardClue'
     messageToSend = {
         'Protocol' : protocol,
-        'clue' : "???",
-        'numberOfGuesses' : 999999,
-        'turn' : "???"
+        'clue' : clue,
+        'numberOfGuesses' : len(targets),
+        'turn' : nextTurn
     }
     emit(protocol, messageToSend, broadcast=True)
-    #return clue_details
+
+
+"""
+Generate a list of guesses
+"""
+@socket_.on('generateGuess', namespace='/')
+def guess(messageReceived):
+    """ #this needs integrating
+    guesses = jsonify(guesses=spy.run())
+    """
+    board = list(chain.from_iterable(messageReceived["board"]["cards"]))
+    clue = messageReceived["board"]["clueWord"]
+    target_num = messageReceived["board"]["numOfGuesses"]
+
+    spy = Predictor_spy(relevant_vectors_path='static/data/relevant_vectors',
+                    board=board,
+                    clue=clue,
+                    target_num=target_num)
+    guesses = spy.run()
+
+    for card in board:
+        if card["word"] in guesses:
+            card["isRevealed"] = True
+
+    # this should be updated in this block
+    nextTurn = {"team": "red", "role": "spymaster"}
+
+    protocol = 'receiveBoardState'
+    messageToSend = {
+        'Protocol': protocol, \
+        'clue': clue, \
+        'numberOfGuesses': target_num, \
+        'redScore': 1, # this should be updated in this block
+        'blueScore': 1, # this should be updated in this block
+        'timerLength': messageReceived["board"]["timer"], \
+        'turn': nextTurn, \
+        'cards': np.reshape(board,(5,5)).tolist() \
+        }
+    emit(protocol, messageToSend, broadcast=True)
 
 
 """
 send/receive BoardState Protocol
 """
-
 @socket_.on('sendBoardState', namespace='/')
 def boardstate_broadcast_message(boardReceived):
     print("Board State Received!")
@@ -167,6 +169,7 @@ def boardstate_broadcast_message(boardReceived):
         }
     # send to client
     emit(protocol, messageToSend, broadcast=True)
+
 
 @socket_.on('disconnect_request', namespace='/test')
 def disconnect_request():

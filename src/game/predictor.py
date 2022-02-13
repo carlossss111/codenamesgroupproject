@@ -47,7 +47,7 @@ class Predictor_spy:
         """
         unpicked_cards = []
         for card in self.board:
-            if not card["active"]:
+            if not card["isRevealed"]:
                 unpicked_cards.append(card)
         return unpicked_cards
 
@@ -72,9 +72,9 @@ class Predictor_spy:
         """
         card_score = {}
         for card in self.unpicked_cards:
-            word = card["name"].replace(" ", "")
+            word = card["word"].replace(" ", "")
             score = cos_sim(self.relevant_vectors[clue], self.relevant_vectors[word])
-            card_score[card["id"]] = score
+            card_score[card["word"]] = score
         return card_score
 
     def run(self):
@@ -89,7 +89,7 @@ class Predictor_spy:
         guesses = list(card_score.keys())[:self.target_num]
         print("Using clue:", self.clue)
         for guess in guesses:
-            print("Guess:", self.board[guess-1])
+            print("Guess:", guess)
         return guesses
 
 
@@ -102,7 +102,7 @@ class Predictor_sm:
                  relevant_vectors_path,
                  board,
                  turn,
-                 threshold=0.4,
+                 threshold=0.45,
                  trials=100):
         """
         Parameters
@@ -157,7 +157,7 @@ class Predictor_sm:
         """
         Extract the words from every card
         """
-        all_words = [card["name"].replace(" ", "") for card in self.board]
+        all_words = [card["word"].replace(" ", "") for card in self.board]
         return all_words
 
     def _get_types(self):
@@ -169,14 +169,14 @@ class Predictor_sm:
         neutral = []
         assassin = ""
         for card in self.board:
-            name = card["name"].replace(" ", "")
-            if card["type"] == "blue" and not card["active"]:
+            name = card["word"].replace(" ", "")
+            if card["colour"] == "blueTeam" and not card["isRevealed"]:
                 blue.append(name)
-            if card["type"] == "red" and not card["active"]:
+            if card["colour"] == "redTeam" and not card["isRevealed"]:
                 red.append(name)
-            if card["type"] == "neutral" and not card["active"]:
+            if card["colour"] == "neutral" and not card["isRevealed"]:
                 neutral.append(name)
-            if card["type"] == "assassin" and not card["active"]:
+            if card["colour"] == "bombCard" and not card["isRevealed"]:
                 assassin = name
         if self.turn == "red":
             return red, blue, neutral, assassin
@@ -253,8 +253,8 @@ class Predictor_sm:
 
         targets = []
         for card in self.board:
-            if card['name'].replace(' ', '') in best_blue:
-                targets.append(card['id'])
+            if card['word'].replace(' ', '') in best_blue:
+                targets.append(card["word"])
         return targets
 
     def run(self):
@@ -267,5 +267,6 @@ class Predictor_sm:
         clue_score = int(score[0])
         targets = self._get_targets(clue, clue_score)
         print("Generated clue:", clue)
+        print("Targets:", targets)
 
         return clue, clue_score, targets

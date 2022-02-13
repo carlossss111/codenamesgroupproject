@@ -3,10 +3,6 @@ import socket
 import numpy as np
 import argparse
 
-ip_port = ('127.0.0.1', 8000)
-#sk = socket.socket
-#sk.bind(ip_port)
-
 
 class generateBoard:
 
@@ -106,25 +102,17 @@ class Boardgen:
         board = []
         for i, word in enumerate(words):
             if i < 9:
-                type = "blue"
-                colour = "#0080FF"
+                type = "blueTeam"
             elif i < 18:
-                type = "red"
-                colour = "#FF0000"
+                type = "redTeam"
             elif i < 24:
                 type = "neutral"
-                colour = "#D0D0D0"
             else:
-                type = "assassin"
-                colour = "#202020"
-            word_details = {"name": word, "type": type, "colour": colour, "active": False}
+                type = "bombCard"
+            word_details = {"name": word, "type": type}
             board.append(word_details)
 
         np.random.shuffle(board)
-
-        # Assign ids (+1 because of the header)
-        for i in range(25):
-            board[i]["id"] = i+1
 
         return board
 
