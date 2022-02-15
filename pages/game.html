@@ -48,9 +48,44 @@
             <p id="scores">10 - 9</p>
         </div>
     </div>
+    <div class="setBox" id="setBox">
+        <img src="../rsc/images/back.png" id="back" class="back" alt="" srcset="">
+        <div class="setTit">
+            Codenames
+        </div>
+        <div class="setSubTit">
+            Local Settings
+        </div>
+        
+        <div class="setItem">
+            <img class="setItemIcon" src="../rsc/images/voice.png" alt="" srcset="">
+            <div class="setItemDesc">
+                Effect Audio
+            </div>
+            <input id="effectAudio" value="100" class="setItemRange" type="range">
+            <div id="effectAudioVal" class="setItemRangeVal">
+                100
+            </div>
+        </div>
+
+        <div class="setItem">
+            <img class="setItemIcon" src="../rsc/images/music.png" alt="" srcset="">
+            <div class="setItemDesc">
+                Music
+            </div>
+            <input value="100" id="music" class="setItemRange" type="range">
+            <div id="musicVal" class="setItemRangeVal">
+                100
+            </div>
+        </div>
+
+    </div>
 
     <div class="mainContainer">
-        <h1>Codenames</h1>
+        <h1>
+            Codenames
+            <img class="set" id="set" src="../rsc/images/set.png" alt="" srcset="">
+        </h1>
         <!-- clue Box temp max clues in future should only show max clues up to the amount of cards left --->
         <form class="clueBox" action="#" onsubmit="board.forwardClue()">
             <input type="text" id="clue" placeholder="Enter clue"></input>
