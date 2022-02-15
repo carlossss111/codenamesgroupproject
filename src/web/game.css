@@ -1,8 +1,7 @@
 /*card containers*/
-#board
-{
+#board {
     max-width: 1150px;
-    width: 100%;    
+    width: 100%;
     display: grid;
     grid-template-columns: 200px 200px 200px 200px 200px;
     grid-template-rows: 120px 120px 120px 120px 120px;
@@ -13,111 +12,103 @@
 }
 
 /*cards*/
-.card
-{
-    width:200px;
-    height:120px;
+.card {
+    width: 200px;
+    height: 120px;
     display: flex;
     justify-content: center;
     align-items: center;
-    margin:10px;
+    margin: 10px;
 }
 
-.card p
-{
+.card p {
     font-weight: bold;
-    font-size:2em;
+    font-size: 2em;
     text-transform: uppercase;
 }
 
-.clueBox
-{  
+.clueBox {
     width: 400px;
     margin: 0 auto;
 }
 
 .clueBox input {
-  width: 150px;
-  margin: 5px 10px 5px 0;
-  padding: 10px;
-  border-radius: 7px;
-  text-align: center;
+    width: 150px;
+    margin: 5px 10px 5px 0;
+    padding: 10px;
+    border-radius: 7px;
+    text-align: center;
     margin: 0 auto;
 }
 
 
 .clueBox input {
-  width: 150px;
-  margin: 5px 10px 5px 0;
-  padding: 10px;
-  border-radius: 7px;
+    width: 150px;
+    margin: 5px 10px 5px 0;
+    padding: 10px;
+    border-radius: 7px;
     margin: 0 auto;
 }
 
 .clueBox input {
-  width: 150px;
-  margin: 5px 10px 5px 0;
-  padding: 10px;
-  border-radius: 7px;
+    width: 150px;
+    margin: 5px 10px 5px 0;
+    padding: 10px;
+    border-radius: 7px;
 
 }
-    
+
 .clueBox button {
-  padding: 10px 20px;
-  cursor: pointer;
-  border-radius: 7px;
-
-}
-
-.clueBox button:hover {
-  background-color: lightGreen;
-}
-
-#maxClues{
     padding: 10px 20px;
     cursor: pointer;
     border-radius: 7px;
 
 }
 
-.neutral
-{
+.clueBox button:hover {
+    background-color: lightGreen;
+}
+
+#maxClues {
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 7px;
+
+}
+
+.neutral {
 
     background-color: tan;
     border: sienna dashed 3px;
-    border-radius:10px;
+    border-radius: 10px;
 }
 
-.blueTeam
-{
+.blueTeam {
     background-image: url("");
     background-color: #3399ff;
     border: darkblue dashed 3px;
-    border-radius:10px;
+    border-radius: 10px;
 
 }
 
-.redTeam
-{
+.redTeam {
     background-color: #ff5050;
     border: darkred dashed 3px;
-    border-radius:10px;
+    border-radius: 10px;
 }
 
-.revealed
-{
-    background-image: url('../../rsc/images/neutral.jpg') ;
+.revealed {
+    background-image: url('../../rsc/images/neutral.jpg');
 }
 
-.bombCard
-{
+.bombCard {
     background-color: #5e5e5e;
-    border:#1f1f1f dashed 3px;
+    border: #1f1f1f dashed 3px;
     border-radius: 10px;
 }
 
 /*side panel*/
-.chatbox{
+.chatbox {
     margin: 1rem auto;
     width: 80%;
     height: 25rem;
@@ -126,7 +117,7 @@
 
 }
 
-.score{
+.score {
     margin: 1rem auto;
     width: 80%;
     height: 10rem;
@@ -135,6 +126,7 @@
 
 
 }
+
 #sidebarMenu {
     border-radius: 10px;
     height: 100%;
@@ -146,12 +138,14 @@
     transition: transform 250ms ease-in-out;
     background: linear-gradient(180deg, darkred 0%, darkred 100%);
 }
-.sidebarMenuInner{
-    margin:0;
-    padding:0;
+
+.sidebarMenuInner {
+    margin: 0;
+    padding: 0;
     border-top: 1px solid rgba(255, 255, 255, 0.10);
 }
-.sidebarMenuInner li{
+
+.sidebarMenuInner li {
     list-style: none;
     color: #fff;
     text-transform: uppercase;
@@ -160,30 +154,35 @@
     cursor: pointer;
     border-bottom: 1px solid rgba(255, 255, 255, 0.10);
 }
-.sidebarMenuInner li span{
+
+.sidebarMenuInner li span {
     display: block;
     font-size: 14px;
     color: rgba(255, 255, 255, 0.50);
 }
-.sidebarMenuInner li a{
+
+.sidebarMenuInner li a {
     color: #fff;
     text-transform: uppercase;
     font-weight: bold;
     cursor: pointer;
     text-decoration: none;
 }
-.openSidebarMenu:checked ~ #sidebarMenu {
+
+.openSidebarMenu:checked~#sidebarMenu {
     transform: translateX(0);
 }
 
-.openSidebarMenu:checked ~ .arrow {
+.openSidebarMenu:checked~.arrow {
     transform: translateX(0);
 }
+
 .openSidebarMenu {
     transition: all 0.3s;
     box-sizing: border-box;
     display: none;
 }
+
 .sidebarIconToggle {
     transition: all 0.3s;
     box-sizing: border-box;
@@ -198,6 +197,7 @@
     height: 22px;
     width: 22px;
 }
+
 .spinner {
     transition: all 0.3s;
     box-sizing: border-box;
@@ -206,29 +206,32 @@
     width: 100%;
     background-color: black;
 }
+
 .arrow {
     position: fixed;
-    border-right:5px solid black;
-    border-bottom:5px solid black;
-    width:20px;
-    height:20px;
-    margin-top:40px;
+    border-right: 5px solid black;
+    border-bottom: 5px solid black;
+    width: 20px;
+    height: 20px;
+    margin-top: 40px;
 
     transform: translateX(0) rotate(135deg);
     transition: transform 250ms ease-in-out;
 }
-.openSidebarMenu:checked ~ .sidebarIconToggle > .arrow {
+
+.openSidebarMenu:checked~.sidebarIconToggle>.arrow {
     transition: all 0.3s ease-in-out;
     transform: translateX(-300px) rotate(-45deg);
 }
 
 
-#scoreText{
+#scoreText {
     text-align: center;
     font-family: 'Trebuchet MS', sans-serif;
 
 }
-#scores{
+
+#scores {
     text-align: center;
     font-size: 50px;
 }
@@ -236,9 +239,96 @@
 
 @media only screen and (max-width: 600px) {
 
-    body {  
+    body {
         background-color: lightblue;
-            
-      }
 
+    }
+
+}
+
+h1 {
+    position: relative;
+}
+
+.set {
+    width: 60px;
+    position: absolute;
+    top: 50%;
+    transform: translate(0, -50%);
+    right: -50px;
+    cursor: pointer;
+}
+
+.setBox {
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 100;
+    width: 100vw;
+    height: 100vh;
+    background: #ffdede;
+    display: none;
+}
+
+.setTit {
+    text-align: center;
+    font-size: 40px;
+    font-weight: bold;
+    padding: 50px 0;
+    padding-bottom: 20px;
+}
+
+.setSubTit {
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.setItem {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+    margin-top: 30px;
+}
+
+.setItemIcon {
+    width: 25px;
+}
+
+.setItemDesc {
+    margin: 0 5px;
+    width: 100px;
+    text-align: left;
+}
+
+.setItemRange {
+    width: 200px;
+}
+.setItemRangeVal{
+    width: 50px;
+}
+input[type=range] {
+    -webkit-appearance: none;
+    background: black;
+    height: 3px;
+}
+
+input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: 15px;
+    width: 15px;
+    background: #fff;
+    border-radius: 50%;
+    border: solid 1px #ddd;
+}
+
+
+
+.back {
+    position: absolute;
+    width: 30px;
+    top: 10px;
+    left: 10px;
+    cursor: pointer;
 }
