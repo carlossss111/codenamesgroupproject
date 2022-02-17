@@ -28,7 +28,7 @@ def index(settings):
     messageToSend = {
         'Protocol': protocol, \
         'board': board, \
-        }
+    }
 
     # send to client
     emit(protocol, messageToSend, broadcast=True)
@@ -46,7 +46,7 @@ def chat_broadcast_message(messageReceived):
     messageToSend = {
         'Protocol': protocol, \
         'message': messageReceived['message'] \
-        }
+    }
     # send to client
     emit(protocol, messageToSend, broadcast=True)
 
@@ -61,7 +61,8 @@ def clue_broadcast_message(messageReceived):
     print("Clue Received!")
 
     # reassign values
-    nextTurn = {"team": "red", "role": "spymaster"}
+    turn = messageReceived['turn']
+    nextTurn = {"team": turn['team'], "role": "spy"}
 
     # define protocol and message
     protocol = 'forwardClue'
@@ -70,7 +71,7 @@ def clue_broadcast_message(messageReceived):
         'clue': messageReceived['clue'], \
         'numberOfGuesses': messageReceived['numberOfGuesses'], \
         'turn': nextTurn \
-        }
+    }
     # send to client
     emit(protocol, messageToSend, broadcast=True)
 
@@ -137,7 +138,7 @@ def guess(messageReceived):
         'timerLength': messageReceived["board"]["timer"], \
         'turn': nextTurn, \
         'cards': np.reshape(board,(5,5)).tolist() \
-        }
+    }
     emit(protocol, messageToSend, broadcast=True)
 
 
@@ -148,11 +149,24 @@ send/receive BoardState Protocol
 def boardstate_broadcast_message(boardReceived):
     print("Board State Received!")
 
-    # reassign values
-    numOfGuesses = boardReceived['numberOfGuesses']
+    # need reassign values
     redScore = 1
     blueScore = 1
-    nextTurn = {"team": "red", "role": "spymaster"}
+
+    numOfGuesses = int(boardReceived['numberOfGuesses']) - 1
+
+    turn = boardReceived['turn']
+    isTurnOver = False
+
+    # TO DO: if pick other team's card, change turn
+    if numOfGuesses == 0:
+        isTurnOver = True
+        if turn['team'] == 'blue':
+            nextTurn = {"team": "red", "role": "spymaster"}
+        else:
+            nextTurn = {"team": "blue", "role": "spymaster"}
+    else:
+        nextTurn = {"team": turn['team'], "role": "spy"}
 
     # define protocol and message
     protocol = 'receiveBoardState'
@@ -164,9 +178,53 @@ def boardstate_broadcast_message(boardReceived):
         'blueScore': blueScore, \
         'timerLength': boardReceived['timerLength'], \
         'turn': nextTurn, \
+        'turnOver': isTurnOver, \
         'cards': boardReceived['cards'] \
-        }
+    }
     # send to client
+    emit(protocol, messageToSend, broadcast=True)
+
+
+@socket_.on('chooseRole', namespace='/')
+def update_role(roleReceived):
+    protocol = 'receiveRole'
+    messageToSend = {
+        'Protocal': protocol,
+        'blueSpy' : roleReceived["blueSpy"],
+        'blueSm' : roleReceived["blueSm"],
+        'redSpy' : roleReceived["redSpy"],
+        'redSm' : roleReceived["redSm"]
+    }
+    emit(protocol, messageToSend, broadcast=True)
+
+
+@socket_.on('syncRole', namespace='/')
+def sync_role(sync):
+    protocol = ''
+    messageToSend = {}
+    if sync["type"] == "request":
+        protocol = 'syncRequest'
+        messageToSend = {
+            'Protocal': protocol,
+        }
+    elif sync["type"] == "sync":
+        protocol = 'receiveRole'
+        messageToSend = {
+            'Protocal': protocol,
+            'blueSpy' : sync["blueSpy"],
+            'blueSm' : sync["blueSm"],
+            'redSpy' : sync["redSpy"],
+            'redSm' : sync["redSm"]
+        }
+    emit(protocol, messageToSend, broadcast=True)
+
+@socket_.on('updateTurn', namespace='/')
+def update_turn(turn):
+    protocol = 'changeTurn'
+    messageToSend = {
+        'Protocal': protocol,
+        'currentTurn': turn["currentTurn"]
+    }
     emit(protocol, messageToSend, broadcast=True)
 
 

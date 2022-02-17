@@ -4,6 +4,7 @@ an action listener to check for when it has been clicked
 */
 
 function boardInitialize(isBombCard) {
+    document.getElementById("startGame").style.display = "none";
     server.sendToServer("createInitialBoardState", {
         "Protocol" : "createInitialBoardState",
         //"TimerLength" : 30, This can be set in other ways
@@ -26,6 +27,62 @@ function generateGuess() {
         "Protocal" : "generateGuess",
         "board" : board,
         "AIDifficulty" : '???'
+    })
+}
+
+function chooseRole(newRole) {
+    if (!document.getElementById(newRole).innerHTML.includes("(AI)"))
+        return;
+    if (role != "") 
+        document.getElementById(role).innerHTML = tmpName;
+    role = newRole;
+    tmpName = document.getElementById(role).innerHTML;
+    document.getElementById(role).innerHTML = nickname;
+
+    if (newRole == "blueSpy")
+        board.player = {"team" : "blue", "role" : "spy"};
+    else if (newRole == "blueSm")
+        board.player = {"team" : "blue", "role" : "spymaster"};
+    else if (newRole == "redSpy")
+        board.player = {"team" : "red", "role" : "spy"};
+    else if (newRole == "redSm")
+        board.player = {"team" : "red", "role" : "spymaster"};
+
+    server.sendToServer("chooseRole", {
+        "blueSpy" : document.getElementById("blueSpy").innerHTML,
+        "blueSm" : document.getElementById("blueSm").innerHTML,
+        "redSpy" : document.getElementById("redSpy").innerHTML,
+        "redSm" : document.getElementById("redSm").innerHTML
+    })
+}
+
+// When new client join the room, sync role choice
+function syncNewClient(type) {
+    server.sendToServer("syncRole", {
+        "type" : type,
+        "blueSpy" : document.getElementById("blueSpy").innerHTML,
+        "blueSm" : document.getElementById("blueSm").innerHTML,
+        "redSpy" : document.getElementById("redSpy").innerHTML,
+        "redSm" : document.getElementById("redSm").innerHTML
+    })
+}
+
+function enableSpyMode() {
+    console.log("spy mode enabled");
+    board.turn.role = "spy";
+    board.player.role = "spy";
+    for(var i = 0; i < board.cards.length; i++){
+        for(var j = 0; j < board.cards[0].length; j++){
+            board.cards[i][j].div.setAttribute("class",`card neutral`); 
+        }
+    }
+    document.getElementById("clueButton").style.display = "none";
+    document.getElementById("clue").placeholder = "";
+}
+
+function updateTurnState() {
+    server.sendToServer("updateTurn", {
+        "currentTurn" : board.turn
     })
 }
 
@@ -120,10 +177,10 @@ class BoardState extends Observer{
         for (var i = 0; i < this.cards.length; i++) {
             this.cards[i] = new Array(5);
         }
-        console.log(this.cards);
     }
 
     cardListener(event){
+        if (!this.isPlayersTurn() || this.player.role == "spymaster") return;
         var card = null;
         for(var i = 0; i < this.cards.length; i++){
             for(var j = 0; j < this.cards[0].length; j++){
@@ -169,10 +226,7 @@ class BoardState extends Observer{
             var alpha = this.cards[i];
             for (var k = 0; k < alpha.length; k++)
             {
-                if(alpha[k].word == cardSelected.word)
-                {
-                    j = 1;
-                }
+                if(alpha[k].word == cardSelected.word) j = 1;
             }
         }
         
@@ -202,20 +256,18 @@ class BoardState extends Observer{
     */
     forwardClue(){
         //check that it is this player's turn and it is the spymaster's turn
-        if(!this.isPlayersTurn || this.turn.role != "spymaster"){
-            return;
-        }
+        if (!this.isPlayersTurn()) return;
         //checks if clue is on the board if it is then break and not send to server
-        else{
+        else {
             let clue = document.getElementById("clue").value;
             let maxGuesses = document.getElementById("maxClues").value;
             let valid = true;
 
             for (let i = 0; i < this.cards.length; i++) {
                 for (let j = 0; j < this.cards[0].length; j++){
-                    if(clue == this.cards[i][j].word){
+                    if(clue.toLowerCase() == this.cards[i][j].word){
                         valid = false;
-                        console.log("card cannot be same as word on board");
+                        alert("Clue cannot be the same as board words!");
                         break;
                     }
                 }
@@ -247,6 +299,9 @@ class BoardState extends Observer{
             this.blueScore = args.blueScore;
             this.timer = args.timerLength;
             this.turn = args.turn;
+            if (args.turnOver && this.isPlayersTurn()) {
+                updateTurnState();
+            }
             for(var i=0;i<5;i++){
                 for(var j=0;j<5;j++){
                     if(args.cards[i][j].isRevealed)
@@ -259,9 +314,10 @@ class BoardState extends Observer{
             this.numOfGuesses = args.numberOfGuesses;
             document.getElementById("clue").value = args.clue;
             document.getElementById("maxClues").value = args.numberOfGuesses;
-            let currentDiv = document.getElementById("board");
-            currentDiv.turn = args.turn;
-
+            //let currentDiv = document.getElementById("board");
+            //currentDiv.turn = args.turn;
+            this.turn = args.turn;
+            if (this.isPlayersTurn()) updateTurnState();
         }
         else if (eventName == "sendInitialBoardState") {
             let receivedBoard = args.board;
@@ -273,7 +329,44 @@ class BoardState extends Observer{
                     this.cards[i][j].div.addEventListener("click", this.cardListener.bind(this));
                 }
             }
-            console.log(this.cards)
+            if (board.player.role == "spy") enableSpyMode();
+            document.getElementById("joinBlueSpy").style.display = "none";
+            document.getElementById("joinBlueSm").style.display = "none";
+            document.getElementById("joinRedSpy").style.display = "none";
+            document.getElementById("joinRedSm").style.display = "none";
+            if (choice == 1) startGame();
+        }
+        else if (eventName == "receiveRole") {
+            document.getElementById("blueSpy").innerHTML = args.blueSpy;
+            document.getElementById("blueSm").innerHTML = args.blueSm;
+            document.getElementById("redSpy").innerHTML = args.redSpy;
+            document.getElementById("redSm").innerHTML = args.redSm;
+        }
+        else if (eventName == "syncRequest") {
+            if (choice == 1) {
+                syncNewClient('sync');
+            }
+        }
+        else if (eventName == "changeTurn") {
+            this.turn = args.currentTurn;
+            document.getElementById("blueSpy").style.fontSize = "1em";
+            document.getElementById("blueSm").style.fontSize = "1em";
+            document.getElementById("redSpy").style.fontSize = "1em";
+            document.getElementById("redSm").style.fontSize = "1em";
+            console.log(this.turn);
+            if (this.turn["team"] == "blue") {
+                if (this.turn["role"] == "spymaster")
+                    document.getElementById("blueSm").style.fontSize = "1.5em";
+                else
+                    document.getElementById("blueSpy").style.fontSize = "1.5em";
+            } else {
+                if (this.turn["role"] == "spymaster")
+                    document.getElementById("redSm").style.fontSize = "1.5em";
+                else
+                    document.getElementById("redSpy").style.fontSize = "1.5em";
+            }
+            if (this.isPlayersTurn())
+                alert("It's your turn!");
         }
     }
 
@@ -297,52 +390,44 @@ class BoardState extends Observer{
     }
 }
 
-//randomizes the board (not cards) for debug purposes
-function DEBUG_boardRandomizer(board){
-    board.clueWord = "word";
-    board.numOfGuesses = Math.floor(Math.random() * 5); //0-4
-    board.redScore = Math.floor(Math.random() * 11); //0-10
-    board.blueScore = Math.floor(Math.random() * 11); //0-10
-    board.timer = 100;
-    Math.floor(Math.random() * 2) ? board.player.team = "red" : board.player.team = "blue" ;
-    Math.floor(Math.random() * 2) ? board.player.role = "spy" : board.player.role = "spymaster" ;
-    Math.floor(Math.random() * 2) ? board.turn.team = "red"   : board.turn.team = "blue" ;
-    Math.floor(Math.random() * 2) ? board.turn.role = "spy"   : board.turn.role = "spymaster" ;
-}
-
-//TEST FUNCTIONALITY
+// Game starts here
 var choice = prompt("Host a game (1) or join a game (2)?");
+
+var nickname = prompt("Enter your nickname:", "Cool Guy");
+var tmpName = "";
 
 var board = new BoardState();
 server.registerObserver(board);
 
+var role = "";
+
+var isBombCard;
+
 if (choice == 1) {
-    var isBombCard = prompt("Do you want Bomb Card in the board? (y/n)", 'y');
-    while (confirm("If all players joined, press OK to initialize board.") == false);
-    if (isBombCard == 'y') boardInitialize(true);
-    else boardInitialize(false);
+    isBombCard = prompt("Do you want Bomb Card in the board? (y/n)", 'y');
+    alert("When all players joined, press START to initialize board.");
+    if (isBombCard == 'y') isBombCard = true;
+    else isBombCard = false;
 }
 else {
     alert("Please wait for the host to start game.");
+    document.getElementById("startGame").style.display = "none";
+    syncNewClient('request');
 }
 
-board.turn = {"team" : "red", "role" : "spymaster"};
-board.player = {"team" : "red", "role" : "spymaster"};
+document.getElementById("joinBlueSpy").onclick = function() {chooseRole("blueSpy");};
+document.getElementById("joinBlueSm").onclick = function() {chooseRole("blueSm");};
+document.getElementById("joinRedSpy").onclick = function() {chooseRole("redSpy");};
+document.getElementById("joinRedSm").onclick = function() {chooseRole("redSm");};
 
-document.getElementById("joinSpy").addEventListener("click", () =>{
-    console.log("spy mode enabled");
-    board.turn.role = "spy";
-    board.player.role = "spy";
-    for(var i = 0; i < board.cards.length; i++){
-        for(var j = 0; j < board.cards[0].length; j++){
-            board.cards[i][j].div.setAttribute("class",`card neutral`); 
-        }
-    }
-
-    document.getElementById("clueButton").style.display = "none";
-    document.getElementById("clue").placeholder = "";
-})
+document.getElementById("startGame").onclick = function() {boardInitialize(isBombCard);};
 
 //Test AI Button
 document.getElementById("clueButtonAI").onclick = function() {generateClue();};
 document.getElementById("guessButtonAI").onclick = function() {generateGuess();};
+
+//Function called only by host user
+function startGame() {
+    board.turn = {"team" : "blue", "role" : "spymaster"};
+    updateTurnState();
+}

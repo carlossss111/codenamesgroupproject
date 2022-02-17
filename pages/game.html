@@ -23,10 +23,31 @@
         To do!
         <a href="../index.html">[to main page]</a>
         <span id="joinSpy" style="color:blue; text-decoration:underline;">[to join spy team]</span>
-        <h1>Codenames</h1>
 
-        <form>
+        <div style="text-align: center;">
+            <span id="blueMember" style="color: #3399ff;">
+                Spymaster:<span id="blueSm" style="color: black;">Bob (AI)</span> 
+                Spy:<span id="blueSpy" style="color: black;">Colin (AI)</span>
+            </span>
+            <span id="blueScore" style="color: #3399ff; font-size: 4em;">0</span>
+            <span style="font-size: 4em;">&nbsp;:&nbsp;</span>
+            <span id="redScore" style="color: #ff5050; font-size: 4em;">0</span>
+            <span id="redMember" style="color: #ff5050;">
+                Spymaster:<span id="redSm" style="color: black;">Geert (AI)</span> 
+                Spy:<span id="redSpy" style="color: black;">Peer (AI)</span>
+            </span>
+        </div>
+
+        <form style="text-align: center;">
+            <button type="submit" id="joinBlueSm">Join Blue Spymaster</button>
+            <button type="submit" id="joinBlueSpy">Join Blue Spy</button>
+            <button type="submit" id="joinRedSm">Join Red Spymaster</button>
+            <button type="submit" id="joinRedSpy">Join Red Spy</button>
+        </form>
+            
+        <form style="text-align: center;">
             <button type="submit" id="clueButtonAI">Give Clue (AI)</button>
+            <button type="submit" id="startGame">START</button>
             <button type="submit" id="guessButtonAI">Make guess (AI)</button>
         </form>
 
@@ -49,6 +70,7 @@
         <div id="board">
         </div>
     </div>
+    <!--
     <div class="sidePanel">
         <p style="color:white;">To do! Here will be the chatbox and other things.</p>
         <div class="chatbox">
@@ -60,6 +82,7 @@
 
             </div>
         </div>
-    </div>
+    </div>    
+    -->
 </body>
 </html>
