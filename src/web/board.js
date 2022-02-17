@@ -67,6 +67,12 @@ function syncNewClient(type) {
     })
 }
 
+function updateTurnState() {
+    server.sendToServer("updateTurn", {
+        "currentTurn" : board.turn
+    })
+}
+
 function enableSpyMode() {
     console.log("spy mode enabled");
     board.turn.role = "spy";
@@ -80,10 +86,15 @@ function enableSpyMode() {
     document.getElementById("clue").placeholder = "";
 }
 
-function updateTurnState() {
-    server.sendToServer("updateTurn", {
-        "currentTurn" : board.turn
-    })
+function getAIConfig() {
+    if (!document.getElementById("blueSm").innerHTML.includes("(AI)"))
+        board.ai.blueSm = false;
+    if (!document.getElementById("blueSpy").innerHTML.includes("(AI)"))
+        board.ai.blueSpy = false;
+    if (!document.getElementById("redSm").innerHTML.includes("(AI)"))
+        board.ai.redSm = false;
+    if (!document.getElementById("redSpy").innerHTML.includes("(AI)"))
+        board.ai.redSpy = false;
 }
 
 class Card
@@ -155,6 +166,12 @@ class BoardState extends Observer{
     redScore;
     blueScore;
     timer = null;
+    ai = {
+        "blueSm" : true,
+        "blueSpy" : true,
+        "redSm" : true,
+        "redSpy" : true
+    };
     player = {
         "team" : null,
         "role" : null
@@ -162,7 +179,7 @@ class BoardState extends Observer{
     turn = {
         "team" : null,
         "role" : null
-    }
+    };
 
     constructor()
     {
@@ -198,6 +215,14 @@ class BoardState extends Observer{
     isPlayersTurn(){
         return (    this.player["team"] === this.turn["team"] 
             &&      this.player["role"] === this.turn["role"]);
+    }
+
+    //return true if it is AI's turn
+    isAITurn(){
+        return (this.turn.team=="blue" && this.turn.role=="spymaster" && this.ai.blueSm)
+            || (this.turn.team=="blue" && this.turn.role=="spy" && this.ai.blueSpy)
+            || (this.turn.team=="red" && this.turn.role=="spymaster" && this.ai.redSm)
+            || (this.turn.team=="red" && this.turn.role=="spy" && this.ai.redSpy)
     }
 
     /*
@@ -299,15 +324,14 @@ class BoardState extends Observer{
             this.blueScore = args.blueScore;
             this.timer = args.timerLength;
             this.turn = args.turn;
-            if (args.turnOver && this.isPlayersTurn()) {
-                updateTurnState();
-            }
             for(var i=0;i<5;i++){
                 for(var j=0;j<5;j++){
                     if(args.cards[i][j].isRevealed)
                         this.cards[i][j].revealCard();
                 }
             }
+            if ( (args.turnOver && this.isPlayersTurn()) || (choice == 1 && this.isAITurn()) )
+                updateTurnState();
         }
         else if(eventName == "forwardClue"){
             this.clueWord = args.clue;
@@ -317,7 +341,8 @@ class BoardState extends Observer{
             //let currentDiv = document.getElementById("board");
             //currentDiv.turn = args.turn;
             this.turn = args.turn;
-            if (this.isPlayersTurn()) updateTurnState();
+            if ( this.isPlayersTurn() || (choice == 1 && this.isAITurn()) )
+                updateTurnState();
         }
         else if (eventName == "sendInitialBoardState") {
             let receivedBoard = args.board;
@@ -329,6 +354,8 @@ class BoardState extends Observer{
                     this.cards[i][j].div.addEventListener("click", this.cardListener.bind(this));
                 }
             }
+            getAIConfig();
+            console.log(this.ai);
             if (board.player.role == "spy") enableSpyMode();
             document.getElementById("joinBlueSpy").style.display = "none";
             document.getElementById("joinBlueSm").style.display = "none";
@@ -355,15 +382,23 @@ class BoardState extends Observer{
             document.getElementById("redSm").style.fontSize = "1em";
             console.log(this.turn);
             if (this.turn["team"] == "blue") {
-                if (this.turn["role"] == "spymaster")
+                if (this.turn["role"] == "spymaster") {
                     document.getElementById("blueSm").style.fontSize = "1.5em";
-                else
+                    if (choice == 1 && this.ai.blueSm) generateClue();
+                }
+                else {
                     document.getElementById("blueSpy").style.fontSize = "1.5em";
+                    if (choice == 1 && this.ai.blueSpy) generateGuess();
+                }
             } else {
-                if (this.turn["role"] == "spymaster")
+                if (this.turn["role"] == "spymaster") {
                     document.getElementById("redSm").style.fontSize = "1.5em";
-                else
+                    if (choice == 1 && this.ai.redSm) generateClue();
+                }
+                else {
                     document.getElementById("redSpy").style.fontSize = "1.5em";
+                    if (choice == 1 && this.ai.redSpy) generateGuess();
+                }
             }
             if (this.isPlayersTurn())
                 alert("It's your turn!");

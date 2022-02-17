@@ -82,15 +82,15 @@ Generate a clue and target number (AI)
 @socket_.on("generateClue", namespace='/')
 def clue_broadcast_message_AI(messageReceived):
     board = list(chain.from_iterable(messageReceived["board"]["cards"]))
-    turn = messageReceived["board"]["turn"]["team"]
+    team = messageReceived["board"]["turn"]["team"]
 
     spymaster = Predictor_sm(relevant_words_path='static/data/relevant_words',
                           relevant_vectors_path='static/data/relevant_vectors',
                           board=board,
-                          turn=turn)
+                          turn=team)
     clue, clue_score, targets = spymaster.run()
-    # this should be updated in this block
-    nextTurn = {"team": "red", "role": "spy"}
+
+    nextTurn = {"team": team, "role": "spy"}
 
     #emit back to the socket
     protocol = 'forwardClue'
@@ -104,7 +104,7 @@ def clue_broadcast_message_AI(messageReceived):
 
 
 """
-Generate a list of guesses
+Generate a list of guesses (AI)
 """
 @socket_.on('generateGuess', namespace='/')
 def guess(messageReceived):
@@ -114,6 +114,7 @@ def guess(messageReceived):
     board = list(chain.from_iterable(messageReceived["board"]["cards"]))
     clue = messageReceived["board"]["clueWord"]
     target_num = messageReceived["board"]["numOfGuesses"]
+    team = messageReceived["board"]["turn"]["team"]
 
     spy = Predictor_spy(relevant_vectors_path='static/data/relevant_vectors',
                     board=board,
@@ -125,8 +126,10 @@ def guess(messageReceived):
         if card["word"] in guesses:
             card["isRevealed"] = True
 
-    # this should be updated in this block
-    nextTurn = {"team": "red", "role": "spymaster"}
+    if (team == "blue"):
+        nextTurn = {"team": "red", "role": "spymaster"}
+    else:
+        nextTurn = {"team": "blue", "role": "spymaster"}
 
     protocol = 'receiveBoardState'
     messageToSend = {
@@ -137,6 +140,7 @@ def guess(messageReceived):
         'blueScore': 1, # this should be updated in this block
         'timerLength': messageReceived["board"]["timer"], \
         'turn': nextTurn, \
+        'turnOver': True, \
         'cards': np.reshape(board,(5,5)).tolist() \
     }
     emit(protocol, messageToSend, broadcast=True)
