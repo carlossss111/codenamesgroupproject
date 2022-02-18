@@ -2,7 +2,7 @@ import socket
 import json
 import numpy as np
 from flask import Flask, render_template, session, copy_current_request_context, request, jsonify
-from flask_socketio import SocketIO, emit, disconnect
+from flask_socketio import SocketIO, emit, disconnect, join_room
 from threading import Lock
 from src.game.generateBoard import *
 from src.game.predictor import *
@@ -14,6 +14,23 @@ socket_ = SocketIO(app, async_mode=async_mode, cors_allowed_origins='*') #todo: 
 thread = None
 thread_lock = Lock()
 
+"""
+Join a game room
+"""
+@socket_.on('joinRoom')
+def on_join(data):
+    room = data['room']
+    name = data['name']
+    join_room(room)
+
+    protocol = 'sendRoomInfo'
+    messageToSend = {
+        'Protocal': protocol,
+        'message': name + ' has entered room ' + room,
+        'name': name
+    }
+    emit(protocol, messageToSend, room=room)
+
 
 """
 create a initial game board
@@ -23,15 +40,15 @@ def index(settings):
     print("Initial game board received!")
     game = generateBoard("static/data/codenames_words", settings["BombCard"])
     board = game.board
+    room = settings["room"]
 
     protocol = 'sendInitialBoardState'
     messageToSend = {
         'Protocol': protocol, \
         'board': board, \
     }
-
     # send to client
-    emit(protocol, messageToSend, broadcast=True)
+    emit(protocol, messageToSend, room=room)
 
 
 """
@@ -63,6 +80,7 @@ def clue_broadcast_message(messageReceived):
     # reassign values
     turn = messageReceived['turn']
     nextTurn = {"team": turn['team'], "role": "spy"}
+    room = messageReceived['room']
 
     # define protocol and message
     protocol = 'forwardClue'
@@ -73,7 +91,7 @@ def clue_broadcast_message(messageReceived):
         'turn': nextTurn \
     }
     # send to client
-    emit(protocol, messageToSend, broadcast=True)
+    emit(protocol, messageToSend, room=room)
 
 
 """
@@ -91,6 +109,7 @@ def clue_broadcast_message_AI(messageReceived):
     clue, clue_score, targets = spymaster.run()
 
     nextTurn = {"team": team, "role": "spy"}
+    room = messageReceived['board']['room']
 
     #emit back to the socket
     protocol = 'forwardClue'
@@ -100,7 +119,7 @@ def clue_broadcast_message_AI(messageReceived):
         'numberOfGuesses' : len(targets),
         'turn' : nextTurn
     }
-    emit(protocol, messageToSend, broadcast=True)
+    emit(protocol, messageToSend, room=room)
 
 
 """
@@ -131,6 +150,8 @@ def guess(messageReceived):
     else:
         nextTurn = {"team": "blue", "role": "spymaster"}
 
+    room = messageReceived['board']['room']
+
     protocol = 'receiveBoardState'
     messageToSend = {
         'Protocol': protocol, \
@@ -143,7 +164,7 @@ def guess(messageReceived):
         'turnOver': True, \
         'cards': np.reshape(board,(5,5)).tolist() \
     }
-    emit(protocol, messageToSend, broadcast=True)
+    emit(protocol, messageToSend, room=room)
 
 
 """
@@ -172,6 +193,8 @@ def boardstate_broadcast_message(boardReceived):
     else:
         nextTurn = {"team": turn['team'], "role": "spy"}
 
+    room = boardReceived['room']
+
     # define protocol and message
     protocol = 'receiveBoardState'
     messageToSend = {
@@ -186,11 +209,12 @@ def boardstate_broadcast_message(boardReceived):
         'cards': boardReceived['cards'] \
     }
     # send to client
-    emit(protocol, messageToSend, broadcast=True)
+    emit(protocol, messageToSend, room=room)
 
 
 @socket_.on('chooseRole', namespace='/')
 def update_role(roleReceived):
+    room = roleReceived['room']
     protocol = 'receiveRole'
     messageToSend = {
         'Protocal': protocol,
@@ -199,13 +223,14 @@ def update_role(roleReceived):
         'redSpy' : roleReceived["redSpy"],
         'redSm' : roleReceived["redSm"]
     }
-    emit(protocol, messageToSend, broadcast=True)
+    emit(protocol, messageToSend, room=room)
 
 
 @socket_.on('syncRole', namespace='/')
 def sync_role(sync):
     protocol = ''
     messageToSend = {}
+    room = sync['room']
     if sync["type"] == "request":
         protocol = 'syncRequest'
         messageToSend = {
@@ -220,16 +245,18 @@ def sync_role(sync):
             'redSpy' : sync["redSpy"],
             'redSm' : sync["redSm"]
         }
-    emit(protocol, messageToSend, broadcast=True)
+    emit(protocol, messageToSend, room=room)
+
 
 @socket_.on('updateTurn', namespace='/')
 def update_turn(turn):
+    room = turn['room']
     protocol = 'changeTurn'
     messageToSend = {
         'Protocal': protocol,
         'currentTurn': turn["currentTurn"]
     }
-    emit(protocol, messageToSend, broadcast=True)
+    emit(protocol, messageToSend, room=room)
 
 
 @socket_.on('disconnect_request', namespace='/test')

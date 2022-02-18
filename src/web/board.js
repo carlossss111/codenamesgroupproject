@@ -3,13 +3,22 @@ Card class, this is where the card is created using a colour and a word and is g
 an action listener to check for when it has been clicked
 */
 
+function joinRoom() {
+    server.sendToServer("joinRoom", {
+        "Protocal" : "joinRoom",
+        "room" : board.room,
+        "name" : nickname
+    })
+}
+
 function boardInitialize(isBombCard) {
     document.getElementById("startGame").style.display = "none";
     server.sendToServer("createInitialBoardState", {
         "Protocol" : "createInitialBoardState",
         //"TimerLength" : 30, This can be set in other ways
         "BombCard" : isBombCard,
-    });
+        "room" : board.room
+    })
 }
 
 // Generate a clue and target number (AI)
@@ -18,7 +27,7 @@ function generateClue() {
         "Protocol" : "generateClue",
         "board" : board,
         "AIDifficulty" : '???'
-    });
+    })
 }
 
 // Generate a list of guesses (AI)
@@ -52,7 +61,8 @@ function chooseRole(newRole) {
         "blueSpy" : document.getElementById("blueSpy").innerHTML,
         "blueSm" : document.getElementById("blueSm").innerHTML,
         "redSpy" : document.getElementById("redSpy").innerHTML,
-        "redSm" : document.getElementById("redSm").innerHTML
+        "redSm" : document.getElementById("redSm").innerHTML,
+        "room" : board.room
     })
 }
 
@@ -63,13 +73,15 @@ function syncNewClient(type) {
         "blueSpy" : document.getElementById("blueSpy").innerHTML,
         "blueSm" : document.getElementById("blueSm").innerHTML,
         "redSpy" : document.getElementById("redSpy").innerHTML,
-        "redSm" : document.getElementById("redSm").innerHTML
+        "redSm" : document.getElementById("redSm").innerHTML,
+        "room" : board.room
     })
 }
 
 function updateTurnState() {
     server.sendToServer("updateTurn", {
-        "currentTurn" : board.turn
+        "currentTurn" : board.turn,
+        "room" : board.room
     })
 }
 
@@ -160,6 +172,7 @@ BoardState class holds the state of the board at any given time while also holdi
 and the players turn. Done so every client has the correct copy of the board at the right time
 */
 class BoardState extends Observer{
+    room;
     cards = [];
     clueWord;
     numOfGuesses;
@@ -270,7 +283,8 @@ class BoardState extends Observer{
             "player" : this.player,
             "turn" : this.turn,
             "cardChosen" : `${i},${j}`,
-            "cards" : this.cards
+            "cards" : this.cards,
+            "room" : this.room
         });
     }
 
@@ -307,7 +321,8 @@ class BoardState extends Observer{
                     "clue" : clue,
                     "numberOfGuesses" : maxGuesses,
                     "player" : this.player,
-                    "turn" : this.turn
+                    "turn" : this.turn,
+                    "room" : this.room
                 })
             }
         }
@@ -403,6 +418,10 @@ class BoardState extends Observer{
             if (this.isPlayersTurn())
                 alert("It's your turn!");
         }
+        else if (eventName == "sendRoomInfo") {
+            if (args.name == nickname)
+                server.sendToServer("chat", {Protocol : "chat", message : `${args.message}`});
+        }
     }
 
     /*
@@ -435,20 +454,23 @@ var board = new BoardState();
 server.registerObserver(board);
 
 var role = "";
-
 var isBombCard;
 
 if (choice == 1) {
+    board.room = prompt("Enter name of your hosted room:", "Great Hall");
     isBombCard = prompt("Do you want Bomb Card in the board? (y/n)", 'y');
     alert("When all players joined, press START to initialize board.");
     if (isBombCard == 'y') isBombCard = true;
     else isBombCard = false;
 }
 else {
+    board.room = prompt("Enter name of the room to join:", "Great Hall");
     alert("Please wait for the host to start game.");
     document.getElementById("startGame").style.display = "none";
     syncNewClient('request');
 }
+document.getElementById("room").innerHTML = "Room: " + board.room;
+joinRoom()
 
 document.getElementById("joinBlueSpy").onclick = function() {chooseRole("blueSpy");};
 document.getElementById("joinBlueSm").onclick = function() {chooseRole("blueSm");};
@@ -456,10 +478,6 @@ document.getElementById("joinRedSpy").onclick = function() {chooseRole("redSpy")
 document.getElementById("joinRedSm").onclick = function() {chooseRole("redSm");};
 
 document.getElementById("startGame").onclick = function() {boardInitialize(isBombCard);};
-
-//Test AI Button
-document.getElementById("clueButtonAI").onclick = function() {generateClue();};
-document.getElementById("guessButtonAI").onclick = function() {generateGuess();};
 
 //Function called only by host user
 function startGame() {
