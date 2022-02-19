@@ -25,7 +25,7 @@ def on_join(data):
 
     protocol = 'sendRoomInfo'
     messageToSend = {
-        'Protocal': protocol,
+        'Protocol': protocol,
         'message': name + ' has entered room ' + room,
         'name': name
     }
@@ -227,7 +227,7 @@ def update_role(roleReceived):
     room = roleReceived['room']
     protocol = 'receiveRole'
     messageToSend = {
-        'Protocal': protocol,
+        'Protocol': protocol,
         'blueSpy' : roleReceived["blueSpy"],
         'blueSm' : roleReceived["blueSm"],
         'redSpy' : roleReceived["redSpy"],
@@ -244,12 +244,12 @@ def sync_role(sync):
     if sync["type"] == "request":
         protocol = 'syncRequest'
         messageToSend = {
-            'Protocal': protocol,
+            'Protocol': protocol,
         }
     elif sync["type"] == "sync":
         protocol = 'receiveRole'
         messageToSend = {
-            'Protocal': protocol,
+            'Protocol': protocol,
             'blueSpy' : sync["blueSpy"],
             'blueSm' : sync["blueSm"],
             'redSpy' : sync["redSpy"],
@@ -263,7 +263,7 @@ def update_turn(turn):
     room = turn['room']
     protocol = 'changeTurn'
     messageToSend = {
-        'Protocal': protocol,
+        'Protocol': protocol,
         'currentTurn': turn["currentTurn"]
     }
     emit(protocol, messageToSend, room=room)
