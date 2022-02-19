@@ -5,7 +5,7 @@ an action listener to check for when it has been clicked
 
 function joinRoom() {
     server.sendToServer("joinRoom", {
-        "Protocal" : "joinRoom",
+        "Protocol" : "joinRoom",
         "room" : board.room,
         "name" : nickname
     })
@@ -33,7 +33,7 @@ function generateClue() {
 // Generate a list of guesses (AI)
 function generateGuess() {
     server.sendToServer("generateGuess", {
-        "Protocal" : "generateGuess",
+        "Protocol" : "generateGuess",
         "board" : board,
         "AIDifficulty" : '???'
     })
@@ -87,8 +87,6 @@ function updateTurnState() {
 
 function enableSpyMode() {
     console.log("spy mode enabled");
-    board.turn.role = "spy";
-    board.player.role = "spy";
     for(var i = 0; i < board.cards.length; i++){
         for(var j = 0; j < board.cards[0].length; j++){
             board.cards[i][j].div.setAttribute("class",`card neutral`); 
@@ -107,6 +105,19 @@ function getAIConfig() {
         board.ai.redSm = false;
     if (!document.getElementById("redSpy").innerHTML.includes("(AI)"))
         board.ai.redSpy = false;
+}
+
+//Functions called only by host user
+function startGame() {
+    board.turn = {"team" : "blue", "role" : "spymaster"};
+    updateTurnState();
+}
+
+function finishGame(winTeam) {
+    server.sendToServer("endGame", {
+        "winner" : winTeam,
+        "room" : board.room
+    })
 }
 
 class Card
@@ -171,7 +182,7 @@ class Card
 BoardState class holds the state of the board at any given time while also holding the score
 and the players turn. Done so every client has the correct copy of the board at the right time
 */
-class BoardState extends Observer{
+class BoardState extends Observer {
     room;
     cards = [];
     clueWord;
@@ -254,7 +265,7 @@ class BoardState extends Observer{
     sends the board state to the server, done when the player has clicked a card
     on the board and made sure it is the correct player.
     */
-    sendBoardState(cardSelected) {
+    sendBoardState(cardSelected){
         var i, j, found = false;
         
         //find and store indexes of the selected card
@@ -335,117 +346,124 @@ class BoardState extends Observer{
     Receives information from the server ad will update when necessary for all clients
     */
     update(eventName, args){
-        if(eventName == "receiveBoardState"){
-            this.clueWord = args.clue;
-            this.numOfGuesses = args.numberOfGuesses;
-            this.redScore = args.redScore;
-            document.getElementById("redScore").innerText = this.redScore;
-            this.blueScore = args.blueScore;
-            document.getElementById("blueScore").innerText = this.blueScore;
-            this.timer = args.timerLength;
-            this.turn = args.turn;
-            for(var i=0;i<5;i++){
-                for(var j=0;j<5;j++){
-                    if(args.cards[i][j].isRevealed)
-                        this.cards[i][j].revealCard();
+        switch (eventName) {
+            case "receiveBoardState":
+                this.clueWord = args.clue;
+                this.numOfGuesses = args.numberOfGuesses;
+                this.redScore = args.redScore;
+                document.getElementById("redScore").innerText = this.redScore;
+                this.blueScore = args.blueScore;
+                document.getElementById("blueScore").innerText = this.blueScore;
+                this.timer = args.timerLength;
+                for(var i=0; i<5; i++){
+                    for(var j=0; j<5; j++){
+                        if(args.cards[i][j].isRevealed)
+                            this.cards[i][j].revealCard();
+                    }
                 }
-            }
-            if ( (args.turnOver && this.isPlayersTurn()) || (choice == 1 && this.isAITurn()) )
-                updateTurnState();
-        }
-        else if(eventName == "forwardClue"){
-            this.clueWord = args.clue;
-            this.numOfGuesses = args.numberOfGuesses;
-            document.getElementById("clue").value = args.clue;
-            document.getElementById("maxClues").value = args.numberOfGuesses;
-            //let currentDiv = document.getElementById("board");
-            //currentDiv.turn = args.turn;
-            this.turn = args.turn;
-            if ( this.isPlayersTurn() || (choice == 1 && this.isAITurn()) )
-                updateTurnState();
-        }
-        else if (eventName == "sendInitialBoardState") {
-            let receivedBoard = args.board;
-            for (let i = 0; i < this.cards.length; i++) {
-                for (let j = 0; j < this.cards[0].length; j++){
-                    let team = receivedBoard[i*this.cards.length+j]["type"];
-                    let word = receivedBoard[i*this.cards.length+j]["name"];
-                    this.cards[i][j] = new Card(team, word);
-                    this.cards[i][j].div.addEventListener("click", this.cardListener.bind(this));
+                //Check if game is over
+                if (this.blueScore == 9 || this.redScore == 9 || args.bombPicked) {
+                    if (choice == 1) {
+                        if (this.blueScore == 9) finishGame("Blue Team");
+                        else if (this.redScore == 9) finishGame("Red Team");
+                        else if (this.turn.team == "blue") finishGame("Red Team");
+                        else if (this.turn.team == "red") finishGame("Blue Team");
+                        this.turn = {"team": null, "role": null};
+                        updateTurnState();
+                    }
+                    return;
                 }
-            }
-            getAIConfig();
-            console.log(this.ai);
-            if (board.player.role == "spy") enableSpyMode();
-            document.getElementById("joinBlueSpy").style.display = "none";
-            document.getElementById("joinBlueSm").style.display = "none";
-            document.getElementById("joinRedSpy").style.display = "none";
-            document.getElementById("joinRedSm").style.display = "none";
-            if (choice == 1) startGame();
-        }
-        else if (eventName == "receiveRole") {
-            document.getElementById("blueSpy").innerHTML = args.blueSpy;
-            document.getElementById("blueSm").innerHTML = args.blueSm;
-            document.getElementById("redSpy").innerHTML = args.redSpy;
-            document.getElementById("redSm").innerHTML = args.redSm;
-        }
-        else if (eventName == "syncRequest") {
-            if (choice == 1) {
-                syncNewClient('sync');
-            }
-        }
-        else if (eventName == "changeTurn") {
-            this.turn = args.currentTurn;
-            document.getElementById("blueSpy").style.fontSize = "1em";
-            document.getElementById("blueSm").style.fontSize = "1em";
-            document.getElementById("redSpy").style.fontSize = "1em";
-            document.getElementById("redSm").style.fontSize = "1em";
-            console.log(this.turn);
-            if (this.turn["team"] == "blue") {
-                if (this.turn["role"] == "spymaster") {
-                    document.getElementById("blueSm").style.fontSize = "1.5em";
-                    if (choice == 1 && this.ai.blueSm) generateClue();
-                }
-                else {
-                    document.getElementById("blueSpy").style.fontSize = "1.5em";
-                    if (choice == 1 && this.ai.blueSpy) generateGuess();
-                }
-            } else {
-                if (this.turn["role"] == "spymaster") {
-                    document.getElementById("redSm").style.fontSize = "1.5em";
-                    if (choice == 1 && this.ai.redSm) generateClue();
-                }
-                else {
-                    document.getElementById("redSpy").style.fontSize = "1.5em";
-                    if (choice == 1 && this.ai.redSpy) generateGuess();
-                }
-            }
-            if (this.isPlayersTurn())
-                alert("It's your turn!");
-        }
-        else if (eventName == "sendRoomInfo") {
-            if (args.name == nickname)
-                server.sendToServer("chat", {Protocol : "chat", message : `${args.message}`});
-        }
-    }
+                //Continue game
+                this.turn = args.turn;
+                if ( (args.turnOver && this.isPlayersTurn()) || (choice == 1 && this.isAITurn()) )
+                    updateTurnState();
+                break;
 
-    /*
-    When game is finished this is what happens after, 
-    temporary implementation 
-    */
-    finishGame(hasWon)
-    {
-        if(hasWon)
-        {
-            let newDiv = document.createElement("div");
-            const currentDiv = document.getElementById("board");
-            newDiv.innerHTML = "<p>" + 'YOU WON' + "</p>";
-            newDiv.style.width = 1000;
-            newDiv.style.height = 500;
-            newDiv.style.colour = "green";
-            currentDiv.appendChild(newDiv);
+            case "forwardClue":
+                this.clueWord = args.clue;
+                this.numOfGuesses = args.numberOfGuesses;
+                document.getElementById("clue").value = args.clue;
+                document.getElementById("maxClues").value = args.numberOfGuesses;
+                //let currentDiv = document.getElementById("board");
+                //currentDiv.turn = args.turn;
+                this.turn = args.turn;
+                if ( this.isPlayersTurn() || (choice == 1 && this.isAITurn()) )
+                    updateTurnState();
+                break;
+
+            case "sendInitialBoardState":
+                let receivedBoard = args.board;
+                for (let i = 0; i < this.cards.length; i++) {
+                    for (let j = 0; j < this.cards[0].length; j++){
+                        let team = receivedBoard[i*this.cards.length+j]["type"];
+                        let word = receivedBoard[i*this.cards.length+j]["name"];
+                        this.cards[i][j] = new Card(team, word);
+                        this.cards[i][j].div.addEventListener("click", this.cardListener.bind(this));
+                    }
+                }
+                getAIConfig();
+                console.log(this.ai);
+                if (board.player.role == "spy") enableSpyMode();
+                document.getElementById("joinBlueSpy").style.display = "none";
+                document.getElementById("joinBlueSm").style.display = "none";
+                document.getElementById("joinRedSpy").style.display = "none";
+                document.getElementById("joinRedSm").style.display = "none";
+                if (choice == 1) startGame();
+                break;
+
+            case "receiveRole":
+                document.getElementById("blueSpy").innerHTML = args.blueSpy;
+                document.getElementById("blueSm").innerHTML = args.blueSm;
+                document.getElementById("redSpy").innerHTML = args.redSpy;
+                document.getElementById("redSm").innerHTML = args.redSm;
+                break;
+
+            case "syncRequest":
+                if (choice == 1) syncNewClient('sync');
+                break;
+
+            case "changeTurn":
+                this.turn = args.currentTurn;
+                document.getElementById("blueSpy").style.fontSize = "1em";
+                document.getElementById("blueSm").style.fontSize = "1em";
+                document.getElementById("redSpy").style.fontSize = "1em";
+                document.getElementById("redSm").style.fontSize = "1em";
+                console.log(this.turn);
+                if (this.turn["team"] == "blue") {
+                    if (this.turn["role"] == "spymaster") {
+                        document.getElementById("blueSm").style.fontSize = "1.5em";
+                        if (choice == 1 && this.ai.blueSm) generateClue();
+                    }
+                    else {
+                        document.getElementById("blueSpy").style.fontSize = "1.5em";
+                        if (choice == 1 && this.ai.blueSpy) generateGuess();
+                    }
+                } else if (this.turn["team"] == "red"){
+                    if (this.turn["role"] == "spymaster") {
+                        document.getElementById("redSm").style.fontSize = "1.5em";
+                        if (choice == 1 && this.ai.redSm) generateClue();
+                    }
+                    else {
+                        document.getElementById("redSpy").style.fontSize = "1.5em";
+                        if (choice == 1 && this.ai.redSpy) generateGuess();
+                    }
+                }
+                if (this.isPlayersTurn())
+                    alert("It's your turn!");
+                break;
+
+            case "sendRoomInfo":
+                if (args.name == nickname)
+                    server.sendToServer("chat", {Protocol : "chat", message : `${args.message}`});
+                break;
+
+            case "gameOver":
+                alert(args.winTeam + " Wins!");
+                break;
+
+            default:
+                break;
         }
-        else return; 
     }
 }
 
@@ -483,9 +501,3 @@ document.getElementById("joinRedSpy").onclick = function() {chooseRole("redSpy")
 document.getElementById("joinRedSm").onclick = function() {chooseRole("redSm");};
 
 document.getElementById("startGame").onclick = function() {boardInitialize(isBombCard);};
-
-//Function called only by host user
-function startGame() {
-    board.turn = {"team" : "blue", "role" : "spymaster"};
-    updateTurnState();
-}

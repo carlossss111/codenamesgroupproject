@@ -1,7 +1,5 @@
-import socket
-import json
 import numpy as np
-from flask import Flask, render_template, session, copy_current_request_context, request, jsonify
+from flask import Flask, session, copy_current_request_context, request
 from flask_socketio import SocketIO, emit, disconnect, join_room
 from threading import Lock
 from src.game.generateBoard import *
@@ -121,14 +119,12 @@ def clue_broadcast_message_AI(messageReceived):
     }
     emit(protocol, messageToSend, room=room)
 
+
 """
 Generate a list of guesses (AI)
 """
 @socket_.on('generateGuess', namespace='/')
 def guess(messageReceived):
-    """ #this needs integrating
-    guesses = jsonify(guesses=spy.run())
-    """
     board = list(chain.from_iterable(messageReceived["board"]["cards"]))
     clue = messageReceived["board"]["clueWord"]
     target_num = messageReceived["board"]["numOfGuesses"]
@@ -142,6 +138,7 @@ def guess(messageReceived):
 
     redScore = messageReceived["board"]["redScore"]
     blueScore = messageReceived["board"]["blueScore"]
+    bombPicked = False
     for card in board:
         if card["word"] in guesses:
             card["isRevealed"] = True
@@ -149,6 +146,8 @@ def guess(messageReceived):
                 redScore += 1
             elif card["colour"] == "blueTeam":
                 blueScore += 1
+            elif card["colour"] == "bombCard":
+                bombPicked = True
 
     if (team == "blue"):
         nextTurn = {"team": "red", "role": "spymaster"}
@@ -167,6 +166,7 @@ def guess(messageReceived):
         'timerLength': messageReceived["board"]["timer"], \
         'turn': nextTurn, \
         'turnOver': True, \
+        'bombPicked': bombPicked, \
         'cards': np.reshape(board,(5,5)).tolist() \
     }
     emit(protocol, messageToSend, room=room)
@@ -182,19 +182,23 @@ def boardstate_broadcast_message(boardReceived):
     numOfGuesses = int(boardReceived['numberOfGuesses']) - 1
     turn = boardReceived['turn']
     isTurnOver = False
+    bombPicked = False
 
-    redScore = boardReceived['redScore']
-    blueScore = boardReceived['blueScore']
     cardI = int(boardReceived['cardChosen'].split(',')[0])
     cardJ = int(boardReceived['cardChosen'].split(',')[1])
     cardSelected = boardReceived['cards'][cardI][cardJ]
-    if(cardSelected['colour'] == 'redTeam'):
+    
+    redScore = boardReceived['redScore']
+    blueScore = boardReceived['blueScore']
+    colour = cardSelected['colour']
+    if colour == 'redTeam':
         redScore += 1
-    if(cardSelected['colour'] == 'blueTeam'):
+    elif colour == 'blueTeam':
         blueScore += 1
+    elif colour == 'bombCard':
+        bombPicked = True
 
-    # TO DO: if pick other team's card, change turn
-    if numOfGuesses == 0:
+    if numOfGuesses == 0 or colour[:len(colour)-4] != turn['team']:
         isTurnOver = True
         if turn['team'] == 'blue':
             nextTurn = {"team": "red", "role": "spymaster"}
@@ -216,6 +220,7 @@ def boardstate_broadcast_message(boardReceived):
         'timerLength': boardReceived['timerLength'], \
         'turn': nextTurn, \
         'turnOver': isTurnOver, \
+        'bombPicked': bombPicked, \
         'cards': boardReceived['cards'] \
     }
     # send to client
@@ -265,6 +270,18 @@ def update_turn(turn):
     messageToSend = {
         'Protocol': protocol,
         'currentTurn': turn["currentTurn"]
+    }
+    emit(protocol, messageToSend, room=room)
+
+
+@socket_.on('endGame', namespace='/')
+def game_over(winTeam):
+    room = winTeam['room']
+
+    protocol = 'gameOver'
+    messageToSend = {
+        'Protocol': protocol,
+        'winTeam': winTeam['winner']
     }
     emit(protocol, messageToSend, room=room)
 

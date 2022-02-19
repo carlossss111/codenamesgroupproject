@@ -1,6 +1,5 @@
 from itertools import chain
 import pickle
-import re
 import numpy as np
 
 

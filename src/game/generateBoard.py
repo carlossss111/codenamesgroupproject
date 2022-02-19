@@ -1,7 +1,4 @@
-import random
-import socket
 import numpy as np
-import argparse
 
 
 class generateBoard:
