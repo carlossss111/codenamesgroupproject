@@ -255,22 +255,25 @@ class BoardState extends Observer{
     on the board and made sure it is the correct player.
     */
     sendBoardState(cardSelected) {
-        //find index of cardSelected
-        var i;
-        var j = -1;
-
-        for (i = 0; i < this.cards.length; i++)
-        {  
-            var alpha = this.cards[i];
-            for (var k = 0; k < alpha.length; k++)
-            {
-                if(alpha[k].word == cardSelected.word) j = 1;
+        var i, j, found = false;
+        
+        //find and store indexes of the selected card
+        for(i = 0; i < this.cards.length; i++){
+            for(j = 0; j < this.cards[i].length; j++){
+                if(this.cards[i][j].div == cardSelected.div){
+                    found = true;
+                    break;
+                }
             }
+            if(found)
+                break;
         }
-        
-        if(j == -1)
-            throw new Error("Card selected not found!")
-        
+
+        //check the card has been found in the array (critical error if not)
+        if(!found)
+            throw new Error("The card selected cannot not been found in the card array");
+
+
         //send board to server
         server.sendToServer("sendBoardState",
         {
@@ -336,7 +339,9 @@ class BoardState extends Observer{
             this.clueWord = args.clue;
             this.numOfGuesses = args.numberOfGuesses;
             this.redScore = args.redScore;
+            document.getElementById("redScore").innerText = this.redScore;
             this.blueScore = args.blueScore;
+            document.getElementById("blueScore").innerText = this.blueScore;
             this.timer = args.timerLength;
             this.turn = args.turn;
             for(var i=0;i<5;i++){

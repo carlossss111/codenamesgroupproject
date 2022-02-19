@@ -121,7 +121,6 @@ def clue_broadcast_message_AI(messageReceived):
     }
     emit(protocol, messageToSend, room=room)
 
-
 """
 Generate a list of guesses (AI)
 """
@@ -141,9 +140,15 @@ def guess(messageReceived):
                     target_num=target_num)
     guesses = spy.run()
 
+    redScore = messageReceived["board"]["redScore"]
+    blueScore = messageReceived["board"]["blueScore"]
     for card in board:
         if card["word"] in guesses:
             card["isRevealed"] = True
+            if card["colour"] == "redTeam":
+                redScore += 1
+            elif card["colour"] == "blueTeam":
+                blueScore += 1
 
     if (team == "blue"):
         nextTurn = {"team": "red", "role": "spymaster"}
@@ -157,8 +162,8 @@ def guess(messageReceived):
         'Protocol': protocol, \
         'clue': clue, \
         'numberOfGuesses': target_num, \
-        'redScore': 1, # this should be updated in this block
-        'blueScore': 1, # this should be updated in this block
+        'redScore': redScore, \
+        'blueScore': blueScore, \
         'timerLength': messageReceived["board"]["timer"], \
         'turn': nextTurn, \
         'turnOver': True, \
@@ -174,14 +179,19 @@ send/receive BoardState Protocol
 def boardstate_broadcast_message(boardReceived):
     print("Board State Received!")
 
-    # need reassign values
-    redScore = 1
-    blueScore = 1
-
     numOfGuesses = int(boardReceived['numberOfGuesses']) - 1
-
     turn = boardReceived['turn']
     isTurnOver = False
+
+    redScore = boardReceived['redScore']
+    blueScore = boardReceived['blueScore']
+    cardI = int(boardReceived['cardChosen'].split(',')[0])
+    cardJ = int(boardReceived['cardChosen'].split(',')[1])
+    cardSelected = boardReceived['cards'][cardI][cardJ]
+    if(cardSelected['colour'] == 'redTeam'):
+        redScore += 1
+    if(cardSelected['colour'] == 'blueTeam'):
+        blueScore += 1
 
     # TO DO: if pick other team's card, change turn
     if numOfGuesses == 0:
