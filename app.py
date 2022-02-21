@@ -39,11 +39,14 @@ def index(settings):
     game = generateBoard("static/data/codenames_words", settings["BombCard"])
     board = game.board
     room = settings["room"]
+    timer = settings["TimerLength"]
 
     protocol = 'sendInitialBoardState'
     messageToSend = {
         'Protocol': protocol, \
         'board': board, \
+        'timerLength': timer, \
+        'vocabulary': getVocabulary()
     }
     # send to client
     emit(protocol, messageToSend, room=room)
@@ -108,13 +111,14 @@ def clue_broadcast_message_AI(messageReceived):
 
     nextTurn = {"team": team, "role": "spy"}
     room = messageReceived['board']['room']
+    numGuesses = max(len(targets), 1)
 
     #emit back to the socket
     protocol = 'forwardClue'
     messageToSend = {
         'Protocol' : protocol,
         'clue' : clue,
-        'numberOfGuesses' : len(targets),
+        'numberOfGuesses' : numGuesses,
         'turn' : nextTurn
     }
     emit(protocol, messageToSend, room=room)

@@ -15,7 +15,7 @@ function boardInitialize(isBombCard) {
     document.getElementById("startGame").style.display = "none";
     server.sendToServer("createInitialBoardState", {
         "Protocol" : "createInitialBoardState",
-        //"TimerLength" : 30, This can be set in other ways
+        "TimerLength" : board.timer,
         "BombCard" : isBombCard,
         "room" : board.room
     })
@@ -105,6 +105,22 @@ function getAIConfig() {
         board.ai.redSm = false;
     if (!document.getElementById("redSpy").innerHTML.includes("(AI)"))
         board.ai.redSpy = false;
+}
+
+//Countdown function
+function timerCount() {
+    var timeLeft = parseInt(document.getElementById("timer").innerHTML, 10);
+    timeLeft -= 1;
+    document.getElementById("timer").innerHTML = timeLeft;
+    if (timeLeft <= 0) {
+        clearInterval(timerVar);
+        if (choice == 1) {
+            if (board.turn.team == "blue") finishGame("Red Team");
+            else if (board.turn.team == "red") finishGame("Blue Team");
+            board.turn = {"team": null, "role": null};
+            updateTurnState();
+        }
+    }
 }
 
 //Functions called only by host user
@@ -220,7 +236,7 @@ class BoardState extends Observer {
         }
     }
 
-    cardListener(event){
+    cardListener(event) {
         if (!this.isPlayersTurn() || this.player.role == "spymaster") return;
         var card = null;
         for(var i = 0; i < this.cards.length; i++){
@@ -236,17 +252,23 @@ class BoardState extends Observer {
     }
 
     //return true if it is this client's turn
-    isPlayersTurn(){
+    isPlayersTurn() {
         return (    this.player["team"] === this.turn["team"] 
             &&      this.player["role"] === this.turn["role"]);
     }
 
     //return true if it is AI's turn
-    isAITurn(){
+    isAITurn() {
         return (this.turn.team=="blue" && this.turn.role=="spymaster" && this.ai.blueSm)
             || (this.turn.team=="blue" && this.turn.role=="spy" && this.ai.blueSpy)
             || (this.turn.team=="red" && this.turn.role=="spymaster" && this.ai.redSm)
             || (this.turn.team=="red" && this.turn.role=="spy" && this.ai.redSpy)
+    }
+
+    //return true if next turn is a spy AI (for input clue recognization)
+    isAISpy() {
+        if (this.turn.team=="blue") return this.ai.blueSpy;
+        else return this.ai.redSpy;
     }
 
     /*
@@ -254,7 +276,7 @@ class BoardState extends Observer {
     to be taking there turn right now. if not then it will not do anything to the board
     If it is the correct player then the board will update.
     */
-    validateClick(cardSelected,turn){
+    validateClick(cardSelected,turn) {
         if(cardSelected.isRevealed == true) return false;
         else if(turn.team != this.player.team) return false;
         else if(turn.role != this.player.role) return false;
@@ -265,7 +287,7 @@ class BoardState extends Observer {
     sends the board state to the server, done when the player has clicked a card
     on the board and made sure it is the correct player.
     */
-    sendBoardState(cardSelected){
+    sendBoardState(cardSelected) {
         var i, j, found = false;
         
         //find and store indexes of the selected card
@@ -303,11 +325,10 @@ class BoardState extends Observer {
     }
 
     /*
-    
     Makes sure clue is not already one on the board and then forwards the clue to the 
     server(and then to the other players) 
     */
-    forwardClue(){
+    forwardClue() {
         //check that it is this player's turn and it is the spymaster's turn
         if (!this.isPlayersTurn()) return;
         //checks if clue is on the board if it is then break and not send to server
@@ -317,11 +338,15 @@ class BoardState extends Observer {
             let valid = true;
 
             for (let i = 0; i < this.cards.length; i++) {
-                for (let j = 0; j < this.cards[0].length; j++){
-                    if(clue.toLowerCase() == this.cards[i][j].word){
+                for (let j = 0; j < this.cards[0].length; j++) {
+                    if (clue.toLowerCase() == this.cards[i][j].word) {
                         valid = false;
                         alert("Clue cannot be the same as board words!");
                         break;
+                    } else if (!vocabulary.includes(clue.toLowerCase()) && this.isAISpy()) {
+                        valid = false;
+                        alert("Word not recognized by AI spy. Please try again.");
+                        return;
                     }
                 }
             }
@@ -345,7 +370,7 @@ class BoardState extends Observer {
     /*
     Receives information from the server ad will update when necessary for all clients
     */
-    update(eventName, args){
+    update(eventName, args) {
         switch (eventName) {
             case "receiveBoardState":
                 this.clueWord = args.clue;
@@ -393,6 +418,12 @@ class BoardState extends Observer {
 
             case "sendInitialBoardState":
                 let receivedBoard = args.board;
+                vocabulary = args.vocabulary;
+                this.timer = args.timerLength;
+                if (this.timer != null) {
+                    document.getElementById("timeLeft").style.display = "inline";
+                    document.getElementById("timer").innerHTML = this.timer;
+                }
                 for (let i = 0; i < this.cards.length; i++) {
                     for (let j = 0; j < this.cards[0].length; j++){
                         let team = receivedBoard[i*this.cards.length+j]["type"];
@@ -403,7 +434,7 @@ class BoardState extends Observer {
                 }
                 getAIConfig();
                 console.log(this.ai);
-                if (board.player.role == "spy") enableSpyMode();
+                if (this.player.role == "spy") enableSpyMode();
                 document.getElementById("joinBlueSpy").style.display = "none";
                 document.getElementById("joinBlueSm").style.display = "none";
                 document.getElementById("joinRedSpy").style.display = "none";
@@ -423,6 +454,8 @@ class BoardState extends Observer {
                 break;
 
             case "changeTurn":
+                document.getElementById("turnAlert").style.display = "none";
+                if (this.timer != null) clearInterval(timerVar);
                 this.turn = args.currentTurn;
                 document.getElementById("blueSpy").style.fontSize = "1em";
                 document.getElementById("blueSm").style.fontSize = "1em";
@@ -448,8 +481,12 @@ class BoardState extends Observer {
                         if (choice == 1 && this.ai.redSpy) generateGuess();
                     }
                 }
+                if (this.timer != null) {
+                    document.getElementById("timer").innerHTML = this.timer;
+                    timerVar = setInterval(timerCount, 1000);
+                }
                 if (this.isPlayersTurn())
-                    alert("It's your turn!");
+                    document.getElementById("turnAlert").style.display = "block";
                 break;
 
             case "sendRoomInfo":
@@ -458,6 +495,7 @@ class BoardState extends Observer {
                 break;
 
             case "gameOver":
+                document.getElementById("timeLeft").style.display = "none";
                 alert(args.winTeam + " Wins!");
                 break;
 
@@ -472,16 +510,20 @@ var choice = prompt("Host a game (1) or join a game (2)?");
 
 var nickname = prompt("Enter your nickname:", "Cool Guy");
 var tmpName = "";
+var timerVar;
 
 var board = new BoardState();
 server.registerObserver(board);
 
 var role = "";
 var isBombCard;
+var vocabulary;
 
 if (choice == 1) {
     board.room = prompt("Enter name of your hosted room:", "Great Hall");
     isBombCard = prompt("Do you want Bomb Card in the board? (y/n)", 'y');
+    if (prompt("Do you want timer for one turn? (y/n)", 'y') == 'y')
+        board.timer = prompt("Enter timer length for one turn", '30');
     alert("When all players joined, press START to initialize board.");
     if (isBombCard == 'y') isBombCard = true;
     else isBombCard = false;
@@ -492,6 +534,8 @@ else {
     document.getElementById("startGame").style.display = "none";
     syncNewClient('request');
 }
+document.getElementById("turnAlert").style.display = "none";
+document.getElementById("timeLeft").style.display = "none";
 document.getElementById("room").innerHTML = "Room: " + board.room;
 joinRoom()
 
