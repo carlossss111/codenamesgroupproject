@@ -189,6 +189,7 @@ class Predictor_sm:
         with open(self.relevant_words_path, 'rb') as f:
             relevant_words = pickle.load(f)
         potential_guesses = set(chain.from_iterable(relevant_words[w] for w in self.blue))
+        # the following condition is not likely to happen
         if len(potential_guesses) == 0:
             print("Generate neutral clue")
             potential_guesses = set(chain.from_iterable(relevant_words[w] for w in self.neutral))
