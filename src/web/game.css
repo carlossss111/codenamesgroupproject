@@ -19,6 +19,7 @@
     justify-content: center;
     align-items: center;
     margin: 10px;
+    transition: transform 0.5s ease-in-out;
 }
 
 .card p {
@@ -88,7 +89,6 @@
     background-color: #3399ff;
     border: darkblue dashed 3px;
     border-radius: 10px;
-
 }
 
 .redTeam {
