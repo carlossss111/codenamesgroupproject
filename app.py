@@ -191,6 +191,7 @@ def boardstate_broadcast_message(boardReceived):
     cardI = int(boardReceived['cardChosen'].split(',')[0])
     cardJ = int(boardReceived['cardChosen'].split(',')[1])
     cardSelected = boardReceived['cards'][cardI][cardJ]
+    cardSelected['isRevealed'] = True
     
     redScore = boardReceived['redScore']
     blueScore = boardReceived['blueScore']
