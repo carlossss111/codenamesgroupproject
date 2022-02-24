@@ -11,14 +11,18 @@
     <link href="../src/web/game.css" type="text/css" rel="stylesheet" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap" rel="stylesheet"> 
+    <link href="https://fonts.googleapis.com/css2?family=Russo+One&di lay=swap" rel="stylesheet"> 
     <script src="../src/web/board.js" defer></script>
     <script src="https://cdn.socket.io/4.4.0/socket.io.min.js" integrity="sha384-1fOn6VtTq3PWwfsOrk45LnYcGosJwzMHv+Xh/Jx5303FVOXzEnw0EpLv30mtjmlj" crossorigin="anonymous"></script>
     <script src="../src/web/server.js"></script>
     <script src="../src/web/chat.js" defer></script>
     <title>Nottingham Codenames</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
 </head>
 <body>
+<<<<<<< HEAD
     <div class="mainContainer">
         To do!
         <a href="../index.html">[to main page]</a>
@@ -54,7 +58,72 @@
         <form style="text-align: center;">
             <button type="submit" id="startGame">START</button>
         </form>
+=======
+    To do!
+    <a href="../index.html">[to main page]</a>
+    <span id="joinSpy" style="color:blue; text-decoration:underline;">[to join spy team]</span>
+    <!-- Working on collapsible side panel which is compatabile with mobile // scripts will be moved to a .js after--->
+    <input type="checkbox" class="openSidebarMenu" id="openSidebarMenu" onclick="MoveBoard()">
+    <label for="openSidebarMenu" class="sidebarIconToggle">
+        <div class="arrow"></div>
+    </label>
+    <div id="sidebarMenu">
+        <p style="color:white;">To do! Here will be the chatbox and other things.</p>
+        <p style ="color: white">Refinement needed; perhaps a tab where the arrow can go?</p>
+        <div class="chatbox">
+            <form action="#" id="chatboxSend">
+                <input type="text" ></input>
+                <input type="submit" value="send chat"></input>
+            </form>
+            <div id="chatboxReceive"></div>  
+        </div>
 
+        <div class="score">
+            <p id="scoreText">Score</p>
+            <p id="scoreText">Red team  | Blue Team</p>
+
+            <p id="scores">10 - 9</p>
+        </div>
+    </div>
+    <div class="setBox" id="setBox">
+        <img src="../rsc/images/back.png" id="back" class="back" alt="" srcset="">
+        <div class="setTit">
+            Codenames
+        </div>
+        <div class="setSubTit">
+            Local Settings
+        </div>
+        
+        <div class="setItem">
+            <img class="setItemIcon" src="../rsc/images/voice.png" alt="" srcset="">
+            <div class="setItemDesc">
+                Effect Audio
+            </div>
+            <input id="effectAudio" value="100" class="setItemRange" type="range">
+            <div id="effectAudioVal" class="setItemRangeVal">
+                100
+            </div>
+        </div>
+
+        <div class="setItem">
+            <img class="setItemIcon" src="../rsc/images/music.png" alt="" srcset="">
+            <div class="setItemDesc">
+                Music
+            </div>
+            <input value="100" id="music" class="setItemRange" type="range">
+            <div id="musicVal" class="setItemRangeVal">
+                100
+            </div>
+        </div>
+>>>>>>> WebDev
+
+    </div>
+
+    <div class="mainContainer">
+        <h1>
+            Codenames
+            <img class="set" id="set" src="../rsc/images/set.png" alt="" srcset="">
+        </h1>
         <!-- clue Box temp max clues in future should only show max clues up to the amount of cards left --->
         <form class="clueBox" action="#" onsubmit="board.forwardClue()" style="text-align: center;">
             <input type="text" id="clue" placeholder="Enter clue"></input>
@@ -76,6 +145,7 @@
         <div id="board">
         </div>
     </div>
+<<<<<<< HEAD
     <div class="sidePanel">
         <p style="color:white;">To do! Here will be the chatbox and other things.</p>
         <div class="chatbox">
@@ -87,5 +157,8 @@
             </div>
         </div>
     </div>    
+=======
+>>>>>>> WebDev
 </body>
+
 </html>
