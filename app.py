@@ -36,7 +36,7 @@ create a initial game board
 @socket_.on("createInitialBoardState", namespace='/')
 def index(settings):
     print("Initial game board received!")
-    game = generateBoard("static/data/codenames_words", settings["BombCard"])
+    game = generateBoard("rsc/data/codenames_words", settings["BombCard"])
     board = game.board
     room = settings["room"]
     timer = settings["TimerLength"]
@@ -103,8 +103,8 @@ def clue_broadcast_message_AI(messageReceived):
     board = list(chain.from_iterable(messageReceived["board"]["cards"]))
     team = messageReceived["board"]["turn"]["team"]
 
-    spymaster = Predictor_sm(relevant_words_path='static/data/relevant_words',
-                          relevant_vectors_path='static/data/relevant_vectors',
+    spymaster = Predictor_sm(relevant_words_path='rsc/data/relevant_words',
+                          relevant_vectors_path='rsc/data/relevant_vectors',
                           board=board,
                           turn=team)
     clue, clue_score, targets = spymaster.run()
@@ -134,7 +134,7 @@ def guess(messageReceived):
     target_num = messageReceived["board"]["numOfGuesses"]
     team = messageReceived["board"]["turn"]["team"]
 
-    spy = Predictor_spy(relevant_vectors_path='static/data/relevant_vectors',
+    spy = Predictor_spy(relevant_vectors_path='rsc/data/relevant_vectors',
                     board=board,
                     clue=clue,
                     target_num=target_num)

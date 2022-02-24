@@ -54,6 +54,6 @@ class generateBoard:
 
 
 def getVocabulary():
-    with open("static/data/word_dict", 'r') as f:
+    with open("rsc/data/word_dict", 'r') as f:
         words = [line.rstrip() for line in f]
         return words
