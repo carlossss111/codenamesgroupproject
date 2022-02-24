@@ -3,12 +3,7 @@ BLUE_IMAGE = "url('../rsc/images/blueteam.jpg')";
 NEUTRAL_IMAGE = "url('../rsc/images/neutral.jpg')";
 BOMB_IMAGE = "url('../rsc/images/bomb.jpg')";
 
-GAME_BG_AUDIO = "../rsc/audio/bg.mp3";
-GAME_FLIP_AUDIO = "../rsc/audio/flip.mp3";
-
 DEBUG_SKIP_VALIDATION = true;
-var bgAudioCtx;
-var flipAudioVolume = 1;
 
 function joinRoom() {
     server.sendToServer("joinRoom", {
@@ -184,10 +179,9 @@ class Card {
      * This should be called whenever an updated boardstate is received from the server.
      */
     revealCard() {
-        if (!this.isRevealed) {
-            playFlipVoice()
-        }
-        console.log("REVEALED: ", this.div);
+        //play audio
+        playFlipAudio();
+
         //set attributes and remove text
         this.isRevealed = true;
         this.div.innerHTML = "";
@@ -634,38 +628,4 @@ function MoveBoard() {
 
     }
 
-}
-
-function initGameBgAudio() {
-    bgAudioCtx = new Audio(GAME_BG_AUDIO);
-    // loop play
-    bgAudioCtx.onended = function () {
-        bgAudioCtx.play();
-    }
-    bgAudioCtx.play();
-}
-initGameBgAudio();
-
-function playFlipVoice() {
-    var flipAudioCtx = new Audio(GAME_FLIP_AUDIO);
-    flipAudioCtx.volume = flipAudioVolume;
-    flipAudioCtx.play();
-}
-document.getElementById("effectAudio").onchange = function () {
-    let val = this.value;
-    document.getElementById("effectAudioVal").innerText = val;
-    flipAudioVolume = val / 100;
-}
-
-document.getElementById("music").onchange = function () {
-    let val = this.value;
-    document.getElementById("musicVal").innerText = val;
-    bgAudioCtx.volume = val / 100;
-}
-
-document.getElementById("back").onclick = function () {
-    document.getElementById("setBox").style.display = "none";
-}
-document.getElementById("set").onclick = function () {
-    document.getElementById("setBox").style.display = "block";
 }
