@@ -15,6 +15,9 @@ class Chatbox extends Observer{
 
         var chatboxSend = document.getElementById("chatboxSend");
         var chatboxSendText = chatboxSend[0];
+        var str_to_send = nickname + chatboxSendText.value;
+        
+
 
         chatboxSend.addEventListener("submit", () => {
             this.sendChat(chatboxSendText.value);

@@ -96,6 +96,7 @@ function enableSpyMode() {
     }
     document.getElementById("clueButton").style.display = "none";
     document.getElementById("clue").placeholder = "";
+    document.getElementById("clue").readOnly = true;
 }
 
 function getAIConfig() {
