@@ -135,22 +135,23 @@ function finishGame(winTeam) {
  * Sets the timer maximum, runs it every second and handles
  * when the timer has ran out.
  */
-class Timer{
+class Timer {
     maxTime = null; //length of timer
     timeLeft;
     timerVar; //for setInterval() calls
 
     //set the max time
-    setMaxTime(mTime){
-        if(mTime)
+    setMaxTime(mTime) {
+        if (mTime)
             this.maxTime = mTime;
-        else if(mTime != null)
+        else if (mTime != null)
             console.log("Warning: setMaxTime() has tried to use a falsy parameter (e.g undefined)");
     }
 
     //when the timer runs out
-    runOut = ()=> {
+    runOut = () => {
         clearInterval(this.timerVar);
+        this.maxTime = null;
         if (choice == 1) {
             if (board.turn.team == "blue") finishGame("Red Team");
             else if (board.turn.team == "red") finishGame("Blue Team");
@@ -160,7 +161,7 @@ class Timer{
     }
 
     //runs every second
-    tick = ()=> {
+    tick = () => {
         //print the time left
         this.timeLeft--;
         document.getElementById("timer").innerHTML = this.timeLeft;
@@ -170,12 +171,13 @@ class Timer{
     }
 
     //restart the timer
-    reset = ()=> {
+    reset = () => {
         if(this.maxTime == null)
             return;
 
         clearInterval(this.timerVar);
         this.timeLeft = this.maxTime;
+        console.log(this);
         document.getElementById("timer").innerHTML = this.maxTime;
         this.timerVar = setInterval(this.tick, 1000); //sets tick() to run every second
     }
@@ -396,7 +398,6 @@ class BoardState extends Observer {
             "numberOfGuesses" : this.numOfGuesses,
             "redScore" : this.redScore,
             "blueScore" : this.blueScore,
-            "timerLength" : this.timer.maxTime,
             "player" : this.player,
             "turn" : this.turn,
             "cardChosen" : `${i},${j}`,
@@ -457,7 +458,6 @@ class BoardState extends Observer {
                 this.numOfGuesses = incoming.numberOfGuesses;
                 this.redScore = incoming.redScore;
                 this.blueScore = incoming.blueScore;
-                this.timer.setMaxTime(incoming.timerLength);
 
                 //display new scores
                 document.getElementById("redScore").innerText = this.redScore;
@@ -481,6 +481,7 @@ class BoardState extends Observer {
                         this.turn = {"team": null, "role": null};
                         updateTurnState();
                     }
+                    this.timer.maxTime = null;
                     return;
                 }
 

@@ -167,7 +167,6 @@ def guess(messageReceived):
         'numberOfGuesses': target_num, \
         'redScore': redScore, \
         'blueScore': blueScore, \
-        'timerLength': messageReceived["board"]["timer"], \
         'turn': nextTurn, \
         'turnOver': True, \
         'bombPicked': bombPicked, \
@@ -222,7 +221,6 @@ def boardstate_broadcast_message(boardReceived):
         'numberOfGuesses': numOfGuesses, \
         'redScore': redScore, \
         'blueScore': blueScore, \
-        'timerLength': boardReceived['timerLength'], \
         'turn': nextTurn, \
         'turnOver': isTurnOver, \
         'bombPicked': bombPicked, \
