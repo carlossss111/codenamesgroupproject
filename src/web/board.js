@@ -109,19 +109,34 @@ function getAIConfig() {
         board.ai.redSpy = false;
 }
 
-//Countdown function
-function timerCount() {
-    var timeLeft = parseInt(document.getElementById("timer").innerHTML, 10);
-    timeLeft -= 1;
-    document.getElementById("timer").innerHTML = timeLeft;
-    if (timeLeft <= 0) {
-        clearInterval(timerVar);
+class Timer{
+    timerVar;
+
+    //when timer runs out
+    runOut(){
+        clearInterval(this.timerVar);
         if (choice == 1) {
             if (board.turn.team == "blue") finishGame("Red Team");
             else if (board.turn.team == "red") finishGame("Blue Team");
             board.turn = {"team": null, "role": null};
             updateTurnState();
         }
+    }
+
+    //runs every second
+    tick(){
+        var timeLeft = parseInt(document.getElementById("timer").innerHTML, 10);
+        timeLeft -= 1;
+        document.getElementById("timer").innerHTML = timeLeft;
+        if (timeLeft <= 0) 
+            timer.runOut();
+    }
+
+    //resets the timer and starts it
+    reset(){
+        clearInterval(this.timerVar);
+        document.getElementById("timer").innerHTML = BoardState.getInstance().timer;
+        this.timerVar = setInterval(this.tick, 1000);
     }
 }
 
@@ -547,11 +562,8 @@ class BoardState extends Observer {
                 }
 
                 //reinitialise the timer
-                if (this.timer != null) {
-                    clearInterval(timerVar);
-                    document.getElementById("timer").innerHTML = this.timer;
-                    timerVar = setInterval(timerCount, 1000);
-                }
+                if (this.timer != null)
+                    timer.reset();
 
                 //alert the player if their turn
                 if (this.isPlayersTurn())
@@ -581,7 +593,8 @@ var choice = prompt("Host a game (1) or join a game (2)?");
 
 var nickname = prompt("Enter your nickname:", "Cool Guy");
 var tmpName = "";
-var timerVar;
+//var timerVar;
+var timer = new Timer();
 
 //var board = new BoardState();
 var board = BoardState.getInstance();
