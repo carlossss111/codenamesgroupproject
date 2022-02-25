@@ -123,8 +123,6 @@
     height: 10rem;
     background-color: #97CAEF;
     border-radius: 10px;
-
-
 }
 
 #sidebarMenu {
@@ -238,12 +236,9 @@
 
 
 @media only screen and (max-width: 600px) {
-
     body {
         background-color: lightblue;
-
     }
-
 }
 
 h1 {
@@ -253,9 +248,8 @@ h1 {
 .set {
     width: 60px;
     position: absolute;
-    top: 50%;
+    top: 20px;
     transform: translate(0, -50%);
-    right: -50px;
     cursor: pointer;
 }
 
@@ -322,8 +316,6 @@ input[type=range]::-webkit-slider-thumb {
     border-radius: 50%;
     border: solid 1px #ddd;
 }
-
-
 
 .back {
     position: absolute;

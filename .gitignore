@@ -1,8 +1,5 @@
 #macOS
 .DS_Store
 
-#the dataset is too large to store on gitlab
-src/ai/dataset/*
-src/ai/log_file
-
+#python cache
 __pycache__/

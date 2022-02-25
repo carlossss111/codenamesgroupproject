@@ -3,7 +3,7 @@ BLUE_IMAGE = "url('../rsc/images/blueteam.jpg')";
 NEUTRAL_IMAGE = "url('../rsc/images/neutral.jpg')";
 BOMB_IMAGE = "url('../rsc/images/bomb.jpg')";
 
-DEBUG_SKIP_VALIDATION = true;
+DEBUG_SKIP_VALIDATION = false;
 
 function joinRoom() {
     server.sendToServer("joinRoom", {
@@ -122,6 +122,15 @@ function timerCount() {
             board.turn = {"team": null, "role": null};
             updateTurnState();
         }
+    }
+}
+
+//Moves board left and right to accomodate for the sidepanel
+function MoveBoard() {
+    if (document.getElementById("openSidebarMenu").checked == true) {
+        document.getElementById("board").style.transform = "translateX(0)";
+    } else if (document.getElementById("openSidebarMenu").checked == false) {
+        document.getElementById("board").style.transform = "translateX(15%)";
     }
 }
 
@@ -315,14 +324,8 @@ class BoardState extends Observer {
         if (cardSelected.isRevealed)
             return false;
 
-        //check it is this team's turn
-        if (this.turn.team != this.player.team)
-            return false;
-        if (this.turn.role != this.player.role)
-            return false;
-
-        //check it is the spy's turn
-        if (this.turn != "spymaster")
+        //check it is a spy's turn
+        if (!this.isPlayersTurn() || this.player.role == "spymaster") 
             return false;
 
         return true;
@@ -336,21 +339,19 @@ class BoardState extends Observer {
         var i, j, found = false;
         
         //find and store indexes of the selected card
-        for(i = 0; i < this.cards.length; i++){
-            for(j = 0; j < this.cards[i].length; j++){
-                if(this.cards[i][j].div == cardSelected.div){
+        for (i = 0; i < this.cards.length; i++) {
+            for (j = 0; j < this.cards[i].length; j++) {
+                if(this.cards[i][j].div == cardSelected.div) {
                     found = true;
                     break;
                 }
             }
-            if(found)
-                break;
+            if (found) break;
         }
 
         //check the card has been found in the array (critical error if not)
-        if(!found)
+        if (!found)
             throw new Error("The card selected cannot not been found in the card array");
-
 
         //send board to server
         server.sendToServer("sendBoardState",
@@ -385,18 +386,17 @@ class BoardState extends Observer {
         *   - the clue should not match cards shown on the board
         *   - the clue should fit the AI vocabulary (if simulating AI player)
         */
-        this.cards.forEach(row => {
-            row.forEach(card => {
-                if (clue.toLowerCase() == card.word) {
-                    alert("The clue given cannot be the same as a word on the board.");
+        for (let i = 0; i < this.cards.length; i++) {
+            for (let j = 0; j < this.cards[0].length; j++) {
+                if (clue.toLowerCase() == this.cards[i][j].word) {
+                    alert("Clue cannot be the same as board words!");
                     return;
-                }
-                else if(!vocabulary.includes(clue.toLowerCase()) && this.isAISpy()){
+                } else if (!vocabulary.includes(clue.toLowerCase()) && this.isAISpy()) {
                     alert("Word not recognized by AI spy. Please try again.");
                     return;
                 }
-            })
-        });
+            }
+        }
 
         //send to server
         server.sendToServer("forwardClue",
@@ -617,15 +617,3 @@ document.getElementById("joinRedSpy").onclick = function() {chooseRole("redSpy")
 document.getElementById("joinRedSm").onclick = function() {chooseRole("redSm");};
 
 document.getElementById("startGame").onclick = function() {boardInitialize(isBombCard);};
-
-
-//Moves board left and right to accomodate for the sidepanel
-function MoveBoard() {
-    if (document.getElementById("openSidebarMenu").checked == true) {
-        document.getElementById("board").style.transform = "translateX(0)";
-    } else if (document.getElementById("openSidebarMenu").checked == false) {
-        document.getElementById("board").style.transform = "translateX(15%)";
-
-    }
-
-}
