@@ -20,7 +20,7 @@ class Chatbox extends Observer{
 
 
         chatboxSend.addEventListener("submit", () => {
-            this.sendChat(chatboxSendText.value);
+            this.sendChat(nickname + ": " + chatboxSendText.value);
             console.log("Chat Sent");
         });
     }
