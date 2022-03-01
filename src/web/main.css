@@ -27,3 +27,49 @@ h1
     height:100vh;
     width:75%;
 }
+
+.menuButton {
+  background-color: rgb(243, 48, 13);
+  border: none;
+  color: black;
+  padding: 4vh 16vh;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 16px;
+  position:fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+}
+
+.single{
+    top: 40%;
+}
+
+.joinmult{
+    top: 55%;
+}
+
+.hostmult{
+    top: 70%;
+}
+
+.observer{
+    top: 85%;
+}
+
+
+
+.menuButton:hover {
+    background-color: #f35c36;
+  }
+
+
+.center {
+    font-size:5vw;
+    text-align: center;
+}

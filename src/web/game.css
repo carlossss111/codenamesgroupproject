@@ -3,9 +3,9 @@
     max-width: 1150px;
     width: 100%;
     display: grid;
-    grid-template-columns: 200px 200px 200px 200px 200px;
-    grid-template-rows: 120px 120px 120px 120px 120px;
-    grid-gap: 30px;
+    grid-template-columns: 13vw 13vw 13vw 13vw 13vw;
+    grid-template-rows: 14vh 14vh 14vh 14vh 14vh;
+    grid-gap: 3vh;
     transform: translateX(15%);
     transition: transform 250ms ease-in-out;
 
@@ -13,8 +13,8 @@
 
 /*cards*/
 .card {
-    width: 200px;
-    height: 120px;
+    width: 13vw;
+    height: 14vh;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -24,7 +24,7 @@
 
 .card p {
     font-weight: bold;
-    font-size: 2em;
+    font-size: 2vw;
     text-transform: uppercase;
 }
 
