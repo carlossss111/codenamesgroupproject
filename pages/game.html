@@ -11,47 +11,127 @@
     <link href="../src/web/game.css" type="text/css" rel="stylesheet" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap" rel="stylesheet"> 
+    <link href="https://fonts.googleapis.com/css2?family=Russo+One&di lay=swap" rel="stylesheet"> 
     <script src="../src/web/board.js" defer></script>
     <script src="https://cdn.socket.io/4.4.0/socket.io.min.js" integrity="sha384-1fOn6VtTq3PWwfsOrk45LnYcGosJwzMHv+Xh/Jx5303FVOXzEnw0EpLv30mtjmlj" crossorigin="anonymous"></script>
     <script src="../src/web/server.js"></script>
     <script src="../src/web/chat.js" defer></script>
+    <script src="../src/web/audio.js" defer></script>
     <title>Nottingham Codenames</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
 </head>
 <body>
-    <div class="mainContainer">
-        To do!
-        <a href="../index.html">[to main page]</a>
-        <span id="joinSpy" style="color:blue; text-decoration:underline;">[to join spy team]</span>
-        <h1>Codenames</h1>
-
-
-        <!-- clue Box temp max clues in future should only show max clues up to the amount of cards left --->
-        <form class="clueBox" action="#" onsubmit="board.forwardClue()">
-            <input type="text" id="clue" placeholder="Enter clue"></input>
-            <select id="maxClues">
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-            </select>
-            <button type="submit" id="clueButton">Give Clue</button>
-        </form>
-
-        <div id="board">
-        </div>
+    <div>
+        <img class="set" id="set" src="../rsc/images/set.png" alt="" srcset="">
     </div>
-    <div class="sidePanel">
+    
+    <span style="float: right;" id="timeLeft">
+        Time Left:
+        <span id="timer"></span>
+    </span>
+    
+    <div id="room" style="font-size: 1.25em; text-align: center;"></div>
+
+    <div style="text-align: center;">
+        <span id="blueMember" style="color: #3399ff;">
+            Spymaster:<span id="blueSm" style="color: black;">Bob (AI)</span> 
+            Spy:<span id="blueSpy" style="color: black;">Colin (AI)</span>
+        </span>
+        <span id="blueScore" style="color: #3399ff; font-size: 4em;">0</span>
+        <span style="font-size: 4em;">&nbsp;:&nbsp;</span>
+        <span id="redScore" style="color: #ff5050; font-size: 4em;">0</span>
+        <span id="redMember" style="color: #ff5050;">
+            Spymaster:<span id="redSm" style="color: black;">Geert (AI)</span> 
+            Spy:<span id="redSpy" style="color: black;">Peer (AI)</span>
+        </span>
+    </div>
+
+    <form style="text-align: center;">
+        <button type="submit" id="joinBlueSm">Join Blue Spymaster</button>
+        <button type="submit" id="joinBlueSpy">Join Blue Spy</button>
+        <button type="submit" id="joinRedSm">Join Red Spymaster</button>
+        <button type="submit" id="joinRedSpy">Join Red Spy</button>
+    </form>
+        
+    <form style="text-align: center;">
+        <button type="submit" id="startGame">START</button>
+    </form>
+    
+    <input type="checkbox" class="openSidebarMenu" id="openSidebarMenu" onclick="MoveBoard()">
+    <label for="openSidebarMenu" class="sidebarIconToggle">
+        <div class="arrow"></div>
+    </label>
+
+    <div id="sidebarMenu">
         <p style="color:white;">To do! Here will be the chatbox and other things.</p>
+        <p style ="color: white">Refinement needed; perhaps a tab where the arrow can go?</p>
         <div class="chatbox">
             <form action="#" id="chatboxSend">
                 <input type="text" ></input>
                 <input type="submit" value="send chat"></input>
             </form>
-            <div id="chatboxReceive">
+            <div id="chatboxReceive"></div>  
+        </div>
 
+        <div class="score">
+            <p id="scoreText">Score</p>
+            <p id="scoreText">Red team  | Blue Team</p>
+
+            <p id="scores">10 - 9</p>
+        </div>
+    </div>
+
+    <div class="setBox" id="setBox">
+        <img src="../rsc/images/back.png" id="back" class="back" alt="" srcset="">
+
+        <div class="setSubTit">
+            Local Settings
+        </div>
+        
+        <div class="setItem">
+            <img class="setItemIcon" src="../rsc/images/voice.png" alt="" srcset="">
+            <div class="setItemDesc">
+                Effect Audio
+            </div>
+            <input id="effectAudio" value="100" class="setItemRange" type="range">
+            <div id="effectAudioVal" class="setItemRangeVal">
+                100
+            </div>
+        </div>
+
+        <div class="setItem">
+            <img class="setItemIcon" src="../rsc/images/music.png" alt="" srcset="">
+            <div class="setItemDesc">
+                Music
+            </div>
+            <input value="100" id="music" class="setItemRange" type="range">
+            <div id="musicVal" class="setItemRangeVal">
+                100
             </div>
         </div>
     </div>
+
+    <!-- clue Box temp max clues in future should only show max clues up to the amount of cards left --->
+    <form class="clueBox" action="#" onsubmit="board.forwardClue()" style="text-align: center;">
+        <input type="text" id="clue" placeholder="Enter clue"></input>
+        <select id="maxClues">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+        </select>
+        <button type="submit" id="clueButton">Give Clue</button>
+    </form>
+
+    <div id="turnAlert" style="text-align: center; font-size: 1.25em;">It's your turn!</div>
+    <div id="board"></div>
+
 </body>
+
 </html>
