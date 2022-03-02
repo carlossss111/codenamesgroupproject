@@ -1,37 +1,47 @@
 # Team 18 Codenames Project
-By: Alexandru Stoica, Daniel Robinson, Hongjia Xue, Shahil Pramodkumar, Ing Sam Yin, Ao Li, Tianxiang Song. 
-## Client Server Proof-of-concept
-Part of our prototype demonstrates the client-server functionality where one client's action will be sent to the server, modified and then returned to all other clients. We have done this with a Vanilla JavaScript client and a Python Socket-IO server.
+This project emulates the [codenames boardgame](https://en.wikipedia.org/wiki/Codenames_(board_game)) in a web browser. It allows for up to 4 players which may be either human or AI.
 
-### Instructions
-1. Write the following command `python3 app.py` in the terminal to load the server. 
-1. Load `index.html` into a browser of your choice.
-1. Repeat the previous step in another browser window.
-1. Join the game in both windows. On one window join the spy team on the top left of the screen. The other window will remain in spymaster view.
+## Installation
+### Latest Version (local host)
+To test the latest version of the application, clone this repository and install the [required dependencies](#dependencies).
 
-![Prototype Image](./rsc/images/prototype.png)
+A python server is required to run the game. Run the following command in the terminal in the project's root directory:
+``` 
+python3 app.py
+```
+If there are no error messages, the server is running with the correct dependencies installed. If dependencies are missing, the error messages should tell you which.
 
-From here you can do any of the following:
-* Enter a message in the chatbox.
-* Enter a clue and number.
-* Pick a card to reveal.
+Then load _index.html_ into a browser of your choice and the game should be playable with AI. Multiple browser windows can also be opened to simulate multiplayer.
 
-The important concept demonstrated in the above actions is that one client (the window where the action took place) will send data to the server which will then send it back to the other client (the other window). This proves that our implementation of multiple players will work sufficiently.
+### Stable Version (online)
+A stable version of the application is available for immediate use at http://3.83.45.21/games/team18_project/
 
-To see the raw data sent between the client and the server, open the console window in the browser and view the printed messages.
+This version may not yet have some of the features that are present in the latest version, but it requires no installation and allows multiplayer between computers on different networks.
 
-### AI Proof-of-concept
-The concept and algorithms of codenames AI is available in **Class Descriptions** file, we have made a simple script for the following functionalities:
-- one AI in each team, the AI could be either spy or spymaster
-- two AIs (one spy and one spymaster) in one team, one AI (could be either) in another team
-- two AIs in each team
+## Project Structure
+The python server is run from _/app.py_ and it uses python code from _/src/ai_ and _/src/game_.
+The client-hosted content is run in HTML files located in _/pages_ which uses JavaScript and CSS from _/src/web_ and resources from _/rsc_.
+Unit tests are run in _test_ and documentation is located in _/docs_.
+```
+├── app.py
+├── index.html
+├── README.md
+├── docs/ 
+├── pages/
+├── rsc/
+│   ├── audio/
+│   ├── data/
+│   ├── images/
+│   └── recordings/
+├── src/
+│   ├── ai/
+│   ├── game/
+│   └── web/
+└── test/
+```
 
-These screen recordings demonstrate how it works. Link to directory:
-[recordings](./rsc/recordings/)
-
-To run the program for yourself follow these steps:
-1. Run `sh AIDev/get_glove.sh` from the project root directory. This downloads the wordset.
-1. Run `python3 AIDev/codenames.py`.
+## Documentation
+For documentation, see [/docs](/docs/).
 
 ## Dependencies
 * python3
@@ -39,3 +49,8 @@ To run the program for yourself follow these steps:
 * pip
 * numba
 * numpy
+
+## Contributors
+This project is designed and programmed by [Alexandru Stoica](https://projects.cs.nott.ac.uk/psyas13), [Ao Li](https://projects.cs.nott.ac.uk/scyal3), [Daniel Robinson](https://projects.cs.nott.ac.uk/psydr2), [Hongjia Xue](https://projects.cs.nott.ac.uk/scyhx5), [Ing Sam Yin](https://projects.cs.nott.ac.uk/hfysi2), [Shahil Pramodkumar](https://projects.cs.nott.ac.uk/psysp7), and [Tianxiang Song](https://projects.cs.nott.ac.uk/scyts1).
+
+The project is under supervision by Associate Professor [Colin Johnson](https://www.nottingham.ac.uk/computerscience/people/colin.johnson).
