@@ -1,0 +1,78 @@
+
+<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Team 18's Codenames Project"/>
+    <link rel="shortcut icon" href="#">
+    <link href="../src/web/main.css" type="text/css" rel="stylesheet" />
+    <title>Nottingham Codenames</title>
+</head>
+<body>
+    <p id="menuTitle">Host Game</p>
+    <div style="margin: 5vw 25vw; font-size: 2vw;">
+
+        <div id="hostMenu">
+            <div>
+                Name your room:
+                <input type="text" id="roomName" placeholder="Auto generate"></input>
+            </div><br>
+            <div>
+                Name yourself:
+                <input type="text" id="yourName" placeholder="Auto generate"></input>
+            </div><br>
+            <div>
+                Bomb Card:
+                <select id="isBomb">
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                </select>
+            </div><br>
+            <div>
+                Timer:
+                <select id="timerLength">
+                    <option value="no">No</option>
+                    <option value="10">10s</option>
+                    <option value="20">20s</option>
+                    <option value="30">30s</option>
+                </select>
+            </div><br><br>
+        </div>
+
+        <div id="joinMenu">
+            <br>
+            <div>
+                Room to join:
+                <input type="text" id="roomName"></input>
+            </div><br><br>
+            <div>
+                Name yourself:
+                <input type="text" id="yourName" placeholder="Auto generate"></input>
+            </div><br><br><br>
+        </div>
+
+        <div>
+            <span>
+                <a href="../index.html">
+                    <button id="backMenu" style="margin-left: 10vw;">Back</button>
+                </a>
+            </span>
+            <span>
+                <button id="confirm" style="margin-right: 10vw; float: right;">Confirm</button>
+            </span>
+        </div>
+    </div>
+
+    <script>
+        var choice = parent.document.URL.charAt(parent.document.URL.length-1);
+        if (choice == 1) {
+            document.getElementById("joinMenu").style.display = "none";
+        } else {
+            document.getElementById("hostMenu").style.display = "none";
+            document.getElementById("menuTitle").innerHTML = "Join Game";
+        }
+    </script>
+</body>
+</html>
