@@ -375,9 +375,9 @@ class BoardState extends Observer {
     * Forwards the clue (after validation) to the server.
     */
     forwardClue() {
+
         let clue = document.getElementById("clue").value;
         let maxGuesses = document.getElementById("maxClues").value;
-
         //check that it is this player's turn and it is the spymaster's turn
         if (!this.isPlayersTurn || this.turn.role != "spymaster")
             return;

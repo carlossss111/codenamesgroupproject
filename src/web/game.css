@@ -5,7 +5,8 @@
     display: grid;
     grid-template-columns: 13vw 13vw 13vw 13vw 13vw;
     grid-template-rows: 14vh 14vh 14vh 14vh 14vh;
-    grid-gap: 3vh;
+    column-gap: 3vh;
+    row-gap: 3vh;
     transform: translateX(15%);
     transition: transform 250ms ease-in-out;
 }
@@ -235,11 +236,20 @@
         max-width: 600px;
         width: 100%;
         display: grid;
-        grid-template-columns: 100px 100px 100px 100px 100px;
-        grid-template-rows: 60px 60px 60px 60px 60px;
-        grid-gap: 15px;
+        grid-template-columns: repeat(3, 1fr);
+        grid-template-rows: auto;
+        column-gap: 1vh;
+        row-gap: 1px;
+        grid-auto-columns: auto;
+        grid-auto-rows: auto;
         transform: translateX(15%);
         transition: transform 250ms ease-in-out;
+        justify-content: center
+    }
+
+    .card:nth-last-child(1){
+        grid-column:2 ;
+
     }
 
     .card {
