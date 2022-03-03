@@ -68,7 +68,7 @@ body {
     cursor: pointer;
 }
 
-#roomName, #yourName, #isBomb, #timerLength {
+#roomNameHost, #yourNameHost, #roomNameJoin, #yourNameJoin, #isBomb, #timerLength {
     float: right;
     font-size: 1.5vw;
     text-align: center;

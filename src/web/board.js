@@ -578,35 +578,32 @@ class BoardState extends Observer {
 }
 
 // Game starts here
-var choice = prompt("Host a game (1) or join a game (2)?");
-
-var nickname = prompt("Enter your nickname:", "Cool Guy");
-var tmpName = "";
-var timerVar;
-
-//var board = new BoardState();
 var board = BoardState.getInstance();
 server.registerObserver(board);
 
+var link = parent.document.URL;
+var choice = link.charAt(link.indexOf('#')+1);
+board.room = link.substring(link.indexOf('!')+1, link.indexOf('@'));
+var nickname = link.substring(link.indexOf('@')+1, link.indexOf('$')).replace('_', ' ');
+
+var tmpName = "";
+var timerVar;
 var role = "";
-var isBombCard;
 var vocabulary;
 
 if (choice == 1) {
-    board.room = prompt("Enter name of your hosted room:", "Great Hall");
-    isBombCard = prompt("Do you want Bomb Card in the board? (y/n)", 'y');
-    if (prompt("Do you want timer for one turn? (y/n)", 'y') == 'y')
-        board.timer = prompt("Enter timer length for one turn", '30');
-    alert("When all players joined, press START to initialize board.");
+    var isBombCard = link.substring(link.indexOf('$')+1, link.indexOf('&'));
+    let timer = link.substring(link.indexOf('&')+1);
     if (isBombCard == 'y') isBombCard = true;
     else isBombCard = false;
-}
-else {
-    board.room = prompt("Enter name of the room to join:", "Great Hall");
-    alert("Please wait for the host to start game.");
+    if (timer != 'n') board.timer = timer;
+    alert("Welcome to Codenames, " + nickname + "!\nWhen all players joined, press START to initialize board.");
+} else {
+    alert("Welcome to Codenames, " + nickname + "!\nPlease wait for the host to start game.");
     document.getElementById("startGame").style.display = "none";
     syncNewClient('request');
 }
+
 document.getElementById("turnAlert").style.display = "none";
 document.getElementById("timeLeft").style.display = "none";
 document.getElementById("room").innerHTML = "Room: " + board.room;

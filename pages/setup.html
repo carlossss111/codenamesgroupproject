@@ -8,6 +8,7 @@
     <meta name="description" content="Team 18's Codenames Project"/>
     <link rel="shortcut icon" href="#">
     <link href="../src/web/main.css" type="text/css" rel="stylesheet" />
+    <script src="../src/web/randomId.js"></script>
     <title>Nottingham Codenames</title>
 </head>
 <body>
@@ -17,23 +18,23 @@
         <div id="hostMenu">
             <div>
                 Name your room:
-                <input type="text" id="roomName" placeholder="Auto generate"></input>
+                <input type="text" id="roomNameHost" placeholder="Auto generate"></input>
             </div><br>
             <div>
                 Name yourself:
-                <input type="text" id="yourName" placeholder="Auto generate"></input>
+                <input type="text" id="yourNameHost" placeholder="Auto generate"></input>
             </div><br>
             <div>
                 Bomb Card:
                 <select id="isBomb">
-                    <option value="yes">Yes</option>
-                    <option value="no">No</option>
+                    <option value="y">Yes</option>
+                    <option value="n">No</option>
                 </select>
             </div><br>
             <div>
                 Timer:
                 <select id="timerLength">
-                    <option value="no">No</option>
+                    <option value="n">No</option>
                     <option value="10">10s</option>
                     <option value="20">20s</option>
                     <option value="30">30s</option>
@@ -45,11 +46,11 @@
             <br>
             <div>
                 Room to join:
-                <input type="text" id="roomName"></input>
+                <input type="text" id="roomNameJoin"></input>
             </div><br><br>
             <div>
                 Name yourself:
-                <input type="text" id="yourName" placeholder="Auto generate"></input>
+                <input type="text" id="yourNameJoin" placeholder="Auto generate"></input>
             </div><br><br><br>
         </div>
 
@@ -60,18 +61,42 @@
                 </a>
             </span>
             <span>
-                <button id="confirm" style="margin-right: 10vw; float: right;">Confirm</button>
+                <button id="confirm" style="margin-right: 10vw; float: right;" onclick="confirmSetting()">Confirm</button>
             </span>
         </div>
     </div>
-
     <script>
         var choice = parent.document.URL.charAt(parent.document.URL.length-1);
+
         if (choice == 1) {
             document.getElementById("joinMenu").style.display = "none";
+            var roomId = "roomNameHost";
+            var yourId = "yourNameHost";
         } else {
             document.getElementById("hostMenu").style.display = "none";
             document.getElementById("menuTitle").innerHTML = "Join Game";
+            var roomId = "roomNameJoin";
+            var yourId = "yourNameJoin"; 
+        }
+
+        function confirmSetting() {
+            var room = document.getElementById(roomId).value;
+            var nickname = document.getElementById(yourId).value;
+            if (room == '') {
+                if (choice == 1) room = autoGenName("room");
+                else {
+                    alert("Room name cannot be empty!");
+                    return;
+                }
+            }
+            if (nickname == '') nickname = autoGenName("player");
+            if (choice == 1) {
+                var isBomb = document.getElementById("isBomb").value;
+                var timer = document.getElementById("timerLength").value;
+                window.location.href = "game.html?#"+choice+"!"+room+"@"+nickname+"$"+isBomb+"&"+timer;
+            } else {
+                window.location.href = "game.html?#"+choice+"!"+room+"@"+nickname+"$";
+            }
         }
     </script>
 </body>
