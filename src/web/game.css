@@ -220,6 +220,102 @@
     font-size: 50px;
 }
 
+.teamButton{
+
+    position: relative;
+    height: 15vh;
+    width: 20vw;
+    margin: 2vh 2vw;
+    padding: 5px 5px;
+
+    border: 2px black solid;
+    border-radius: 4px;
+
+    background: none;
+    transition:         0.08s ease-in;
+    -o-transition:      0.08s ease-in;
+    -ms-transition:     0.08s ease-in;
+    -moz-transition:    0.08s ease-in;
+    -webkit-transition: 0.08s ease-in;
+}
+
+.blueBt:hover {
+    color: white;
+  }
+  
+  .blueBt:before {
+    content: "";
+    position: absolute;
+    background: #54a4dd;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: 100%;
+    z-index: -1;
+    transition: top 0.09s ease-in;
+  }
+  
+  .blueBt:hover:before {
+    top: 0;
+  }
+
+  .redBt:hover {
+    color: white;
+  }
+  
+  .redBt:before {
+    content: "";
+    position: absolute;
+    background: #e02e2e;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: 100%;
+    z-index: -1;
+    transition: top 0.09s ease-in;
+  }
+  
+  .redBt:hover:before {
+    top: 0;
+  }
+
+
+  .startBt:hover {
+    color: white;
+  }
+  
+  .startBt:before {
+    content: "";
+    position: absolute;
+    background: #3b3b3b;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: 100%;
+    z-index: -1;
+    transition: top 0.09s ease-in;
+  }
+  
+  .startBt:hover:before {
+    top: 0;
+  }
+
+
+.TeamForm{
+    position:absolute;
+    width: 50vw;
+    height: 50vh;
+    top: 30%;
+    left: 25%;
+}
+
+#teamBox{
+    z-index: 100;    
+}
+
+
+
+
 /*For mobile*/
 @media only screen and (max-width: 600px) {
     

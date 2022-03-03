@@ -15,12 +15,15 @@ function joinRoom() {
 
 function boardInitialize(isBombCard) {
     document.getElementById("startGame").style.display = "none";
+
     server.sendToServer("createInitialBoardState", {
         "Protocol" : "createInitialBoardState",
         "TimerLength" : board.timer,
         "BombCard" : isBombCard,
         "room" : board.room
     })
+    document.getElementById("teamBox").style.zIndex ="-1";
+
 }
 
 // Generate a clue and target number (AI)
