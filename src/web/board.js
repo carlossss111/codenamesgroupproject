@@ -22,8 +22,6 @@ function boardInitialize(isBombCard) {
         "BombCard" : isBombCard,
         "room" : board.room
     })
-    document.getElementById("teamBox").style.zIndex ="-1";
-
 }
 
 // Generate a clue and target number (AI)
@@ -378,9 +376,9 @@ class BoardState extends Observer {
     * Forwards the clue (after validation) to the server.
     */
     forwardClue() {
-
         let clue = document.getElementById("clue").value;
         let maxGuesses = document.getElementById("maxClues").value;
+
         //check that it is this player's turn and it is the spymaster's turn
         if (!this.isPlayersTurn || this.turn.role != "spymaster")
             return;
@@ -498,10 +496,7 @@ class BoardState extends Observer {
 
                 //configure roles and start game
                 if (this.player.role == "spy") enableSpyMode();
-                document.getElementById("joinBlueSpy").style.display = "none";
-                document.getElementById("joinBlueSm").style.display = "none";
-                document.getElementById("joinRedSpy").style.display = "none";
-                document.getElementById("joinRedSm").style.display = "none";
+                document.getElementById("teamBox").style.display = "none";
                 if (choice == 1) startGame();
                 break;
 

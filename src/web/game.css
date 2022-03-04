@@ -70,7 +70,6 @@
 }
 
 .blueTeam {
-    background-image: url("");
     background-color: #3399ff;
     border: darkblue dashed 3px;
     border-radius: 10px;
@@ -80,10 +79,6 @@
     background-color: #ff5050;
     border: darkred dashed 3px;
     border-radius: 10px;
-}
-
-.revealed {
-    background-image: url('../../rsc/images/neutral.jpg');
 }
 
 .bombCard {
@@ -99,14 +94,6 @@
     height: 30rem;
     background-color: white;
     border-radius: 5px;
-}
-
-.score {
-    margin: 1rem auto;
-    width: 80%;
-    height: 10rem;
-    background-color: #97CAEF;
-    border-radius: 10px;
 }
 
 #sidebarMenu {
@@ -209,19 +196,8 @@
     transform: translateX(-300px) rotate(-45deg);
 }
 
-
-#scoreText {
-    text-align: center;
-    font-family: 'Trebuchet MS', sans-serif;
-}
-
-#scores {
-    text-align: center;
-    font-size: 50px;
-}
-
 .teamButton{
-
+    font-size: 1.5vw;
     position: relative;
     height: 15vh;
     width: 20vw;
@@ -229,7 +205,7 @@
     padding: 5px 5px;
 
     border: 2px black solid;
-    border-radius: 4px;
+    border-radius: 1em;
 
     background: none;
     transition:         0.08s ease-in;
@@ -241,67 +217,71 @@
 
 .blueBt:hover {
     color: white;
-  }
+}
   
-  .blueBt:before {
+.blueBt:before {
     content: "";
     position: absolute;
-    background: #54a4dd;
+    background: #3399ff;
+    border-radius: 0.8em;
     bottom: 0;
     left: 0;
     right: 0;
     top: 100%;
     z-index: -1;
     transition: top 0.09s ease-in;
-  }
-  
-  .blueBt:hover:before {
-    top: 0;
-  }
+}
 
-  .redBt:hover {
+.blueBt:hover:before {
+    top: 0;
+}
+
+
+.redBt:hover {
     color: white;
-  }
-  
-  .redBt:before {
+}
+
+.redBt:before {
     content: "";
     position: absolute;
-    background: #e02e2e;
+    background: #ff5050;
+    border-radius: 0.8em;
     bottom: 0;
     left: 0;
     right: 0;
     top: 100%;
     z-index: -1;
     transition: top 0.09s ease-in;
-  }
-  
-  .redBt:hover:before {
+}
+
+.redBt:hover:before {
     top: 0;
-  }
+}
 
 
-  .startBt:hover {
+.startBt:hover {
     color: white;
-  }
-  
-  .startBt:before {
+}
+
+.startBt:before {
     content: "";
     position: absolute;
     background: #3b3b3b;
+    border-radius: 0.8em;
     bottom: 0;
     left: 0;
     right: 0;
     top: 100%;
     z-index: -1;
     transition: top 0.09s ease-in;
-  }
-  
-  .startBt:hover:before {
+}
+
+.startBt:hover:before {
     top: 0;
-  }
+}
 
 
-.TeamForm{
+.teamForm{
     position:absolute;
     width: 50vw;
     height: 50vh;
@@ -312,8 +292,6 @@
 #teamBox{
     z-index: 100;    
 }
-
-
 
 
 /*For mobile*/
@@ -345,7 +323,6 @@
 
     .card:nth-last-child(1){
         grid-column:2 ;
-
     }
 
     .card {
@@ -392,28 +369,8 @@
         border-radius: 7px;
     }
 
-    .score {
-        margin:101rem auto;
-        width: 80%;
-        height: 10rem;
-        background-color: #97CAEF;
-        align-self: center;
-        border-radius: 10px;
-    }
-
-    #scoreText {
-        text-align: center;
-        font-family: 'Trebuchet MS', sans-serif;
-        align-self:center;
-    
-    }
-    #scores {
-        text-align:center;
-        font-size: 25px;
-    }
-
     #scoringSys {
-        text-align:center;
+        text-align: center;
         font-size: 12px;
     }
 
