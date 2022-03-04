@@ -120,9 +120,14 @@
 }
 
 #chatText, #chatSubmit {
+    background-color: white;
     border-radius: 0.5em;
     border: 1px solid gray;
     padding: 0.5vw;
+}
+
+#chatSubmit:hover {
+    background-color: lightGreen;
 }
 
 /* sidebar itself */
