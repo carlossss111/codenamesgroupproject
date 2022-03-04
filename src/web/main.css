@@ -30,6 +30,10 @@ body {
     margin-top: 5vw;
 }
 
+button{
+    cursor:pointer;
+}
+
 .menuButton {
     width: 20vw;
     height: 10vh;
