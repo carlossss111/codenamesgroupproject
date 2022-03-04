@@ -34,7 +34,7 @@
     
     <div id="room" style="font-size: 1.25em; text-align: center;"></div>
 
-    <div id = "scoringSys"style="text-align: center;">
+    <div id="scoringSys" style="text-align: center;">
         <span id="blueMember" style="color: #3399ff;">
             Spymaster:<span id="blueSm" style="color: black;">Bob (AI)</span> 
             Spy:<span id="blueSpy" style="color: black;">Colin (AI)</span>
@@ -47,18 +47,18 @@
             Spy:<span id="redSpy" style="color: black;">Peer (AI)</span>
         </span>
     </div>
-    <div id="teamBox" class="TeamForm">
+
+    <div id="teamBox" class="teamForm">
         <form style="text-align: center;" >
             <button type="submit" id="joinBlueSm" class="teamButton blueBt">Join Blue Spymaster</button>
             <button type="submit" id="joinRedSm" class="teamButton redBt">Join Red Spymaster</button>
             <button type="submit" id="joinBlueSpy" class="teamButton blueBt">Join Blue Spy</button>
             <button type="submit" id="joinRedSpy" class="teamButton redBt">Join Red Spy</button>
         </form>        
-    <form style="text-align: center;">
-        <button type="submit" id="startGame" class="teamButton startBt">START</button>
-    </form>
+        <form style="text-align: center;">
+            <button type="submit" id="startGame" class="teamButton startBt">START</button>
+        </form>
     </div>
-
     
     <input type="checkbox" class="openSidebarMenu" id="openSidebarMenu" onclick="MoveBoard()">
     <label for="openSidebarMenu" class="sidebarIconToggle">
@@ -74,7 +74,6 @@
             </form>
             <div id="chatboxReceive"></div>  
         </div>
-
     </div>
 
     <div class="setBox" id="setBox">

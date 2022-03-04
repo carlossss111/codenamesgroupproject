@@ -111,6 +111,25 @@ h1 {
 */
 
 /* actual chat box */
+.blueTeam {
+    background-color: #3399ff;
+    border: darkblue dashed 3px;
+    border-radius: 10px;
+}
+
+.redTeam {
+    background-color: #ff5050;
+    border: darkred dashed 3px;
+    border-radius: 10px;
+}
+
+.bombCard {
+    background-color: #5e5e5e;
+    border: #1f1f1f dashed 3px;
+    border-radius: 10px;
+}
+
+/*side panel*/
 .chatbox {
     margin: 1rem auto;
     width: 80%;
@@ -242,7 +261,9 @@ h1 {
 /*
 * ROLE SELECT BUTTONS
 */
+
 .teamButton{
+    font-size: 1.5vw;
     position: relative;
     height: 15vh;
     width: 20vw;
@@ -250,7 +271,7 @@ h1 {
     padding: 5px 5px;
 
     border: 2px black solid;
-    border-radius: 4px;
+    border-radius: 1em;
 
     background: none;
     transition: 0.08s ease-in;
@@ -259,6 +280,7 @@ h1 {
 .teamButton:before{
     content: "";
     position: absolute;
+    border-radius: 0.8em;
     bottom: 0;
     left: 0;
     right: 0;
@@ -292,7 +314,7 @@ h1 {
     color: white;
 }
 
-.TeamForm{
+.teamForm{
     position:absolute;
     width: 50vw;
     height: 50vh;
@@ -424,7 +446,6 @@ input[type=range]::-webkit-slider-thumb {
 
     .card:nth-last-child(1){
         grid-column:2 ;
-
     }
 
     .card {
@@ -471,28 +492,8 @@ input[type=range]::-webkit-slider-thumb {
         border-radius: 7px;
     }
 
-    .score {
-        margin:101rem auto;
-        width: 80%;
-        height: 10rem;
-        background-color: #97CAEF;
-        align-self: center;
-        border-radius: 10px;
-    }
-
-    #scoreText {
-        text-align: center;
-        font-family: 'Trebuchet MS', sans-serif;
-        align-self:center;
-    
-    }
-    #scores {
-        text-align:center;
-        font-size: 25px;
-    }
-
     #scoringSys {
-        text-align:center;
+        text-align: center;
         font-size: 12px;
     }
 
