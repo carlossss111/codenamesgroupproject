@@ -1,3 +1,6 @@
+/*
+* BACKGROUND
+*/
 * {
     margin: 0;
     padding: 0;
@@ -5,12 +8,13 @@
     font-family: 'Trebuchet MS', 'Lucida Sans Unicode', Arial, sans-serif;
 }
 
-/*general*/
-
 body {
     background-color: #ffdede;
 }
 
+/*
+* TITLES
+*/
 .title {
     text-align: center;
     text-transform: uppercase;
@@ -30,6 +34,9 @@ body {
     margin-top: 5vw;
 }
 
+/*
+* BUTTONS
+*/
 button{
     cursor:pointer;
 }
@@ -51,6 +58,13 @@ button{
     transform: translate(-50%, -50%);
 }
 
+.menuButton:hover {
+    box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+    cursor: pointer;
+}
+
+/* the below needs to me moved to 
+ specific CSS instead of main */
 .single {
     top: 35%;
 }
@@ -65,11 +79,6 @@ button{
 
 .observer {
     top: 80%;
-}
-
-.menuButton:hover {
-    box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
-    cursor: pointer;
 }
 
 #roomNameHost, #yourNameHost, #roomNameJoin, #yourNameJoin, #isBomb, #timerLength {
