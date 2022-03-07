@@ -104,16 +104,61 @@
 * SIDE PANEL
 */
 
-/* side panel */
+.sidebarContainer{
+    position: absolute;
+    z-index:1;
+    top:0;
+    right:0;
+    height:100vh;
+    width:25%;
+    transition: all 250ms ease-in-out;
+}
+
+#openSidebarMenu{
+    position:relative;
+    float:left;
+    width:20%;
+    height:10%;
+    top:45%;
+    /* div centering is one of the greatest achievements
+    of computer science */
+}
+
+#openSidebarMenu input{
+    cursor: pointer;
+    opacity:0;
+    width:100%;
+    height:100%;
+}
+
+#sidebarMenu{
+    background: linear-gradient(180deg, #F1BF98 0%, #ffdede 100%);
+    display:inline-block;
+    height:100vh;
+    width:80%;
+}
+
+.arrow {
+    position:absolute;
+    z-index:2;
+    border-right: 5px solid black;
+    border-bottom: 5px solid black;
+    width: 20px;
+    height: 20px;
+    top:15px;
+    left: 40px;
+    transform: rotate(-45deg);
+    transition: all 0.3s ease-in-out;
+}
+
 .chatbox {
     margin: 1rem auto;
     width: 80%;
-    height: 60vh;
+    height: 80vh;
     background-color: white;
     border-radius: 10px;
 }
 
-/* chat input and submit */
 #chatboxSend {
     margin-top: 2em;
     text-align: center;
@@ -130,66 +175,10 @@
     background-color: lightGreen;
 }
 
-/* sidebar itself */
-#sidebarMenu {
-    border-radius: 10px;
-    height: 100%;
-    position: fixed;
-    right: 0;
-    width: 20%;
-    top: 0;
-    z-index:1000;
-    transform: translateX(250%);
-    transition: transform 250ms ease-in-out;
-    background: linear-gradient(180deg, #F1BF98 0%, #F1BF98 100%);
-}
-
-/* open/close sidebar button */
-.openSidebarMenu {
-    transition: all 0.3s;
-    box-sizing: border-box;
-    display: none;
-}
-.openSidebarMenu:checked~#sidebarMenu,
-.openSidebarMenu:checked~.arrow {
-    transform: translateX(0);
-}
-
-/* arrow container */
-.sidebarIconToggle {
-    max-width: 100%;
-    transition: all 0.3s;
-    box-sizing: border-box;
-    cursor: pointer;
-    position: absolute;
-
-    z-index: 99;
-    height: 100%;
-    width: 100%;
-    top: 55%;
-    right: 3%;
-    height: 22px;
-    width: 22px;
-}
-
-/* arrow itself */
-.arrow {
-    position: absolute;
-    z-index:1000;
-    border-right: 5px solid black;
-    border-bottom: 5px solid black;
-    width: 20px;
-    height: 20px;
-    margin-top: 40px;
-
-    transform: translateX(0) rotate(135deg);
-    transition: transform 250ms ease-in-out;
-}
-
-/* arrow positioning */
-.openSidebarMenu:checked~.sidebarIconToggle>.arrow {
-    transition: all 0.3s ease-in-out;
-    transform: translateX(-300px) rotate(-45deg);
+#chatboxReceive{
+    padding:5px 10px;
+    height:100%;
+    overflow:scroll;
 }
 
 /*
@@ -253,7 +242,7 @@
     height: 50vh;
     top: 30%;
     left: 25%;
-    z-index: 100;    
+    z-index: 1;    
 }
 
 /*
@@ -341,11 +330,6 @@ input[type=range]::-webkit-slider-thumb {
 /* honestly the mobile part needs a big rework :/ */
 /*For mobile*/
 @media only screen and (max-width: 600px) {
-    
-    #sidebarMenu {
-        width: 40%;
-    }
-
 
     body {
         background-color: lightblue;
@@ -452,23 +436,20 @@ input[type=range]::-webkit-slider-thumb {
         font-weight: bold;
     }
 
-    .sidebarIconToggle {
-        transition: all 0.3s;
-        box-sizing: border-box;
-        cursor: pointer;
-        position: absolute;
-    
-        max-width: 600px;
-        z-index: 999;
-        height:2100%;
-        width: 10%;
-        top: 70%;
-        right: 1px;
-        height: 22px;
+    .sidebarContainer{
+        width:100%;
     }
-  
-    .openSidebarMenu:checked~.sidebarIconToggle>.arrow {
-        transition: all 0.3s ease-in-out;
-        transform: translateX(-200%) rotate(-45deg);
+
+    #openSidebarMenu{
+        width:15%;
+    }
+
+    .arrow{
+        top:0;
+        left:10px;
+    }
+
+    #sidebarMenu{
+        width:85%;
     }
 }

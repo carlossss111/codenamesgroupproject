@@ -5,6 +5,24 @@ BOMB_IMAGE = "url('../rsc/images/bomb.jpg')";
 
 DEBUG_SKIP_VALIDATION = false;
 
+function moveSidebar(event){
+    var width = window.innerWidth;
+    var open = event.target.checked;
+    var container = document.querySelector(".sidebarContainer");
+    var arrow = document.querySelector(".arrow");
+    if(open){
+        arrow.style.transform = "rotate(135deg)";
+        if(width <= 600)
+            container.style.right = "-90%";
+        else
+            container.style.right = "-20%";
+    }
+    else{
+        arrow.style.transform = "rotate(-45deg)";
+        event.target.parentNode.parentNode.style.right = "0";
+    }
+}; document.getElementById("openSidebarMenu").addEventListener("click", moveSidebar);
+
 function joinRoom() {
     server.sendToServer("joinRoom", {
         "Protocol" : "joinRoom",

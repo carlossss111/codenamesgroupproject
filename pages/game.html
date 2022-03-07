@@ -75,40 +75,6 @@
     <!-- End of Page Head-->
     
 
-    <!-- Page Side -->
-    <div>
-        <!-- Sidebar open/close button -->
-        <input type="checkbox" class="openSidebarMenu" id="openSidebarMenu" onclick="MoveBoard()">
-        <label for="openSidebarMenu" class="sidebarIconToggle">
-            <div class="arrow"></div>
-        </label>
-
-        <!-- Sidebar -->
-        <div id="sidebarMenu">
-            <p style="color:white; text-align: center; font-size: 1.5em; margin-top: 1em;">ChatBox</p>
-            <div class="chatbox">
-                <div id="chatboxReceive"></div>  
-            </div>
-            <form action="#" id="chatboxSend">
-                <input id="chatText" type="text"></input>
-                <button id="chatSubmit" type="submit">Send</button>
-            </form>
-        </div>
-    </div>
-    <!-- End of Page Side -->
-
-
-    <!-- Board -->
-    <div id="board">
-    <!--
-        <div class="card neutral">
-            <p>card name</p>
-        </div>
-        .. * 25
-    -->
-    </div>
-    <!-- End of board -->
-
 
     <!-- Team Selection-->
     <div id="teamBox" class="teamForm">
@@ -124,6 +90,61 @@
         </form>
     </div>
     <!-- End of Team Selection-->
+
+
+
+    <!-- Board -->
+    <div id="board">
+        <!--
+            <div class="card neutral">
+                <p>card name</p>
+            </div>
+            .. * 25
+        -->
+        </div>
+    <!-- End of board -->
+
+
+
+    <!-- Page Side -->
+    <div class="sidebarContainer">
+        <div id="openSidebarMenu">
+            <div class="arrow"></div>
+            <input type="checkbox"/>
+        </div>
+        <div id="sidebarMenu">
+
+        <p style="color:white; text-align: center; font-size: 1.5em; margin-top: 1em;">ChatBox</p>
+        <div class="chatbox">
+            <div id="chatboxReceive"></div>  
+        </div>
+        <form action="#" id="chatboxSend">
+            <input id="chatText" type="text"></input>
+            <button id="chatSubmit" type="submit">Send</button>
+        </form>
+    </div>
+    <!--
+    <div class="sidebarContainer">
+        <div>
+            <label for="openSidebarMenu" class="sidebarIconToggle">
+                <input type="checkbox" class="openSidebarMenu" id="openSidebarMenu" onclick="MoveBoard()">
+                <div class="arrow"></div>
+            </label>
+            <div id="sidebarMenu">
+            <p style="color:white; text-align: center; font-size: 1.5em; margin-top: 1em;">ChatBox</p>
+            <div class="chatbox">
+                <div id="chatboxReceive"></div>  
+            </div>
+            <form action="#" id="chatboxSend">
+                <input id="chatText" type="text"></input>
+                <button id="chatSubmit" type="submit">Send</button>
+            </form>
+            </div>
+        </div>
+    </div>
+    -->
+    <!-- End of Page Side -->
+
 
 
     <!-- Settings -->

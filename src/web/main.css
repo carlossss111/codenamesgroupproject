@@ -10,6 +10,8 @@
 
 body {
     background-color: #ffdede;
+    overflow-x: hidden; /*no scrolling */
+    /*overflow-y: hidden; */ /* TODO: */
 }
 
 /*
