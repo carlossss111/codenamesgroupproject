@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
@@ -23,32 +22,97 @@
 
 </head>
 <body>
+    <!-- Page Head -->
     <div>
-        <img class="set" id="set" src="../rsc/images/set.png" alt="" srcset="">
-    </div>
-    
-    <span style="float: right;" id="timeLeft">
-        Time Left:
-        <span id="timer"></span>
-    </span>
-    
-    <div id="room" style="font-size: 1.25em; text-align: center;"></div>
-
-    <div id="scoringSys" style="text-align: center;">
-        <span id="blueMember" style="color: #3399ff;">
-            Spymaster:<span id="blueSm" style="color: black;">Bob (AI)</span> 
-            Spy:<span id="blueSpy" style="color: black;">Colin (AI)</span>
+        <!-- Settings Icon -->
+        <div>
+            <img class="set" id="set" src="../rsc/images/set.png" alt="" srcset="">
+        </div>
+        
+        <!-- Timer -->
+        <span style="float: right;" id="timeLeft">
+            Time Left:
+            <span id="timer"></span>
         </span>
-        <span id="blueScore" style="color: #3399ff; font-size: 4em;">0</span>
-        <span style="font-size: 4em;">&nbsp;:&nbsp;</span>
-        <span id="redScore" style="color: #ff5050; font-size: 4em;">0</span>
-        <span id="redMember" style="color: #ff5050;">
-            Spymaster:<span id="redSm" style="color: black;">Geert (AI)</span> 
-            Spy:<span id="redSpy" style="color: black;">Peer (AI)</span>
-        </span>
-    </div>
+        
+        <!-- Room Number -->
+        <div id="room" style="font-size: 1.25em; text-align: center;"></div>
 
+        <!-- Scores -->
+        <div id="scoringSys" style="text-align: center;">
+            <span id="blueMember" style="color: #3399ff;">
+                Spymaster:<span id="blueSm" style="color: black;">Bob (AI)</span> 
+                Spy:<span id="blueSpy" style="color: black;">Colin (AI)</span>
+            </span>
+            <span id="blueScore" style="color: #3399ff; font-size: 4em;">0</span>
+            <span style="font-size: 4em;">&nbsp;:&nbsp;</span>
+            <span id="redScore" style="color: #ff5050; font-size: 4em;">0</span>
+            <span id="redMember" style="color: #ff5050;">
+                Spymaster:<span id="redSm" style="color: black;">Geert (AI)</span> 
+                Spy:<span id="redSpy" style="color: black;">Peer (AI)</span>
+            </span>
+        </div>
+
+        <!-- Clue box and options -->
+        <form class="clueBox" action="#" onsubmit="board.forwardClue()" style="text-align: center;">
+            <input type="text" id="clue" placeholder="Enter clue"></input>
+            <select id="maxClues">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+            </select>
+            <button type="submit" id="clueButton">Give Clue</button>
+        </form>
+
+        <!-- "It's your turn!" notification -->
+        <div id="turnAlert" style="text-align: center; font-size: 1.25em;">It's your turn!</div>
+    </div>
+    <!-- End of Page Head-->
+    
+
+    <!-- Page Side -->
+    <div>
+        <!-- Sidebar open/close button -->
+        <input type="checkbox" class="openSidebarMenu" id="openSidebarMenu" onclick="MoveBoard()">
+        <label for="openSidebarMenu" class="sidebarIconToggle">
+            <div class="arrow"></div>
+        </label>
+
+        <!-- Sidebar -->
+        <div id="sidebarMenu">
+            <p style="color:white; text-align: center; font-size: 1.5em; margin-top: 1em;">ChatBox</p>
+            <div class="chatbox">
+                <div id="chatboxReceive"></div>  
+            </div>
+            <form action="#" id="chatboxSend">
+                <input id="chatText" type="text"></input>
+                <button id="chatSubmit" type="submit">Send</button>
+            </form>
+        </div>
+    </div>
+    <!-- End of Page Side -->
+
+
+    <!-- Board -->
+    <div id="board">
+    <!--
+        <div class="card neutral">
+            <p>card name</p>
+        </div>
+        .. * 25
+    -->
+    </div>
+    <!-- End of board -->
+
+
+    <!-- Team Selection-->
     <div id="teamBox" class="teamForm">
+        <!--Join Button & Start Game-->
         <form style="text-align: center;" >
             <button type="submit" id="joinBlueSm" class="teamButton blueBt">Join Blue Spymaster</button>
             <button type="submit" id="joinRedSm" class="teamButton redBt">Join Red Spymaster</button>
@@ -59,30 +123,18 @@
             <button type="submit" id="startGame" class="teamButton startBt">START</button>
         </form>
     </div>
-    
-    <input type="checkbox" class="openSidebarMenu" id="openSidebarMenu" onclick="MoveBoard()">
-    <label for="openSidebarMenu" class="sidebarIconToggle">
-        <div class="arrow"></div>
-    </label>
+    <!-- End of Team Selection-->
 
-    <div id="sidebarMenu">
-        <p style="color:white; text-align: center; font-size: 1.5em; margin-top: 1em;">ChatBox</p>
-        <div class="chatbox">
-            <div id="chatboxReceive"></div>  
-        </div>
-        <form action="#" id="chatboxSend">
-            <input id="chatText" type="text"></input>
-            <button id="chatSubmit" type="submit">Send</button>
-        </form>
-    </div>
 
+    <!-- Settings -->
     <div class="setBox" id="setBox">
+        <!-- Back Button & Heading -->
         <img src="../rsc/images/back.png" id="back" class="back" alt="" srcset="">
-
         <div class="setSubTit">
             Local Settings
         </div>
         
+        <!-- Audio -->
         <div class="setItem">
             <img class="setItemIcon" src="../rsc/images/voice.png" alt="" srcset="">
             <div class="setItemDesc">
@@ -94,6 +146,7 @@
             </div>
         </div>
 
+        <!-- Music -->
         <div class="setItem">
             <img class="setItemIcon" src="../rsc/images/music.png" alt="" srcset="">
             <div class="setItemDesc">
@@ -105,25 +158,7 @@
             </div>
         </div>
     </div>
-
-    <!-- clue Box temp max clues in future should only show max clues up to the amount of cards left --->
-    <form class="clueBox" action="#" onsubmit="board.forwardClue()" style="text-align: center;">
-        <input type="text" id="clue" placeholder="Enter clue"></input>
-        <select id="maxClues">
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-            <option value="6">6</option>
-            <option value="7">7</option>
-            <option value="8">8</option>
-        </select>
-        <button type="submit" id="clueButton">Give Clue</button>
-    </form>
-
-    <div id="turnAlert" style="text-align: center; font-size: 1.25em;">It's your turn!</div>
-    <div id="board"></div>
+    <!-- End of Settings -->
 
 </body>
 
