@@ -146,11 +146,11 @@ function timerCount() {
 }
 
 //Moves board left and right to accomodate for the sidepanel
-function MoveBoard() {
-    if (document.getElementById("openSidebarMenu").checked == true) {
-        document.getElementById("board").style.transform = "translateX(0)";
-    } else if (document.getElementById("openSidebarMenu").checked == false) {
+function moveBoard() {
+    if (document.getElementById("openSideCheck").checked == true) {
         document.getElementById("board").style.transform = "translateX(15%)";
+    } else if (document.getElementById("openSideCheck").checked == false) {
+        document.getElementById("board").style.transform = "translateX(0)";
     }
 }
 
@@ -534,6 +534,7 @@ class BoardState extends Observer {
             case "changeTurn":
                 //styling
                 document.getElementById("turnAlert").style.display = "none";
+                document.getElementById("room").style.display = "block";
                 document.getElementById("blueSpy").style.fontSize = "1em";
                 document.getElementById("blueSm").style.fontSize = "1em";
                 document.getElementById("redSpy").style.fontSize = "1em";
@@ -571,8 +572,11 @@ class BoardState extends Observer {
                 }
 
                 //alert the player if their turn
-                if (this.isPlayersTurn())
+                if (this.isPlayersTurn()) {
+                    document.getElementById("room").style.display = "none";
                     document.getElementById("turnAlert").style.display = "block";
+                }
+                    
                 break;
 
             case "sendRoomInfo":

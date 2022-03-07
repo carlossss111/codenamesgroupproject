@@ -8,8 +8,8 @@
     display: grid;
     grid-template-columns: 13vw 13vw 13vw 13vw 13vw;
     grid-template-rows: 14vh 14vh 14vh 14vh 14vh;
-    column-gap: 3vh;
-    row-gap: 3vh;
+    column-gap: 2vw;
+    row-gap: 2vh;
     transform: translateX(15%);
     transition: transform 250ms ease-in-out;
 }
@@ -21,7 +21,7 @@
 /* all cards */
 .card {
     width: 13vw;
-    height: 14vh;
+    height: 13vh;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -106,47 +106,49 @@
 
 .sidebarContainer{
     position: absolute;
-    z-index:1;
-    top:0;
-    right:0;
-    height:100vh;
-    width:25%;
+    z-index: 1;
+    top: 0;
+    right: 0;
+    height: 100vh;
+    width: 25%;
     transition: all 250ms ease-in-out;
 }
 
-#openSidebarMenu{
-    position:relative;
-    float:left;
-    width:20%;
-    height:10%;
-    top:45%;
+#openSidebarMenu {
+    position: relative;
+    float: left;
+    width: 20%;
+    height: 10%;
+    top: 0%;
     /* div centering is one of the greatest achievements
     of computer science */
 }
 
-#openSidebarMenu input{
+#openSidebarMenu input {
     cursor: pointer;
-    opacity:0;
-    width:100%;
-    height:100%;
+    position: relative;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
 }
 
-#sidebarMenu{
+#sidebarMenu {
+    position: fixed;
     background: linear-gradient(180deg, #F1BF98 0%, #ffdede 100%);
-    display:inline-block;
-    height:100vh;
-    width:80%;
+    border-radius: 15px;
+    display: inline-block;
+    height: 100vh;
 }
 
 .arrow {
-    position:absolute;
-    z-index:2;
+    position: absolute;
+    z-index: 2;
     border-right: 5px solid black;
     border-bottom: 5px solid black;
     width: 20px;
     height: 20px;
-    top:15px;
-    left: 40px;
+    top: 20px;
+    left: 10px;
     transform: rotate(-45deg);
     transition: all 0.3s ease-in-out;
 }
@@ -176,9 +178,9 @@
 }
 
 #chatboxReceive{
-    padding:5px 10px;
-    height:100%;
-    overflow:scroll;
+    padding: 5px 10px;
+    height: 100%;
+    overflow: scroll;
 }
 
 /*
@@ -213,15 +215,15 @@
 }
 
 .blueBt:before {
-    background: #54a4dd;
+    background: #3399ff;
 }
 
 .redBt:before {
-    background: #e02e2e;
+    background: #ff5050;
 }
 
 .startBt:before {
-    background: #3b3b3b;
+    background: #5e5e5e;
 }
 
 .blueBt:hover:before,
@@ -396,11 +398,6 @@ input[type=range]::-webkit-slider-thumb {
         padding: 10px 20px;
         cursor: pointer;
         border-radius: 7px;
-    }
-
-    #scoringSys {
-        text-align: center;
-        font-size: 12px;
     }
 
     .set {

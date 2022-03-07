@@ -37,16 +37,21 @@
         
         <!-- Room Number -->
         <div id="room" style="font-size: 1.25em; text-align: center;"></div>
+        
+        <!-- "It's your turn!" notification -->
+        <div id="turnAlert" style="text-align: center; font-size: 1.25em;">It's your turn!</div>
 
         <!-- Scores -->
         <div id="scoringSys" style="text-align: center;">
+            <div>
+                <span id="blueScore" style="color: #3399ff; font-size: 4em;">0</span>
+                <span style="font-size: 4em;">&nbsp;:&nbsp;</span>
+                <span id="redScore" style="color: #ff5050; font-size: 4em;">0</span>
+            </div>
             <span id="blueMember" style="color: #3399ff;">
                 Spymaster:<span id="blueSm" style="color: black;">Bob (AI)</span> 
                 Spy:<span id="blueSpy" style="color: black;">Colin (AI)</span>
             </span>
-            <span id="blueScore" style="color: #3399ff; font-size: 4em;">0</span>
-            <span style="font-size: 4em;">&nbsp;:&nbsp;</span>
-            <span id="redScore" style="color: #ff5050; font-size: 4em;">0</span>
             <span id="redMember" style="color: #ff5050;">
                 Spymaster:<span id="redSm" style="color: black;">Geert (AI)</span> 
                 Spy:<span id="redSpy" style="color: black;">Peer (AI)</span>
@@ -68,12 +73,8 @@
             </select>
             <button type="submit" id="clueButton">Give Clue</button>
         </form>
-
-        <!-- "It's your turn!" notification -->
-        <div id="turnAlert" style="text-align: center; font-size: 1.25em;">It's your turn!</div>
     </div>
     <!-- End of Page Head-->
-    
 
 
     <!-- Team Selection-->
@@ -92,7 +93,6 @@
     <!-- End of Team Selection-->
 
 
-
     <!-- Board -->
     <div id="board">
         <!--
@@ -105,12 +105,11 @@
     <!-- End of board -->
 
 
-
     <!-- Page Side -->
     <div class="sidebarContainer">
         <div id="openSidebarMenu">
             <div class="arrow"></div>
-            <input type="checkbox"/>
+            <input type="checkbox" id="openSideCheck" onclick="moveBoard()"/>
         </div>
         <div id="sidebarMenu">
 
@@ -124,7 +123,6 @@
         </form>
     </div>
     <!-- End of Page Side -->
-
 
 
     <!-- Settings -->
