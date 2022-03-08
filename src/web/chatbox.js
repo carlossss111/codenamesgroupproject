@@ -4,33 +4,30 @@
  * Receives chat messages from the python server using the Observer
  * pattern. Messages are displayed below.
  */
-class Chatbox extends Observer{
+ class Chatbox extends Observer{
 
     /**
     * Adds an event listener to the HTML node with id="chatboxSend" 
     * so that it calls the sendChat function.
     */
-    constructor(){
+    constructor() {
         super();
-
-        var chatboxSend = document.getElementById("chatboxSend");
-        var chatboxSendText = chatboxSend[0];
-        var str_to_send = nickname + chatboxSendText.value;
-        
-
-
-        chatboxSend.addEventListener("submit", () => {
-            this.sendChat(nickname + ": " + chatboxSendText.value);
-            console.log("Chat Sent");
-        });
+        document.getElementById("chatboxSend").addEventListener("submit", this.sendChat);      
     }
 
     /**
     * Sends the chat to the server using the Server Class.
     * Called with event listener in the constructor.
     */
-    sendChat(msg){
-        server.sendToServer("chat", {Protocol : "chat", message : `${msg}`});
+    sendChat() {
+        var chatText = document.getElementById("chatText").value;
+        var message = nickname + ": " + chatText;
+        server.sendToServer("chat", {
+            "Protocol" : "chat", 
+            "message" : message,
+            "room" : board.room,
+            "team" : board.player.team
+        });
     }
 
     /**
@@ -38,12 +35,16 @@ class Chatbox extends Observer{
     * Called whenever a "chat" message is received from the server.
     * (Observer Class Override!)
     */
-    update(eventName, args){
-        if(eventName != "chat")
-            return;
+    update(eventName, args) {
+        if (eventName != "chat") return;
 
         var chatboxReceive = document.getElementById("chatboxReceive");
         var newMessage = document.createElement("p");
+
+        var team = args['team'];
+        if (team == "blue") newMessage.style.color = "#3399ff";
+        else if (team == "red") newMessage.style.color = "#ff5050";
+        else newMessage.style.color = "black";
 
         newMessage.innerHTML = args['message'];
         chatboxReceive.appendChild(newMessage);

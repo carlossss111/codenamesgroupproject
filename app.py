@@ -59,14 +59,16 @@ Forwards message sent from a client to all other clients.
 @socket_.on('chat', namespace='/')
 def chat_broadcast_message(messageReceived):
     print("Chat Message Received!")
+    room = messageReceived['room']
     # define protocol and message
     protocol = 'chat'
     messageToSend = {
-        'Protocol': protocol, \
-        'message': messageReceived['message'] \
+        'Protocol': protocol,
+        'message': messageReceived['message'],
+        'team' : messageReceived['team']
     }
     # send to client
-    emit(protocol, messageToSend, broadcast=True)
+    emit(protocol, messageToSend, room=room)
 
 
 """

@@ -10,7 +10,6 @@
     grid-template-rows: 14vh 14vh 14vh 14vh 14vh;
     column-gap: 2vw;
     row-gap: 2vh;
-    transform: translateX(15%);
     transition: transform 250ms ease-in-out;
 }
 
@@ -348,7 +347,6 @@ input[type=range]::-webkit-slider-thumb {
         row-gap: 1px;
         grid-auto-columns: auto;
         grid-auto-rows: auto;
-        transform: translateX(15%);
         transition: transform 250ms ease-in-out;
         justify-content: center
     }

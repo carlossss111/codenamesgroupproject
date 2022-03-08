@@ -8,19 +8,20 @@ DEBUG_SKIP_VALIDATION = false;
 //Move sidebar and board left and right
 function moveSidebar(event) {
     var width = window.innerWidth;
-    var open = event.target.checked;
     var container = document.querySelector(".sidebarContainer");
     var arrow = document.querySelector(".arrow");
-    if (open) {
+    if (!isSidebarOpen) {
         document.getElementById("board").style.transform = "translateX(15%)";
         arrow.style.transform = "rotate(135deg)";
         if (width <= 600) container.style.right = "-90%";
         else container.style.right = "-20%";
+        isSidebarOpen = true;
     }
     else {
         document.getElementById("board").style.transform = "translateX(0)";
         arrow.style.transform = "rotate(-45deg)";
         event.target.parentNode.parentNode.style.right = "0";
+        isSidebarOpen = false;
     }
 }
 
@@ -568,13 +569,17 @@ class BoardState extends Observer {
                     document.getElementById("room").style.display = "none";
                     document.getElementById("turnAlert").style.display = "block";
                 }
-                    
                 break;
 
             case "sendRoomInfo":
                 //resend the room info
                 if (incoming.name == nickname)
-                    server.sendToServer("chat", {Protocol : "chat", message : `${incoming.message}`});
+                    server.sendToServer("chat", {
+                        Protocol : "chat", 
+                        message : `${incoming.message}`,
+                        room : this.room,
+                        team : this.player.team
+                    });
                 break;
 
             case "gameOver":
@@ -602,6 +607,7 @@ var tmpName = "";
 var timerVar;
 var role = "";
 var vocabulary;
+var isSidebarOpen = true;
 
 if (choice == 1) {
     var isBombCard = link.substring(link.indexOf('$')+1, link.indexOf('&'));
