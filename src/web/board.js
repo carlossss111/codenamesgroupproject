@@ -5,25 +5,39 @@ BOMB_IMAGE = "url('../rsc/images/bomb.jpg')";
 
 DEBUG_SKIP_VALIDATION = false;
 
+notiVal=10;
+
+setInterval(function(){ 
+    console.log(notiVal);
+    document.getElementById('noti').innerHTML=notiVal;
+}, 1000);
+
 //Move sidebar and board left and right
 function moveSidebar(event) {
     var width = window.innerWidth;
     var container = document.querySelector(".sidebarContainer");
     var arrow = document.querySelector(".arrow");
+    var noti = document.querySelector(".notificationIcon");
+
     if (!isSidebarOpen) {
         document.getElementById("board").style.transform = "translateX(15%)";
         arrow.style.transform = "rotate(135deg)";
+        noti.style.display = "block";
         if (width <= 600) container.style.right = "-90%";
         else container.style.right = "-20%";
         isSidebarOpen = true;
     }
     else {
+        notiVal = 0;
         document.getElementById("board").style.transform = "translateX(0)";
         arrow.style.transform = "rotate(-45deg)";
+        noti.style.display = "none"; 
         event.target.parentNode.parentNode.style.right = "0";
         isSidebarOpen = false;
+
     }
 }
+
 
 function joinRoom() {
     server.sendToServer("joinRoom", {
@@ -634,3 +648,4 @@ document.getElementById("joinRedSm").onclick = function() {chooseRole("redSm");}
 document.getElementById("startGame").onclick = function() {boardInitialize(isBombCard);};
 
 document.getElementById("openSidebarMenu").addEventListener("click", moveSidebar);
+

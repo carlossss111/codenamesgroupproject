@@ -19,7 +19,9 @@ class Chatbox extends Observer{
     * Sends the chat to the server using the Server Class.
     * Called with event listener in the constructor.
     */
+   
     sendChat() {
+        notiVal+=1;
         var chatText = document.getElementById("chatText").value;
         var message = nickname + ": " + chatText;
         server.sendToServer("chat", {
