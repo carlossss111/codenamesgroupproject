@@ -5,23 +5,24 @@ BOMB_IMAGE = "url('../rsc/images/bomb.jpg')";
 
 DEBUG_SKIP_VALIDATION = false;
 
-function moveSidebar(event){
+//Move sidebar and board left and right
+function moveSidebar(event) {
     var width = window.innerWidth;
     var open = event.target.checked;
     var container = document.querySelector(".sidebarContainer");
     var arrow = document.querySelector(".arrow");
-    if(open){
+    if (open) {
+        document.getElementById("board").style.transform = "translateX(15%)";
         arrow.style.transform = "rotate(135deg)";
-        if(width <= 600)
-            container.style.right = "-90%";
-        else
-            container.style.right = "-20%";
+        if (width <= 600) container.style.right = "-90%";
+        else container.style.right = "-20%";
     }
-    else{
+    else {
+        document.getElementById("board").style.transform = "translateX(0)";
         arrow.style.transform = "rotate(-45deg)";
         event.target.parentNode.parentNode.style.right = "0";
     }
-}; document.getElementById("openSidebarMenu").addEventListener("click", moveSidebar);
+}
 
 function joinRoom() {
     server.sendToServer("joinRoom", {
@@ -142,15 +143,6 @@ function timerCount() {
             board.turn = {"team": null, "role": null};
             updateTurnState();
         }
-    }
-}
-
-//Moves board left and right to accomodate for the sidepanel
-function moveBoard() {
-    if (document.getElementById("openSideCheck").checked == true) {
-        document.getElementById("board").style.transform = "translateX(15%)";
-    } else if (document.getElementById("openSideCheck").checked == false) {
-        document.getElementById("board").style.transform = "translateX(0)";
     }
 }
 
@@ -633,5 +625,6 @@ document.getElementById("joinBlueSpy").onclick = function() {chooseRole("blueSpy
 document.getElementById("joinBlueSm").onclick = function() {chooseRole("blueSm");};
 document.getElementById("joinRedSpy").onclick = function() {chooseRole("redSpy");};
 document.getElementById("joinRedSm").onclick = function() {chooseRole("redSm");};
-
 document.getElementById("startGame").onclick = function() {boardInitialize(isBombCard);};
+
+document.getElementById("openSidebarMenu").addEventListener("click", moveSidebar);
