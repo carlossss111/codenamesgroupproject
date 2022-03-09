@@ -153,7 +153,6 @@
     transition: all 0.3s ease-in-out;
 }
 
-
 .notificationIcon {
     position: absolute;
     top: -3px;
@@ -166,7 +165,7 @@
     transform: rotate(-135deg);
     transition: all 0.3s ease-in-out;
     display: none;
-  }
+}
 
 .chatbox {
     margin: 1rem auto;

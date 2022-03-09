@@ -4,7 +4,7 @@
  * Receives chat messages from the python server using the Observer
  * pattern. Messages are displayed below.
  */
-class Chatbox extends Observer{
+ class Chatbox extends Observer{
 
     /**
     * Adds an event listener to the HTML node with id="chatboxSend" 
@@ -19,9 +19,7 @@ class Chatbox extends Observer{
     * Sends the chat to the server using the Server Class.
     * Called with event listener in the constructor.
     */
-   
     sendChat() {
-        notiVal+=1;
         var chatText = document.getElementById("chatText").value;
         var message = nickname + ": " + chatText;
         server.sendToServer("chat", {
@@ -48,6 +46,9 @@ class Chatbox extends Observer{
         else if (team == "red") newMessage.style.color = "#ff5050";
         else newMessage.style.color = "black";
 
+        notiVal += 1;
+        document.getElementById('noti').innerHTML = notiVal;
+        
         newMessage.innerHTML = args['message'];
         chatboxReceive.appendChild(newMessage);
     }
