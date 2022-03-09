@@ -603,6 +603,7 @@ class BoardState extends Observer {
 // Game starts here
 var board = BoardState.getInstance();
 server.registerObserver(board);
+console.log(server.observers);
 
 var link = parent.document.URL;
 var choice = link.charAt(link.indexOf('#')+1);
