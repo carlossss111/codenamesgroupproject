@@ -38,6 +38,7 @@ class Server{
         console.log("MESSAGE SENT:");
         console.log(data);
         socket.emit(eventName, data);
+        return {eventName, data};
     }
 
     //receive data from server and update oberservers
