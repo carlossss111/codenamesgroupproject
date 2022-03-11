@@ -443,6 +443,18 @@ class BoardState extends Observer {
                 this.blueScore = incoming.blueScore;
                 this.timer = incoming.timerLength;
 
+                //play score win/lose audio
+                if (this.turn.team == this.player.team) {
+                    if (this.player.team == 'blue') {
+                        if (document.getElementById("blueScore").innerText != this.blueScore) addScoreAudio();
+                        else loseScoreAudio();
+                    }
+                    if (this.player.team == 'red') {
+                        if (document.getElementById("redScore").innerText != this.redScore) addScoreAudio();
+                        else loseScoreAudio();
+                    }
+                }
+
                 //display new scores
                 document.getElementById("redScore").innerText = this.redScore;
                 document.getElementById("blueScore").innerText = this.blueScore;
@@ -514,6 +526,7 @@ class BoardState extends Observer {
                 //configure roles and start game
                 if (this.player.role == "spy") enableSpyMode();
                 document.getElementById("teamBox").style.display = "none";
+                document.querySelector(".clueBox").style.display = "block";
                 if (choice == 1) startGame();
                 break;
 
@@ -534,31 +547,31 @@ class BoardState extends Observer {
                 //styling
                 document.getElementById("turnAlert").style.display = "none";
                 document.getElementById("room").style.display = "block";
-                document.getElementById("blueSpy").style.fontSize = "1em";
-                document.getElementById("blueSm").style.fontSize = "1em";
-                document.getElementById("redSpy").style.fontSize = "1em";
-                document.getElementById("redSm").style.fontSize = "1em";
+                document.getElementById("blueSpy").style.color = "black";
+                document.getElementById("blueSm").style.color = "black";
+                document.getElementById("redSpy").style.color = "black";
+                document.getElementById("redSm").style.color = "black";
                 
                 //change the turn and handle AI
                 this.turn = incoming.currentTurn;
                 console.log(this.turn);
                 if (this.turn["team"] == "blue") {
                     if (this.turn["role"] == "spymaster") {
-                        document.getElementById("blueSm").style.fontSize = "1.5em";
+                        document.getElementById("blueSm").style.color = "lightgreen";;
                         if (choice == 1 && this.ai.blueSm) generateClue();
                     }
                     else {
-                        document.getElementById("blueSpy").style.fontSize = "1.5em";
+                        document.getElementById("blueSpy").style.color = "lightgreen";;
                         if (choice == 1 && this.ai.blueSpy) generateGuess();
                     }
                 } 
                 else if (this.turn["team"] == "red"){
                     if (this.turn["role"] == "spymaster") {
-                        document.getElementById("redSm").style.fontSize = "1.5em";
+                        document.getElementById("redSm").style.color = "lightgreen";;
                         if (choice == 1 && this.ai.redSm) generateClue();
                     }
                     else {
-                        document.getElementById("redSpy").style.fontSize = "1.5em";
+                        document.getElementById("redSpy").style.color = "lightgreen";;
                         if (choice == 1 && this.ai.redSpy) generateGuess();
                     }
                 }
@@ -591,6 +604,7 @@ class BoardState extends Observer {
             case "gameOver":
                 //display winning text
                 document.getElementById("timeLeft").style.display = "none";
+                gameOverAudio();
                 alert(incoming.winTeam + " Wins!");
                 break;
 
@@ -632,6 +646,7 @@ if (choice == 1) {
 
 document.getElementById("turnAlert").style.display = "none";
 document.getElementById("timeLeft").style.display = "none";
+document.querySelector(".clueBox").style.display = "none";
 document.getElementById("room").innerHTML = "Room: " + board.room;
 joinRoom()
 

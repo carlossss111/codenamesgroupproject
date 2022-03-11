@@ -10,7 +10,8 @@
     <link href="../src/web/game.css" type="text/css" rel="stylesheet" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Russo+One&di lay=swap" rel="stylesheet"> 
+    <link href="https://fonts.googleapis.com/css2?family=Russo+One&di lay=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
     <script src="../src/web/board.js" defer></script>
     <script src="https://cdn.socket.io/4.4.0/socket.io.min.js" integrity="sha384-1fOn6VtTq3PWwfsOrk45LnYcGosJwzMHv+Xh/Jx5303FVOXzEnw0EpLv30mtjmlj" crossorigin="anonymous"></script>
     <script src="../src/web/server.js"></script>
@@ -36,21 +37,23 @@
         </span>
         
         <!-- Room Number -->
-        <div id="room" style="font-size: 1.25em; text-align: center;"></div>
+        <div id="room" class="text-center text-md mt-3 font-bold text-amber-800"></div>
         
         <!-- "It's your turn!" notification -->
-        <div id="turnAlert" style="text-align: center; font-size: 1.25em;">It's your turn!</div>
+        <div id="turnAlert" class="text-center text-md mt-3 font-bold text-amber-800">It's your turn!</div>
 
         <!-- Scores -->
-        <div id="scoringSys" style="text-align: center;">
-            <div>
-                <span id="blueScore" style="color: #3399ff; font-size: 4em;">0</span>
-                <span style="font-size: 4em;">&nbsp;:&nbsp;</span>
-                <span id="redScore" style="color: #ff5050; font-size: 4em;">0</span>
-            </div>
+        <div id="scoringSys" class="text-center text-md mt-3 bg-white drop-shadow-md">
             <span id="blueMember" style="color: #3399ff;">
                 Spymaster:<span id="blueSm" style="color: black;">Bob (AI)</span> 
                 Spy:<span id="blueSpy" style="color: black;">Colin (AI)</span>
+            </span>
+            <span style="font-size: 4em; display: inline-block;">
+                &nbsp;
+                <span id="blueScore" style="color: #3399ff;">0</span>
+                &nbsp;:&nbsp;
+                <span id="redScore" style="color: #ff5050;">0</span>
+                &nbsp; 
             </span>
             <span id="redMember" style="color: #ff5050;">
                 Spymaster:<span id="redSm" style="color: black;">Geert (AI)</span> 
@@ -78,17 +81,20 @@
 
 
     <!-- Team Selection-->
-    <div id="teamBox" class="teamForm">
-        <!--Join Button & Start Game-->
-        <form style="text-align: center;" >
-            <button type="submit" id="joinBlueSm" class="teamButton blueBt">Join Blue Spymaster</button>
-            <button type="submit" id="joinRedSm" class="teamButton redBt">Join Red Spymaster</button>
-            <button type="submit" id="joinBlueSpy" class="teamButton blueBt">Join Blue Spy</button>
-            <button type="submit" id="joinRedSpy" class="teamButton redBt">Join Red Spy</button>
+    <div id="teamBox" class="teamForm pt-10">
+        <form style="text-align: center;" class="flex flex-col items-center space-y-10" >
+            <div class="flex flex-row space-x-10">
+                <button type="submit" id="joinBlueSm" class="-rotate-6 bg-slate-50 shadow-md hover:bg-blue-300 hover:text-white hover:animate-pulse w-80 h-20 p-5 rounded-xl text-2xl font-bold">Join Blue Spymaster</button>
+                <button type="submit" id="joinRedSm" class="rotate-6 bg-slate-50 shadow-md hover:bg-rose-300 hover:text-white hover:animate-pulse w-80 h-20 p-5 rounded-xl text-2xl font-bold">Join Red Spymaster</button>
+            </div>
+            <div class="flex flex-row">
+                <button type="submit" id="startGame" class="shadow-md hover:bg-slate-500 hover:text-white w-80 h-20 p-5 rounded-xl text-2xl font-bold hover:animate-ping bg-amber-200">START</button>
+            </div>
+            <div class="flex flex-row space-x-10">
+                <button type="submit" id="joinBlueSpy" class="rotate-6 bg-slate-50 shadow-md hover:bg-blue-300 hover:text-white hover:animate-pulse w-80 h-20 p-5 rounded-xl text-2xl font-bold">Join Blue Spy</button>
+                <button type="submit" id="joinRedSpy" class="-rotate-6 bg-slate-50 shadow-md hover:bg-rose-300 hover:text-white hover:animate-pulse w-80 h-20 p-5 rounded-xl text-2xl font-bold">Join Red Spy</button>
+            </div>
         </form>        
-        <form style="text-align: center;">
-            <button type="submit" id="startGame" class="teamButton startBt">START</button>
-        </form>
     </div>
     <!-- End of Team Selection-->
 
@@ -115,13 +121,13 @@
         </div>
         <div id="sidebarMenu">
 
-        <p style="color:white; text-align: center; font-size: 1.5em; margin-top: 1em;">ChatBox</p>
+        <p style="color: #697a88; text-align: center; margin-top: 2em; font-weight: bold;">CHATBOX</p>
         <div class="chatbox">
             <div id="chatboxReceive"></div>  
         </div>
         <form action="#" id="chatboxSend">
             <input id="chatText" type="text"></input>
-            <button id="chatSubmit" type="submit">Send</button>
+            <button id="chatSubmit" type="submit" class='border-0 shadow-sm bg-sky-300 hover:bg-sky-200 hover:text-gray-500'>Send</button>
         </form>
     </div>
     <!-- End of Page Side -->

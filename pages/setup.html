@@ -9,62 +9,65 @@
     <link rel="shortcut icon" href="#">
     <link href="../src/web/main.css" type="text/css" rel="stylesheet" />
     <script src="../src/web/randomId.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <title>Nottingham Codenames</title>
 </head>
 <body>
-    <p id="menuTitle">Host Game</p>
-    <div style="margin: 5vw 25vw; font-size: 2vw;">
+    <div class='bg-[#ffdede] shadow-md mb-12'>
+        <h1 id="menuTitle" class='font-extrabold text-7xl uppercase leading-9 text-center pt-10 pb-10 text-gray-900 -rotate-3'>Host Game</h1>
+    </div>
 
-        <div id="hostMenu">
-            <div>
-                Name your room:
-                <input type="text" id="roomNameHost" placeholder="Auto generate"></input>
-            </div><br>
-            <div>
-                Name yourself:
-                <input type="text" id="yourNameHost" placeholder="Auto generate"></input>
-            </div><br>
-            <div>
-                Bomb Card:
+    <div class='mx-auto max-w-4xl text-3xl leading-6 font-bold text-gray-500 p-10 rounded-xl shadow-md'>
+        <div id="hostMenu" class='flex flex-col space-y-9'>
+            <div class='flex flex-row justify-between'>
+                <p>Name your room:</p>
+                <input type="text" id="roomNameHost" placeholder="Auto generate" class='border-0 border-b-2 border-grey-dark text-right'></input>
+            </div>
+            <div class='flex flex-row justify-between'>
+                <p>Name yourself:</p>
+                <input type="text" id="yourNameHost" placeholder="Auto generate" class='border-0 border-b-2 border-grey-dark text-right'></input>
+            </div>
+            <div class='flex flex-row justify-between'>
+                <p>Bomb Card:</p>
                 <select id="isBomb">
                     <option value="y">Yes</option>
                     <option value="n">No</option>
                 </select>
-            </div><br>
-            <div>
-                Timer:
+            </div>
+            <div class='flex flex-row justify-between'>
+                <p>Timer:</p>
                 <select id="timerLength">
                     <option value="n">No</option>
                     <option value="10">10s</option>
                     <option value="20">20s</option>
                     <option value="30">30s</option>
                 </select>
+            </div><br>
+        </div>
+
+        <div id="joinMenu" class='flex flex-col space-y-7'>
+            <div class='flex flex-row justify-between'>
+                <p>Room to join:</p>
+                <input type="text" id="roomNameJoin" class='border-0 border-b-2 border-grey-dark text-right'></input>
+            </div><br>
+            <div class='flex flex-row justify-between'>
+                <p>Name yourself:</p>
+                <input type="text" id="yourNameJoin" placeholder="Auto generate" class='border-0 border-b-2 border-grey-dark text-right'></input>
             </div><br><br>
         </div>
 
-        <div id="joinMenu">
-            <br>
-            <div>
-                Room to join:
-                <input type="text" id="roomNameJoin"></input>
-            </div><br><br>
-            <div>
-                Name yourself:
-                <input type="text" id="yourNameJoin" placeholder="Auto generate"></input>
-            </div><br><br><br>
-        </div>
-
-        <div>
-            <span>
-                <a href="../index.html">
-                    <button id="backMenu" style="margin-left: 10vw;">Back</button>
-                </a>
-            </span>
-            <span>
-                <button id="confirm" style="margin-right: 10vw; float: right;" onclick="confirmSetting()">Confirm</button>
-            </span>
+        <div class='flex flex-row items-center justify-evenly text-gray-700'>
+            <a href="../index.html">
+                <button id="backMenu" class="bg-slate-100 shadow-md p-5 rounded-xl w-40 h-15 font-bold hover:text-gray-200 hover:bg-rose-400 rotate-3">
+                    Back
+                </button>
+            </a>
+            <button id="confirm" class='bg-slate-100 shadow-md p-5 rounded-xl w-40 h-15 font-bold hover:text-gray-200 hover:bg-sky-300 -rotate-3' onclick="confirmSetting()">
+                Confirm
+            </button>
         </div>
     </div>
+
     <script>
         var choice = parent.document.URL.charAt(parent.document.URL.length-1);
 
