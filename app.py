@@ -315,4 +315,4 @@ def disconnect_request():
 
 
 if __name__ == '__main__':
-    socket_.run(app, debug=True, host="172.31.94.13", port='5000')
+    socket_.run(app, debug=True)
