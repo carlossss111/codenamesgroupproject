@@ -6,13 +6,13 @@ BOMB_IMAGE = "url('../rsc/images/bomb.jpg')";
 DEBUG_SKIP_VALIDATION = false;
 
 //Move sidebar and board left and right
-function moveSidebar(event) {
+function moveSidebar() {
     var width = window.innerWidth;
     var container = document.querySelector(".sidebarContainer");
     var arrow = document.querySelector(".arrow");
     var noti = document.querySelector(".notificationIcon");
 
-    if (!isSidebarOpen) {
+    if (isSidebarOpen) {
         notiVal = 0;
         document.getElementById('noti').innerHTML = notiVal;
         document.getElementById("board").style.transform = "translateX(15%)";
@@ -20,15 +20,21 @@ function moveSidebar(event) {
         noti.style.display = "block";
         if (width <= 600) container.style.right = "-90%";
         else container.style.right = "-20%";
-        isSidebarOpen = true;
+        isSidebarOpen = false;
     }
     else {
         document.getElementById("board").style.transform = "translateX(0)";
         arrow.style.transform = "rotate(-45deg)";
         noti.style.display = "none"; 
-        event.target.parentNode.parentNode.style.right = "0";
-        isSidebarOpen = false;
+        container.style.right = "0";
+        isSidebarOpen = true;
     }
+}
+
+function welcomeConfirm() {
+    document.getElementById("welcome").style.display = "none";
+    document.getElementById("teamBox").style.display = "block";
+    initGameBgAudio();
 }
 
 function joinRoom() {
@@ -525,6 +531,7 @@ class BoardState extends Observer {
 
                 //configure roles and start game
                 if (this.player.role == "spy") enableSpyMode();
+                document.getElementById("welcome").style.display = "none";
                 document.getElementById("teamBox").style.display = "none";
                 document.querySelector(".clueBox").style.display = "block";
                 if (choice == 1) startGame();
@@ -603,9 +610,19 @@ class BoardState extends Observer {
 
             case "gameOver":
                 //display winning text
-                document.getElementById("timeLeft").style.display = "none";
                 gameOverAudio();
-                alert(incoming.winTeam + " Wins!");
+                document.querySelector(".clueBox").style.display = "none";
+                document.getElementById("timeLeft").style.display = "none";
+                document.getElementById("gameOver").style.display = "block";
+                document.getElementById("winText").innerHTML = incoming.winTeam + " Wins!";
+                if (incoming.winTeam == "Blue Team") document.getElementById("winText").style.color = "#3399ff";
+                else document.getElementById("winText").style.color = "#ff5050";
+                if (choice == 2) document.getElementById("restart").style.display = "none"
+                break;
+
+            case "restartGame":
+                window.location.replace(link);
+                window.location.reload();
                 break;
 
             default:
@@ -629,7 +646,7 @@ var timerVar;
 var role = "";
 var vocabulary;
 var notiVal = 0;
-var isSidebarOpen = true;
+var isSidebarOpen = false;
 
 if (choice == 1) {
     var isBombCard = link.substring(link.indexOf('$')+1, link.indexOf('&'));
@@ -637,13 +654,16 @@ if (choice == 1) {
     if (isBombCard == 'y') isBombCard = true;
     else isBombCard = false;
     if (timer != 'n') board.timer = timer;
-    alert("Welcome to Codenames, " + nickname + "!\nWhen all players joined, press START to initialize board.");
+    var welcomeText = "When all players joined, press START to initialize board";
 } else {
-    alert("Welcome to Codenames, " + nickname + "!\nPlease wait for the host to start game.");
+    var welcomeText = "Please wait for the host to start game";
     document.getElementById("startGame").style.display = "none";
     syncNewClient('request');
 }
 
+document.getElementById("welcomeText1").innerHTML = "Welcome to Codenames, " + nickname;
+document.getElementById("welcomeText2").innerHTML = welcomeText;
+document.getElementById("teamBox").style.display = "none";
 document.getElementById("turnAlert").style.display = "none";
 document.getElementById("timeLeft").style.display = "none";
 document.querySelector(".clueBox").style.display = "none";
@@ -655,5 +675,6 @@ document.getElementById("joinBlueSm").onclick = function() {chooseRole("blueSm")
 document.getElementById("joinRedSpy").onclick = function() {chooseRole("redSpy");};
 document.getElementById("joinRedSm").onclick = function() {chooseRole("redSm");};
 document.getElementById("startGame").onclick = function() {boardInitialize(isBombCard);};
-
-document.getElementById("openSidebarMenu").addEventListener("click", moveSidebar);
+document.getElementById("openSidebarMenu").onclick = function() {moveSidebar();};
+document.getElementById("welcomeConfirm").onclick = function() {welcomeConfirm();};
+document.getElementById("restart").onclick = function() {server.sendToServer("restart", {"room": board.room});};

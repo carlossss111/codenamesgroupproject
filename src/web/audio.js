@@ -16,7 +16,6 @@ function initGameBgAudio() {
     }
     bgAudioCtx.play();
 }
-initGameBgAudio();
 
 function playFlipAudio() {
     var flipAudioCtx = new Audio(GAME_FLIP_AUDIO);

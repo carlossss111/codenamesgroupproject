@@ -10,6 +10,7 @@
     column-gap: 2vw;
     row-gap: 2vh;
     transition: transform 250ms ease-in-out;
+    transform: translateX(15%);
 }
 
 /*
@@ -76,12 +77,13 @@
 }
 
 /*
-* CLUE BOX
+* CLUE BOX & GAMEOVER BOX
 */
 
-/* "enter clue" box */
-.clueBox {
+.clueBox,
+#gameOver {
     margin: 1em auto;
+    text-align: center;
 }
 
 .clueBox input {
@@ -90,7 +92,8 @@
 
 .clueBox input,
 .clueBox select,
-.clueBox button {
+.clueBox button,
+#gameOver button {
     font-size: 1em;
     padding: 0.5em;
     border-radius: 0.4em;
@@ -99,7 +102,8 @@
     text-align: center;
 }
 
-.clueBox button:hover {
+.clueBox button:hover,
+#gameOver button:hover {
     background-color: lightGreen;
 }
 
@@ -118,7 +122,7 @@
     position: absolute;
     z-index: 1;
     top: 0;
-    right: 0;
+    right: -20%;
     height: 100vh;
     width: 25%;
     transition: all 250ms ease-in-out;
@@ -161,7 +165,7 @@
     height: 20px;
     top: 40px;
     left: 10px;
-    transform: rotate(-45deg);
+    transform: rotate(135deg);
     transition: all 0.3s ease-in-out;
 }
 
@@ -176,7 +180,6 @@
     display: block;
     transform: rotate(-135deg);
     transition: all 0.3s ease-in-out;
-    display: none;
 }
 
 .chatbox {
@@ -417,6 +420,7 @@ input[type=range]::-webkit-slider-thumb {
     }
 
     .sidebarContainer{
+        right: -90%;
         width: 100%;
     }
 

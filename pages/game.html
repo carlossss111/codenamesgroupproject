@@ -62,7 +62,7 @@
         </div>
 
         <!-- Clue box and options -->
-        <form class="clueBox" action="#" onsubmit="board.forwardClue()" style="text-align: center;">
+        <form class="clueBox" action="#" onsubmit="board.forwardClue()">
             <input type="text" id="clue" placeholder="Enter clue"></input>
             <select id="maxClues">
                 <option value="1">1</option>
@@ -76,11 +76,29 @@
             </select>
             <button type="submit" id="clueButton">Give Clue</button>
         </form>
+
+        <!-- Gameover Box -->
+        <div id="gameOver" style="display: none;">
+            <button id="winText"></button>
+            <a href="../index.html">
+                <button id="quitRoom">Quit Room</button>
+            </a>
+            <button id="restart">Restart</button>
+        </div>
+        
     </div>
     <!-- End of Page Head-->
 
 
-    <!-- Team Selection-->
+    <!-- Welcome Text -->
+    <div id="welcome" style="text-align: center;">
+        <p id="welcomeText1" style="margin-top: 15vh; margin-bottom: 2vh; font-size: 1.5em;"></p>
+        <p id="welcomeText2" style="margin-bottom: 6vh; font-size: 1.5em;"></p>
+        <button type="submit" id="welcomeConfirm" class="bg-slate-50 shadow-md hover:bg-slate-500 hover:text-white hover:animate-pulse w-80 h-20 p-5 rounded-xl text-2xl font-bold">Choose Role</button>
+    </div>
+
+
+    <!-- Team Selection -->
     <div id="teamBox" class="teamForm pt-10">
         <form style="text-align: center;" class="flex flex-col items-center space-y-10" >
             <div class="flex flex-row space-x-10">

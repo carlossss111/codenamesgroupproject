@@ -284,11 +284,20 @@ def update_turn(turn):
 @socket_.on('endGame', namespace='/')
 def game_over(winTeam):
     room = winTeam['room']
-
     protocol = 'gameOver'
     messageToSend = {
         'Protocol': protocol,
         'winTeam': winTeam['winner']
+    }
+    emit(protocol, messageToSend, room=room)
+
+
+@socket_.on('restart', namespace='/')
+def restart(message):
+    room = message['room']
+    protocol = 'restartGame'
+    messageToSend = {
+        'Protocol': protocol
     }
     emit(protocol, messageToSend, room=room)
 
@@ -306,4 +315,4 @@ def disconnect_request():
 
 
 if __name__ == '__main__':
-    socket_.run(app, debug=True)
+    socket_.run(app, debug=True, host="172.31.94.13", port='5000')
