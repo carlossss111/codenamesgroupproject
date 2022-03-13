@@ -659,23 +659,29 @@ console.log(server.observers);
 var link = parent.document.URL;
 var choice = link.charAt(link.indexOf('#')+1);
 board.room = link.substring(link.indexOf('!')+1, link.indexOf('@'));
+document.getElementById("room").innerHTML = "Room: " + board.room;
 var nickname = link.substring(link.indexOf('@')+1, link.indexOf('$')).replace('_', ' ');
 
-var tmpName = "";
 var timerVar;
-var role = "";
 var vocabulary;
+var tmpName = "";
+var role = "";
 var notiVal = 0;
 var isSidebarOpen = false;
 
 if (choice != 2) {
     var isBombCard = link.substring(link.indexOf('$')+1, link.indexOf('&'));
-    let timer = link.substring(link.indexOf('&')+1);
+    let timer = link.substring(link.indexOf('&')+1, link.indexOf('*'));
+    var difficulty = link.substring(link.indexOf('*')+1);
     if (isBombCard == 'y') isBombCard = true;
     else isBombCard = false;
     if (timer != 'n') board.timer = timer;
     var welcomeText = "When all players joined, press START to initialize board";
-    if (choice == 0) welcomeText = "Please choose your team and role";
+    if (choice == 0) {
+        welcomeText = "Please choose your team and role";
+        document.getElementById("room").innerHTML = "Difficulty: " + difficulty;
+        document.querySelector(".sidebarContainer").style.display = "none";
+    }
 } else {
     var welcomeText = "Please wait for the host to start game";
     document.getElementById("startGame").style.display = "none";
@@ -688,8 +694,6 @@ document.getElementById("teamBox").style.display = "none";
 document.getElementById("turnAlert").style.display = "none";
 document.getElementById("timeLeft").style.display = "none";
 document.querySelector(".clueBox").style.display = "none";
-document.getElementById("room").innerHTML = "Room: " + board.room;
-if (choice == 0) document.getElementById("room").innerHTML = "Plaese wait...";
 joinRoom()
 
 document.getElementById("joinBlueSpy").onclick = function() {chooseRole("blueSpy");};

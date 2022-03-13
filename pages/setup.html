@@ -30,9 +30,9 @@
             <div class='flex flex-row justify-between' id="aiDifficulty">
                 <p>Difficulty:</p>
                 <select id="difficulty">
-                    <option value="1">Easy</option>
-                    <option value="2">Medium</option>
-                    <option value="3">Hard</option>
+                    <option value="Easy">Easy</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Hard">Hard</option>
                 </select>
             </div>
             <div class='flex flex-row justify-between'>
@@ -98,8 +98,8 @@
         }
 
         function confirmSetting() {
-            var room = document.getElementById(roomId).value;
-            var nickname = document.getElementById(yourId).value;
+            var room = document.getElementById(roomId).value.replace(' ', '_');
+            var nickname = document.getElementById(yourId).value.replace(' ', '_');
             if (room == '') {
                 if (choice != 2) room = autoGenName("room");
                 else {
@@ -108,10 +108,17 @@
                 }
             }
             if (nickname == '') nickname = autoGenName("player");
+            for (let char of ['?','#','!','@','$','%','&','*']) {
+                if (room.includes(char) || nickname.includes(char)) {
+                    alert("Illegal room id or username!");
+                    return;
+                }
+            }
             if (choice != 2) {
                 var isBomb = document.getElementById("isBomb").value;
                 var timer = document.getElementById("timerLength").value;
-                window.location.href = "game.html?#"+choice+"!"+room+"@"+nickname+"$"+isBomb+"&"+timer;
+                var difficulty = document.getElementById("difficulty").value;
+                window.location.href = "game.html?#"+choice+"!"+room+"@"+nickname+"$"+isBomb+"&"+timer+"*"+difficulty;
             } else {
                 window.location.href = "game.html?#"+choice+"!"+room+"@"+nickname+"$";
             }
