@@ -31,6 +31,30 @@ def on_join(data):
 
 
 """
+Quit a game room
+"""
+@socket_.on('quitRoom')
+def on_quit(data):
+    room = data['room']
+    name = data['name']
+    team = data['team']
+    choice = data['choice']
+
+    messageToSend = {
+        'Protocol': 'chat',
+        'message': name + ' has quit room ' + room,
+        'team': team
+    }
+    emit('chat', messageToSend, room=room)
+    
+    if choice == '1':
+        messageToSend = {
+            'Protocol': 'hostQuit'
+        }
+        emit('hostQuit', messageToSend, room=room)
+
+
+"""
 create a initial game board
 """
 @socket_.on("createInitialBoardState", namespace='/')

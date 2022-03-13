@@ -45,6 +45,17 @@ function joinRoom() {
     })
 }
 
+function quitRoom() {
+    server.sendToServer("quitRoom", {
+        "Protocal" : "quitRoom",
+        "room" : board.room,
+        "name" : nickname,
+        "team" : board.player.team,
+        "choice" : choice
+    })
+    window.location.href = "../index.html";
+}
+
 function boardInitialize(isBombCard) {
     document.getElementById("startGame").style.display = "none";
 
@@ -621,8 +632,17 @@ class BoardState extends Observer {
                 break;
 
             case "restartGame":
+                //host restart game
                 window.location.replace(link);
                 window.location.reload();
+                break;
+
+            case "hostQuit":
+                //host quits room
+                if (choice == 2) {
+                    alert("Host user quits room!");
+                    window.location.href = "../index.html";
+                }
                 break;
 
             default:
@@ -677,4 +697,5 @@ document.getElementById("joinRedSm").onclick = function() {chooseRole("redSm");}
 document.getElementById("startGame").onclick = function() {boardInitialize(isBombCard);};
 document.getElementById("openSidebarMenu").onclick = function() {moveSidebar();};
 document.getElementById("welcomeConfirm").onclick = function() {welcomeConfirm();};
+document.getElementById("quitRoom").onclick = function() {quitRoom();};
 document.getElementById("restart").onclick = function() {server.sendToServer("restart", {"room": board.room});};
