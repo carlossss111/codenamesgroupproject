@@ -25,7 +25,13 @@ button {
 * SETUP PAGE
 */
 
-#roomNameHost, #yourNameHost, #roomNameJoin, #yourNameJoin, #isBomb, #timerLength {
+#roomNameHost, 
+#yourNameHost, 
+#roomNameJoin, 
+#yourNameJoin, 
+#difficulty, 
+#isBomb, 
+#timerLength {
     float: right;
     font-size: 0.75em;
     text-align: center;
@@ -34,7 +40,8 @@ button {
     background: transparent;
 }
 
-#backMenu, #confirm {
+#backMenu, 
+#confirm {
     width: 6em;
     height: 2em;
     font-size: 1em;

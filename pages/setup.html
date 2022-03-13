@@ -19,13 +19,21 @@
 
     <div class='mx-auto max-w-4xl text-3xl leading-6 font-bold text-gray-500 p-10 rounded-xl shadow-md'>
         <div id="hostMenu" class='flex flex-col space-y-9'>
-            <div class='flex flex-row justify-between'>
+            <div class='flex flex-row justify-between' id="nameRoom">
                 <p>Name your room:</p>
                 <input type="text" id="roomNameHost" placeholder="Auto generate" class='border-0 border-b-2 border-grey-dark text-right'></input>
             </div>
             <div class='flex flex-row justify-between'>
                 <p>Name yourself:</p>
                 <input type="text" id="yourNameHost" placeholder="Auto generate" class='border-0 border-b-2 border-grey-dark text-right'></input>
+            </div>
+            <div class='flex flex-row justify-between' id="aiDifficulty">
+                <p>Difficulty:</p>
+                <select id="difficulty">
+                    <option value="1">Easy</option>
+                    <option value="2">Medium</option>
+                    <option value="3">Hard</option>
+                </select>
             </div>
             <div class='flex flex-row justify-between'>
                 <p>Bomb Card:</p>
@@ -70,30 +78,37 @@
 
     <script>
         var choice = parent.document.URL.charAt(parent.document.URL.length-1);
+        var roomId = "roomNameHost";
+        var yourId = "yourNameHost";
 
-        if (choice == 1) {
+        if (choice == 0) {
             document.getElementById("joinMenu").style.display = "none";
-            var roomId = "roomNameHost";
-            var yourId = "yourNameHost";
-        } else {
+            document.getElementById("nameRoom").style.display = "none";
+            document.getElementById("menuTitle").innerHTML = "Single Player";
+        }
+        else if (choice == 1) {
+            document.getElementById("joinMenu").style.display = "none";
+            document.getElementById("aiDifficulty").style.display = "none";
+        }
+        else {
             document.getElementById("hostMenu").style.display = "none";
             document.getElementById("menuTitle").innerHTML = "Join Game";
-            var roomId = "roomNameJoin";
-            var yourId = "yourNameJoin"; 
+            roomId = "roomNameJoin";
+            yourId = "yourNameJoin"; 
         }
 
         function confirmSetting() {
             var room = document.getElementById(roomId).value;
             var nickname = document.getElementById(yourId).value;
             if (room == '') {
-                if (choice == 1) room = autoGenName("room");
+                if (choice != 2) room = autoGenName("room");
                 else {
                     alert("Room name cannot be empty!");
                     return;
                 }
             }
             if (nickname == '') nickname = autoGenName("player");
-            if (choice == 1) {
+            if (choice != 2) {
                 var isBomb = document.getElementById("isBomb").value;
                 var timer = document.getElementById("timerLength").value;
                 window.location.href = "game.html?#"+choice+"!"+room+"@"+nickname+"$"+isBomb+"&"+timer;

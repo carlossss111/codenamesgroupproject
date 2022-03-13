@@ -161,7 +161,7 @@ function timerCount() {
     document.getElementById("timer").innerHTML = timeLeft;
     if (timeLeft <= 0) {
         clearInterval(timerVar);
-        if (choice == 1) {
+        if (choice != 2) {
             if (board.turn.team == "blue") finishGame("Red Team");
             else if (board.turn.team == "red") finishGame("Blue Team");
             board.turn = {"team": null, "role": null};
@@ -486,7 +486,7 @@ class BoardState extends Observer {
 
                 //check if game is over
                 if (this.blueScore == 9 || this.redScore == 9 || incoming.bombPicked) {
-                    if (choice == 1) {
+                    if (choice != 2) {
                         if (this.blueScore == 9) finishGame("Blue Team");
                         else if (this.redScore == 9) finishGame("Red Team");
                         else if (this.turn.team == "blue") finishGame("Red Team");
@@ -499,7 +499,7 @@ class BoardState extends Observer {
 
                 //continue game
                 this.turn = incoming.turn;
-                if ((incoming.turnOver && this.isPlayersTurn()) || (choice == 1 && this.isAITurn()) )
+                if ((incoming.turnOver && this.isPlayersTurn()) || (choice != 2 && this.isAITurn()) )
                     updateTurnState();
                 break;
 
@@ -508,7 +508,7 @@ class BoardState extends Observer {
                 this.clueWord = incoming.clue;
                 this.numOfGuesses = incoming.numberOfGuesses;
                 this.turn = incoming.turn;
-                if ( this.isPlayersTurn() || (choice == 1 && this.isAITurn()) )
+                if ( this.isPlayersTurn() || (choice != 2 && this.isAITurn()) )
                     updateTurnState();
 
                 //print the new clue on screen
@@ -545,7 +545,7 @@ class BoardState extends Observer {
                 document.getElementById("welcome").style.display = "none";
                 document.getElementById("teamBox").style.display = "none";
                 document.querySelector(".clueBox").style.display = "block";
-                if (choice == 1) startGame();
+                if (choice != 2) startGame();
                 break;
 
             case "receiveRole":
@@ -558,7 +558,7 @@ class BoardState extends Observer {
 
             case "syncRequest":
                 //sync a new client to the room
-                if (choice == 1) syncNewClient('sync');
+                if (choice != 2) syncNewClient('sync');
                 break;
 
             case "changeTurn":
@@ -576,21 +576,21 @@ class BoardState extends Observer {
                 if (this.turn["team"] == "blue") {
                     if (this.turn["role"] == "spymaster") {
                         document.getElementById("blueSm").style.color = "lightgreen";;
-                        if (choice == 1 && this.ai.blueSm) generateClue();
+                        if (choice != 2 && this.ai.blueSm) generateClue();
                     }
                     else {
                         document.getElementById("blueSpy").style.color = "lightgreen";;
-                        if (choice == 1 && this.ai.blueSpy) generateGuess();
+                        if (choice != 2 && this.ai.blueSpy) generateGuess();
                     }
                 } 
                 else if (this.turn["team"] == "red"){
                     if (this.turn["role"] == "spymaster") {
                         document.getElementById("redSm").style.color = "lightgreen";;
-                        if (choice == 1 && this.ai.redSm) generateClue();
+                        if (choice != 2 && this.ai.redSm) generateClue();
                     }
                     else {
                         document.getElementById("redSpy").style.color = "lightgreen";;
-                        if (choice == 1 && this.ai.redSpy) generateGuess();
+                        if (choice != 2 && this.ai.redSpy) generateGuess();
                     }
                 }
 
@@ -668,13 +668,14 @@ var vocabulary;
 var notiVal = 0;
 var isSidebarOpen = false;
 
-if (choice == 1) {
+if (choice != 2) {
     var isBombCard = link.substring(link.indexOf('$')+1, link.indexOf('&'));
     let timer = link.substring(link.indexOf('&')+1);
     if (isBombCard == 'y') isBombCard = true;
     else isBombCard = false;
     if (timer != 'n') board.timer = timer;
     var welcomeText = "When all players joined, press START to initialize board";
+    if (choice == 0) welcomeText = "Please choose your team and role";
 } else {
     var welcomeText = "Please wait for the host to start game";
     document.getElementById("startGame").style.display = "none";
@@ -688,6 +689,7 @@ document.getElementById("turnAlert").style.display = "none";
 document.getElementById("timeLeft").style.display = "none";
 document.querySelector(".clueBox").style.display = "none";
 document.getElementById("room").innerHTML = "Room: " + board.room;
+if (choice == 0) document.getElementById("room").innerHTML = "Plaese wait...";
 joinRoom()
 
 document.getElementById("joinBlueSpy").onclick = function() {chooseRole("blueSpy");};
