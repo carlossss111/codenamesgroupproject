@@ -203,9 +203,10 @@ class Timer {
     tick = () => {
         //print the time left
         this.timeLeft--;
-        document.getElementById("timer").innerHTML = this.timeLeft;
+        document.getElementById("timerBar").style.width = 100*this.timeLeft/this.maxTime + '%';
+        document.getElementById("timerBar").style.opacity = 1-this.timeLeft/this.maxTime + '';
         //run the "runOut()" method if the timer has ran out
-        if (this.timeLeft <= 0) 
+        if (this.timeLeft < 0) 
             this.runOut();
     }
 
@@ -217,7 +218,6 @@ class Timer {
         clearInterval(this.timerVar);
         this.timeLeft = this.maxTime;
         console.log(this);
-        document.getElementById("timer").innerHTML = this.maxTime;
         this.timerVar = setInterval(this.tick, 1000); //sets tick() to run every second
     }
 }
@@ -568,7 +568,7 @@ class BoardState extends Observer {
 
                 //show timer
                 if (this.timer.maxTime != null) {
-                    document.getElementById("timeLeft").style.display = "inline";
+                    document.getElementById("timerBar").style.display = "block";
                 }
 
                 //card set up
@@ -613,6 +613,7 @@ class BoardState extends Observer {
                 document.getElementById("blueSm").style.color = "black";
                 document.getElementById("redSpy").style.color = "black";
                 document.getElementById("redSm").style.color = "black";
+                document.getElementById("timerBar").style.backgroundColor = "green";
                 
                 //change the turn and handle AI
                 this.turn = incoming.currentTurn;
@@ -645,6 +646,7 @@ class BoardState extends Observer {
                 if (this.isPlayersTurn()) {
                     document.getElementById("room").style.display = "none";
                     document.getElementById("turnAlert").style.display = "block";
+                    document.getElementById("timerBar").style.backgroundColor = "red";
                 }
                 break;
 
@@ -663,7 +665,8 @@ class BoardState extends Observer {
                 //display winning text
                 gameOverAudio();
                 document.querySelector(".clueBox").style.display = "none";
-                document.getElementById("timeLeft").style.display = "none";
+                document.getElementById("timerBar").style.width = "0";
+                document.getElementById("timerBar").style.opacity = "1";
                 document.getElementById("gameOver").style.display = "block";
                 document.getElementById("winText").innerHTML = incoming.winTeam + " Wins!";
                 if (incoming.winTeam == "Blue Team") document.getElementById("winText").style.color = "#3399ff";
@@ -731,7 +734,6 @@ document.getElementById("welcomeText1").innerHTML = "Welcome to Codenames, " + n
 document.getElementById("welcomeText2").innerHTML = welcomeText;
 document.getElementById("teamBox").style.display = "none";
 document.getElementById("turnAlert").style.display = "none";
-document.getElementById("timeLeft").style.display = "none";
 document.querySelector(".clueBox").style.display = "none";
 joinRoom()
 
