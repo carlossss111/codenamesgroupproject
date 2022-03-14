@@ -61,7 +61,7 @@ function boardInitialize(isBombCard) {
 
     server.sendToServer("createInitialBoardState", {
         "Protocol" : "createInitialBoardState",
-        "TimerLength" : board.timer,
+        "TimerLength" : board.timer.maxTime,
         "BombCard" : isBombCard,
         "room" : board.room
     })
@@ -72,16 +72,19 @@ function generateClue() {
     server.sendToServer("generateClue", {
         "Protocol" : "generateClue",
         "board" : board,
-        "AIDifficulty" : '???'
     })
 }
 
 // Generate a list of guesses (AI)
 function generateGuess() {
+    let aiLevel = difficulty;
+    // if the AI spy is followed by human spymaster or in multiplayer mode, use highest AI level
+    if (!board.isAISm() || choice == 1) aiLevel = "Hard";
+
     server.sendToServer("generateGuess", {
         "Protocol" : "generateGuess",
         "board" : board,
-        "AIDifficulty" : '???'
+        "AIDifficulty" : aiLevel
     })
 }
 
@@ -154,22 +157,6 @@ function getAIConfig() {
         board.ai.redSpy = false;
 }
 
-//Countdown function
-function timerCount() {
-    var timeLeft = parseInt(document.getElementById("timer").innerHTML, 10);
-    timeLeft -= 1;
-    document.getElementById("timer").innerHTML = timeLeft;
-    if (timeLeft <= 0) {
-        clearInterval(timerVar);
-        if (choice != 2) {
-            if (board.turn.team == "blue") finishGame("Red Team");
-            else if (board.turn.team == "red") finishGame("Blue Team");
-            board.turn = {"team": null, "role": null};
-            updateTurnState();
-        }
-    }
-}
-
 //Functions called only by host user
 function startGame() {
     board.turn = {"team" : "blue", "role" : "spymaster"};
@@ -181,6 +168,58 @@ function finishGame(winTeam) {
         "winner" : winTeam,
         "room" : board.room
     })
+}
+
+/*
+ * Sets the timer maximum, runs it every second and handles
+ * when the timer has ran out.
+ */
+class Timer {
+    maxTime = null; //length of timer
+    timeLeft;
+    timerVar; //for setInterval() calls
+
+    //set the max time
+    setMaxTime(mTime) {
+        if (mTime)
+            this.maxTime = mTime;
+        else if (mTime != null)
+            console.log("Warning: setMaxTime() has tried to use a falsy parameter (e.g undefined)");
+    }
+
+    //when the timer runs out
+    runOut = () => {
+        clearInterval(this.timerVar);
+        this.maxTime = null;
+        if (choice != 2) {
+            if (board.turn.team == "blue") finishGame("Red Team");
+            else if (board.turn.team == "red") finishGame("Blue Team");
+            board.turn = {"team": null, "role": null};
+            updateTurnState();
+        }
+    }
+
+    //runs every second
+    tick = () => {
+        //print the time left
+        this.timeLeft--;
+        document.getElementById("timer").innerHTML = this.timeLeft;
+        //run the "runOut()" method if the timer has ran out
+        if (this.timeLeft <= 0) 
+            this.runOut();
+    }
+
+    //restart the timer
+    reset = () => {
+        if(this.maxTime == null)
+            return;
+
+        clearInterval(this.timerVar);
+        this.timeLeft = this.maxTime;
+        console.log(this);
+        document.getElementById("timer").innerHTML = this.maxTime;
+        this.timerVar = setInterval(this.tick, 1000); //sets tick() to run every second
+    }
 }
 
 /*
@@ -278,7 +317,7 @@ class BoardState extends Observer {
     numOfGuesses;
     redScore;
     blueScore;
-    timer = null;
+    timer;
     ai = {
         "blueSm" : true,
         "blueSpy" : true,
@@ -314,6 +353,7 @@ class BoardState extends Observer {
         super();
 
         //attribute assignments
+        this.timer = new Timer();
         this.clueWord = null;
         this.numOfGuesses = null;
         this.redScore = 0;
@@ -344,6 +384,12 @@ class BoardState extends Observer {
     isAISpy() {
         if (this.turn.team=="blue") return this.ai.blueSpy;
         else return this.ai.redSpy;
+    }
+
+    //return true if last turn is a spymaster AI (for difficulty control)
+    isAISm() {
+        if (this.turn.team=="blue") return this.ai.blueSm;
+        else return this.ai.redSm;
     }
 
     /*
@@ -397,7 +443,6 @@ class BoardState extends Observer {
             "numberOfGuesses" : this.numOfGuesses,
             "redScore" : this.redScore,
             "blueScore" : this.blueScore,
-            "timerLength" : this.timer,
             "player" : this.player,
             "turn" : this.turn,
             "cardChosen" : `${i},${j}`,
@@ -458,7 +503,6 @@ class BoardState extends Observer {
                 this.numOfGuesses = incoming.numberOfGuesses;
                 this.redScore = incoming.redScore;
                 this.blueScore = incoming.blueScore;
-                this.timer = incoming.timerLength;
 
                 //play score win/lose audio
                 if (this.turn.team == this.player.team) {
@@ -494,6 +538,7 @@ class BoardState extends Observer {
                         this.turn = {"team": null, "role": null};
                         updateTurnState();
                     }
+                    this.timer.maxTime = null;
                     return;
                 }
 
@@ -519,12 +564,11 @@ class BoardState extends Observer {
             case "sendInitialBoardState":
                 let receivedBoard = incoming.board;
                 vocabulary = incoming.vocabulary;
-                this.timer = incoming.timerLength;
+                this.timer.setMaxTime(incoming.timerLength);
 
-                //timer setup
-                if (this.timer != null) {
+                //show timer
+                if (this.timer.maxTime != null) {
                     document.getElementById("timeLeft").style.display = "inline";
-                    document.getElementById("timer").innerHTML = this.timer;
                 }
 
                 //card set up
@@ -594,12 +638,8 @@ class BoardState extends Observer {
                     }
                 }
 
-                //reinitialise the timer
-                if (this.timer != null) {
-                    clearInterval(timerVar);
-                    document.getElementById("timer").innerHTML = this.timer;
-                    timerVar = setInterval(timerCount, 1000);
-                }
+                //reset the timer
+                this.timer.reset();
 
                 //alert the player if their turn
                 if (this.isPlayersTurn()) {
@@ -662,7 +702,6 @@ board.room = link.substring(link.indexOf('!')+1, link.indexOf('@'));
 document.getElementById("room").innerHTML = "Room: " + board.room;
 var nickname = link.substring(link.indexOf('@')+1, link.indexOf('$')).replace('_', ' ');
 
-var timerVar;
 var vocabulary;
 var tmpName = "";
 var role = "";
@@ -675,7 +714,7 @@ if (choice != 2) {
     var difficulty = link.substring(link.indexOf('*')+1);
     if (isBombCard == 'y') isBombCard = true;
     else isBombCard = false;
-    if (timer != 'n') board.timer = timer;
+    if (timer != 'n') board.timer.setMaxTime(timer);
     var welcomeText = "When all players joined, press START to initialize board";
     if (choice == 0) {
         welcomeText = "Please choose your team and role";

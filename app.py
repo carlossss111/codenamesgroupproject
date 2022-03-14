@@ -159,11 +159,13 @@ def guess(messageReceived):
     clue = messageReceived["board"]["clueWord"]
     target_num = messageReceived["board"]["numOfGuesses"]
     team = messageReceived["board"]["turn"]["team"]
+    level = messageReceived["AIDifficulty"]
 
     spy = Predictor_spy(relevant_vectors_path='rsc/data/relevant_vectors',
                     board=board,
                     clue=clue,
-                    target_num=target_num)
+                    target_num=target_num,
+                    level=level)
     guesses = spy.run()
 
     redScore = messageReceived["board"]["redScore"]
@@ -193,7 +195,6 @@ def guess(messageReceived):
         'numberOfGuesses': target_num, \
         'redScore': redScore, \
         'blueScore': blueScore, \
-        'timerLength': messageReceived["board"]["timer"], \
         'turn': nextTurn, \
         'turnOver': True, \
         'bombPicked': bombPicked, \
@@ -248,7 +249,6 @@ def boardstate_broadcast_message(boardReceived):
         'numberOfGuesses': numOfGuesses, \
         'redScore': redScore, \
         'blueScore': blueScore, \
-        'timerLength': boardReceived['timerLength'], \
         'turn': nextTurn, \
         'turnOver': isTurnOver, \
         'bombPicked': bombPicked, \
