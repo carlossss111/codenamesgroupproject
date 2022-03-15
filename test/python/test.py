@@ -20,24 +20,45 @@ client_.connect('http://localhost:5000')
 def connect():
     print("Connection Established")
 
+# Room Connection
+roomDict = {
+    "Protocol" : "joinRoom",
+    "room" : "AABBCC",
+    "name" : "test"
+}
+room = roomDict['room']
+client_.emit("joinRoom", roomDict, namespace='/')
+
 #############
 ### Tests ###
 #############
 
-### Template Test
+### Template Test ###
 client_.emit('template', "Hello World!", namespace='/') #message SENT
 @client_.on('template', namespace='/')
 def template_test(data): #data RECEIVED
     print("Template Test: ", end="")
     assert (data == "Hello World!"), tFail("The server response should be 'Hello World!'"); tPass()
 
-# copy and change the below as needed
-""""
-client_.emit(PROTOCOL_NAME_ON_SERVER, MESSAGE_TO_SEND, namespace='/')
-@client_.on(PROTOCOL_NAME_ON_SERVER, namespace='/')
-def template_test(data):
-    print(TEST NAME, end="")
-    assert (data == EXPECTED OUTPUT), tFail(FAILURE MESSAGE); tPass()
-"""
+### Chat Test ###
+input = {
+    "Protocol" : "chat",
+    "message" : "Test Name: Hello World",
+    "room" : room,
+    "team" : "red"
+}
+client_.emit('chat', input, namespace='/')
+
+@client_.on("chat", namespace='/')
+def chat_test(data):
+
+    expectedOutput = {
+    "Protocol" : "chat",
+    "message" : "Test Name: Hello World",
+    "team" : "red"
+    }
+
+    print("Chat Protocol Test: ", end="")
+    assert (data == expectedOutput), tFail("The chat should be in the expected format!"); tPass()
 
 exit(1)
