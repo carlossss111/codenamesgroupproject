@@ -338,5 +338,10 @@ def disconnect_request():
          callback=can_disconnect)
 
 
+@socket_.on('template', namespace='/') #i needed to write this for the python tests because I was having trouble
+def template_test(data):
+    print("Received: " + data)
+    emit("template", data)
+
 if __name__ == '__main__':
     socket_.run(app, debug=True)

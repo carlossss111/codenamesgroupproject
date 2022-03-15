@@ -1,59 +1,43 @@
-# import parent directories
-import os
-import sys
-import inspect
-currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-parentdir = os.path.dirname(currentdir)
-grandparentdir = os.path.dirname(parentdir)
-sys.path.insert(0, grandparentdir) 
+import socketio
 
-#import /app.py and other dependencies from it
-from app import app, SocketIO
+##########
+# Setup  #
+##########
 
-# unit test imports 
-import unittest
-import json
+# Utility Functions
+def tPass():
+    print("\u001b[32m" + "Pass" + "\u001b[0m")
+    
+def tFail(text):
+    print("\u001b[31m" + "FAIL, " + "\u001b[0m" + text)
+    client_.disconnect()
+    
+# Client Creation
+client_ = socketio.Client()
+client_.connect('http://localhost:5000')
 
-# declare the socket connection
-async_mode = None #"threading" ?
-socket_ = SocketIO(app, async_mode=async_mode, cors_allowed_origins='*')
+@client_.event
+def connect():
+    print("Connection Established")
 
-#test class, test functions must begin with "test" to be run
-class test(unittest.TestCase):
-    #template
-    def testTemplate(self):
-        flask_test_client = app.test_client()
-        client = socket_.test_client(app, flask_test_client=flask_test_client, namespace='/')
-        self.assertTrue(client.is_connected())
+#############
+### Tests ###
+#############
 
-    #test that the chat message returns something
-    def testChatSuccess(self):
+### Template Test
+client_.emit('template', "Hello World!", namespace='/') #message SENT
+@client_.on('template', namespace='/')
+def template_test(data): #data RECEIVED
+    print("Template Test: ", end="")
+    assert (data == "Hello World!"), tFail("The server response should be 'Hello World!'"); tPass()
 
-        #create a new client to test the server
-        flask_test_client = app.test_client()
-        client = socket_.test_client(app, flask_test_client=flask_test_client, namespace='/')
-        
-        #define the JSON input
-        input =  { 
-            "Protocol" : "chat",
-            "message" : "Cool Name: Hello World!", 
-            "room" : "AABBCC11", 
-            "team" : "red" }
-        input =  json.dumps(input)
-        client.emit("chat", input, namespace='/')
+# copy and change the below as needed
+""""
+client_.emit(PROTOCOL_NAME_ON_SERVER, MESSAGE_TO_SEND, namespace='/')
+@client_.on(PROTOCOL_NAME_ON_SERVER, namespace='/')
+def template_test(data):
+    print(TEST NAME, end="")
+    assert (data == EXPECTED OUTPUT), tFail(FAILURE MESSAGE); tPass()
+"""
 
-        #output that we expect to receive
-        expected = { 
-            "Protocol": "chat", 
-            "message": "Cool Name: Hello World!", 
-            "team": "red" }
-        expected =  json.dumps(expected)
-
-        #get the actual output
-        output = client.get_received(namespace='/')
-        
-        #tests
-        self.assertEqual(output, expected)
-
-if __name__ == '__main__':
-    unittest.main()
+exit(1)
