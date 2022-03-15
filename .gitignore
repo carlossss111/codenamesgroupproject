@@ -8,3 +8,4 @@ __pycache__/
 #run `npm install mocha chai --save-dev` from the /test/js directory to get the below
 /test/js/node_modules/ 
 /test/js/package-lock.json
+/test/python/test.log

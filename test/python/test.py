@@ -5,8 +5,13 @@ import socketio
 ##########
 
 # Utility Functions
+f = open("test.log", "w")
+f.close()
 def tPass():
     print("\u001b[32m" + "Pass" + "\u001b[0m")
+    f = open("test.log", "a") #every time there is a pass that should be recorded for runTests.sh
+    f.write("PASS\n")
+    f.close()
     
 def tFail(text):
     client_.disconnect()
