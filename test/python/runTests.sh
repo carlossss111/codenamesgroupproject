@@ -7,6 +7,7 @@ sleep 1
 #run test script (for 3 seconds)
 echo Running tests...
 timeout 3 python3 test.py
+exitCode="$?"
 
 #stop python server
 procs=`ps -ux | grep "../../app.py" | head -n 1`
@@ -14,7 +15,7 @@ procArr=($procs)
 kill ${procArr[1]}
 
 #echo output and return 
-if [ $? -eq 1 ]; then
+if [ "$exitCode" -eq 1 ]; then
     echo Done, some tests FAILED.
     exit 1
 fi
