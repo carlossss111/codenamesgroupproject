@@ -9,8 +9,8 @@ def tPass():
     print("\u001b[32m" + "Pass" + "\u001b[0m")
     
 def tFail(text):
-    print("\u001b[31m" + "FAIL, " + "\u001b[0m" + text)
     client_.disconnect()
+    return "\u001b[31m" + "FAIL, " + "\u001b[0m" + text
     
 # Client Creation
 client_ = socketio.Client()
