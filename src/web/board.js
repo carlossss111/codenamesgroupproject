@@ -17,7 +17,7 @@ function boardInitialize(isBombCard) {
     document.getElementById("startGame").style.display = "none";
     server.sendToServer("createInitialBoardState", {
         "Protocol" : "createInitialBoardState",
-        "TimerLength" : board.timer,
+        "TimerLength" : board.timer.maxTime,
         "BombCard" : isBombCard,
         "room" : board.room
     })
@@ -109,22 +109,6 @@ function getAIConfig() {
         board.ai.redSpy = false;
 }
 
-//Countdown function
-function timerCount() {
-    var timeLeft = parseInt(document.getElementById("timer").innerHTML, 10);
-    timeLeft -= 1;
-    document.getElementById("timer").innerHTML = timeLeft;
-    if (timeLeft <= 0) {
-        clearInterval(timerVar);
-        if (choice == 1) {
-            if (board.turn.team == "blue") finishGame("Red Team");
-            else if (board.turn.team == "red") finishGame("Blue Team");
-            board.turn = {"team": null, "role": null};
-            updateTurnState();
-        }
-    }
-}
-
 //Moves board left and right to accomodate for the sidepanel
 function MoveBoard() {
     if (document.getElementById("openSidebarMenu").checked == true) {
@@ -145,6 +129,58 @@ function finishGame(winTeam) {
         "winner" : winTeam,
         "room" : board.room
     })
+}
+
+/*
+ * Sets the timer maximum, runs it every second and handles
+ * when the timer has ran out.
+ */
+class Timer {
+    maxTime = null; //length of timer
+    timeLeft;
+    timerVar; //for setInterval() calls
+
+    //set the max time
+    setMaxTime(mTime) {
+        if (mTime)
+            this.maxTime = mTime;
+        else if (mTime != null)
+            console.log("Warning: setMaxTime() has tried to use a falsy parameter (e.g undefined)");
+    }
+
+    //when the timer runs out
+    runOut = () => {
+        clearInterval(this.timerVar);
+        this.maxTime = null;
+        if (choice == 1) {
+            if (board.turn.team == "blue") finishGame("Red Team");
+            else if (board.turn.team == "red") finishGame("Blue Team");
+            board.turn = {"team": null, "role": null};
+            updateTurnState();
+        }
+    }
+
+    //runs every second
+    tick = () => {
+        //print the time left
+        this.timeLeft--;
+        document.getElementById("timer").innerHTML = this.timeLeft;
+        //run the "runOut()" method if the timer has ran out
+        if (this.timeLeft <= 0) 
+            this.runOut();
+    }
+
+    //restart the timer
+    reset = () => {
+        if(this.maxTime == null)
+            return;
+
+        clearInterval(this.timerVar);
+        this.timeLeft = this.maxTime;
+        console.log(this);
+        document.getElementById("timer").innerHTML = this.maxTime;
+        this.timerVar = setInterval(this.tick, 1000); //sets tick() to run every second
+    }
 }
 
 /*
@@ -242,7 +278,7 @@ class BoardState extends Observer {
     numOfGuesses;
     redScore;
     blueScore;
-    timer = null;
+    timer;
     ai = {
         "blueSm" : true,
         "blueSpy" : true,
@@ -278,6 +314,7 @@ class BoardState extends Observer {
         super();
 
         //attribute assignments
+        this.timer = new Timer();
         this.clueWord = null;
         this.numOfGuesses = null;
         this.redScore = 0;
@@ -361,7 +398,6 @@ class BoardState extends Observer {
             "numberOfGuesses" : this.numOfGuesses,
             "redScore" : this.redScore,
             "blueScore" : this.blueScore,
-            "timerLength" : this.timer,
             "player" : this.player,
             "turn" : this.turn,
             "cardChosen" : `${i},${j}`,
@@ -422,7 +458,6 @@ class BoardState extends Observer {
                 this.numOfGuesses = incoming.numberOfGuesses;
                 this.redScore = incoming.redScore;
                 this.blueScore = incoming.blueScore;
-                this.timer = incoming.timerLength;
 
                 //display new scores
                 document.getElementById("redScore").innerText = this.redScore;
@@ -446,6 +481,7 @@ class BoardState extends Observer {
                         this.turn = {"team": null, "role": null};
                         updateTurnState();
                     }
+                    this.timer.maxTime = null;
                     return;
                 }
 
@@ -471,13 +507,11 @@ class BoardState extends Observer {
             case "sendInitialBoardState":
                 let receivedBoard = incoming.board;
                 vocabulary = incoming.vocabulary;
-                this.timer = incoming.timerLength;
+                this.timer.setMaxTime(incoming.timerLength);
 
-                //timer setup
-                if (this.timer != null) {
+                //show timer
+                if (this.timer.maxTime != null)
                     document.getElementById("timeLeft").style.display = "inline";
-                    document.getElementById("timer").innerHTML = this.timer;
-                }
 
                 //card set up
                 for (let i = 0; i < this.cards.length; i++) {
@@ -546,12 +580,8 @@ class BoardState extends Observer {
                     }
                 }
 
-                //reinitialise the timer
-                if (this.timer != null) {
-                    clearInterval(timerVar);
-                    document.getElementById("timer").innerHTML = this.timer;
-                    timerVar = setInterval(timerCount, 1000);
-                }
+                //reset the timer
+                this.timer.reset();
 
                 //alert the player if their turn
                 if (this.isPlayersTurn())
@@ -581,9 +611,7 @@ var choice = prompt("Host a game (1) or join a game (2)?");
 
 var nickname = prompt("Enter your nickname:", "Cool Guy");
 var tmpName = "";
-var timerVar;
 
-//var board = new BoardState();
 var board = BoardState.getInstance();
 server.registerObserver(board);
 
@@ -595,7 +623,7 @@ if (choice == 1) {
     board.room = prompt("Enter name of your hosted room:", "Great Hall");
     isBombCard = prompt("Do you want Bomb Card in the board? (y/n)", 'y');
     if (prompt("Do you want timer for one turn? (y/n)", 'y') == 'y')
-        board.timer = prompt("Enter timer length for one turn", '30');
+        board.timer.setMaxTime(prompt("Enter timer length for one turn", '30'));
     alert("When all players joined, press START to initialize board.");
     if (isBombCard == 'y') isBombCard = true;
     else isBombCard = false;
