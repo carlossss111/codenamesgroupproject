@@ -14,19 +14,20 @@ function moveSidebar() {
 
     if (isSidebarOpen) {
         notiVal = 0;
+        document.getElementById('sidebarMenu').style.opacity = "0";
         document.getElementById('noti').innerHTML = notiVal;
         document.getElementById("board").style.transform = "translateX(15%)";
         arrow.style.transform = "rotate(135deg)";
         noti.style.display = "block";
-        if (width <= 600) container.style.right = "-90%";
-        else container.style.right = "-20%";
+        container.style.width = "0";
         isSidebarOpen = false;
     }
     else {
+        document.getElementById('sidebarMenu').style.opacity = "1";
         document.getElementById("board").style.transform = "translateX(0)";
         arrow.style.transform = "rotate(-45deg)";
         noti.style.display = "none"; 
-        container.style.right = "0";
+        container.style.width = "20em";
         isSidebarOpen = true;
     }
 }

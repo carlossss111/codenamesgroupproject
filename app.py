@@ -343,5 +343,6 @@ def template_test(data):
     print("Received: " + data)
     emit("template", data)
 
+
 if __name__ == '__main__':
     socket_.run(app, debug=True)

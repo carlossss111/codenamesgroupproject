@@ -94,7 +94,7 @@
             document.getElementById("hostMenu").style.display = "none";
             document.getElementById("menuTitle").innerHTML = "Join Game";
             roomId = "roomNameJoin";
-            yourId = "yourNameJoin"; 
+            yourId = "yourNameJoin";
         }
 
         function confirmSetting() {
@@ -108,7 +108,7 @@
                 }
             }
             if (nickname == '') nickname = autoGenName("player");
-            for (let char of ['?','#','!','@','$','%','&','*']) {
+            for (let char of ['?','#','!','@','$','%','&','*',"(AI)"]) {
                 if (room.includes(char) || nickname.includes(char)) {
                     alert("Illegal room id or username!");
                     return;

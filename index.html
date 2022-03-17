@@ -13,8 +13,8 @@
 </head>
 <body class='bg-[#ffdede]'>
     <div class="mx-auto">
-    <p style="text-align: right;">Ver. 1.1.0</p>
-    <h1 class="text-7xl text-center font-extrabold leading-9 pt-10 mt-10 uppercase">Codenames</h1>
+        <p style="text-align: right;">Ver. 1.2.0</p>
+        <h1 class="text-7xl text-center font-extrabold leading-9 pt-10 mt-10 uppercase">Codenames</h1>
         <div class="mx-auto flex flex-col items-center space-y-10 pt-20">
             <a href="./pages/setup.html?#0">
                 <button class="bg-[#ff6c6c] w-80 h-20 shadow-md rounded-xl text-2xl font-bold hover:animate-bounce hover:opacity-70 hover:text-amber-400">
@@ -31,10 +31,31 @@
                     Join Multiplayer
                 </button>
             </a>
-            <button class="bg-[#ff6c6c] w-80 h-20 rounded-xl text-2xl shadow-md font-bold hover:animate-bounce hover:opacity-70 hover:text-amber-400">
+            <button class="bg-[#ff6c6c] w-80 h-20 rounded-xl text-2xl shadow-md font-bold hover:animate-bounce hover:opacity-70 hover:text-amber-400" onclick="showObserverText()">
                 Observer mode
             </button>
         </div>
-    </div> 
+    </div>
+    <div id="observerText">
+        <p style="font-size: 1.6em; font-weight: bold; margin-top: 10vh;">To observe all-AI games:</p>
+        <p>Choose "Single Player"</p>
+        <p>Configure "Difficulty" to change AI accuracy ("Hard" means highest)</p>
+        <p>Skip choosing role for yourself, press "START"</p>
+        <br>
+        <p style="font-size: 1.6em; font-weight: bold;">To observe games with human player:</p>
+        <p>Choose "Join Multiplayer"</p>
+        <p>Enter the room id you want to join</p>
+        <p>Skip choosing role for yourself, wait for the host to start game</p>
+        <img src="rsc/images/back.png" id="hideObserver" alt="" srcset="" onclick="hideObserverText()">
+    </div>
+
+    <script>
+        function showObserverText() {
+            document.getElementById("observerText").style.display = "block";
+        }
+        function hideObserverText() {
+            document.getElementById("observerText").style.display = "none";
+        }
+    </script>
 </body>
 </html>
