@@ -66,4 +66,25 @@ def chat_test(data):
     print("Chat Protocol Test: ", end="")
     assert (data == expectedOutput), tFail("The chat should be in the expected format!"); tPass()
 
+### Forward Clue Test ###
+#get input
+input = {
+    "Protocol" : "forwardClue",
+    "clue" : "testClue",
+    "numberOfGuesses" : 5,
+    "player" : "testPlayer",
+    "turn" : {"team" : "red", "role" : "spymaster"},
+    "room" : room
+}
+client_.emit("forwardClue",input,namespace='/')
+
+@client_.on("forwardClue", namespace='/')
+def forwardClue_test(data):
+    print("Forward-clue word test: ", end="")
+    assert (data["clue"] == "testClue"), tFail("The clue has changed"); tPass()
+    print("Forward-clue number test: ", end="")
+    assert (data["numberOfGuesses"] == 5), tFail("The number of guesses has changed"); tPass()
+    print("Forward-clue turn change test: ", end="")
+    assert (data["turn"] == {"team" : "red", "role" : "spy"}), tFail("The turn should have changed"); tPass()
+
 exit(1)

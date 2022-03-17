@@ -15,7 +15,7 @@ procArr=($procs)
 kill ${procArr[1]}
 
 #count number of tests to make sure all have come back
-totalTests=`cat test.py | grep -o "@client_.on" | wc -l`
+totalTests=`cat test.py | grep -o "assert" | wc -l`
 tests=`wc -l test.log | head -c 1`
 
 #echo output and return 
