@@ -34,10 +34,11 @@ class Predictor_spy:
     """
     Generate a list of guesses
     """
-    def __init__(self, board, clue, target_num, relevant_vectors_path):
+    def __init__(self, board, clue, target_num, level, relevant_vectors_path):
         self.board = board
         self.clue = str(clue).replace(" ", "").lower()
         self.target_num = int(target_num)
+        self.level = level
         self.relevant_vectors_path = relevant_vectors_path
 
     def _get_unpicked_cards(self):
@@ -85,8 +86,13 @@ class Predictor_spy:
         card_score = dict(sorted(x.items(), key=lambda item:item[1], reverse=True))
         if (self.target_num == 0):
             self.target_num = 1
-        guesses = list(card_score.keys())[:self.target_num]
-        print("Using clue:", self.clue)
+        offset = 0
+        if (self.level == "Easy"):
+            offset = int((len(x)-self.target_num) / 12)
+        elif (self.level == "Medium"):
+            offset = int((len(x)-self.target_num) / 18)
+        guesses = list(card_score.keys())[offset : self.target_num+offset]
+        print("Using clue [", self.clue, "] with offset", offset)
         for guess in guesses:
             print("Guess:", guess)
         return guesses

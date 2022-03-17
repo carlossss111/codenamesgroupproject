@@ -6,11 +6,35 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Team 18's Codenames Project"/>
-    <link rel="shortcut icon" type="image/jpg" href="TODO"/>
+    <link rel="shortcut icon" href="#">
+    <script src="https://cdn.tailwindcss.com"></script>
     <link href="src/web/main.css" type="text/css" rel="stylesheet" />
     <title>Nottingham Codenames</title>
 </head>
-<body style="font-size: 60px;">
-    <a href="./pages/game.html?#">to game</a>
+<body class='bg-[#ffdede]'>
+    <div class="mx-auto">
+    <p style="text-align: right;">Ver. 1.1.0</p>
+    <h1 class="text-7xl text-center font-extrabold leading-9 pt-10 mt-10 uppercase">Codenames</h1>
+        <div class="mx-auto flex flex-col items-center space-y-10 pt-20">
+            <a href="./pages/setup.html?#0">
+                <button class="bg-[#ff6c6c] w-80 h-20 shadow-md rounded-xl text-2xl font-bold hover:animate-bounce hover:opacity-70 hover:text-amber-400">
+                    Single Player
+                </button>
+            </a>
+            <a href="./pages/setup.html?#1">
+                <button class="bg-[#ff6c6c] shadow-md w-80 h-20 rounded-xl text-2xl font-bold hover:animate-bounce hover:opacity-70 hover:text-amber-400">
+                    Host Multiplayer
+                </button>
+            </a>
+            <a href="./pages/setup.html?#2">
+                <button class="bg-[#ff6c6c] shadow-md w-80 h-20 rounded-xl text-2xl font-bold hover:animate-bounce hover:opacity-70 hover:text-amber-400">
+                    Join Multiplayer
+                </button>
+            </a>
+            <button class="bg-[#ff6c6c] w-80 h-20 rounded-xl text-2xl shadow-md font-bold hover:animate-bounce hover:opacity-70 hover:text-amber-400">
+                Observer mode
+            </button>
+        </div>
+    </div> 
 </body>
 </html>

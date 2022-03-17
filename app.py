@@ -31,6 +31,30 @@ def on_join(data):
 
 
 """
+Quit a game room
+"""
+@socket_.on('quitRoom')
+def on_quit(data):
+    room = data['room']
+    name = data['name']
+    team = data['team']
+    choice = data['choice']
+
+    messageToSend = {
+        'Protocol': 'chat',
+        'message': name + ' has quit room ' + room,
+        'team': team
+    }
+    emit('chat', messageToSend, room=room)
+    
+    if choice == '1':
+        messageToSend = {
+            'Protocol': 'hostQuit'
+        }
+        emit('hostQuit', messageToSend, room=room)
+
+
+"""
 create a initial game board
 """
 @socket_.on("createInitialBoardState", namespace='/')
@@ -59,14 +83,16 @@ Forwards message sent from a client to all other clients.
 @socket_.on('chat', namespace='/')
 def chat_broadcast_message(messageReceived):
     print("Chat Message Received!")
+    room = messageReceived['room']
     # define protocol and message
     protocol = 'chat'
     messageToSend = {
-        'Protocol': protocol, \
-        'message': messageReceived['message'] \
+        'Protocol': protocol,
+        'message': messageReceived['message'],
+        'team' : messageReceived['team']
     }
     # send to client
-    emit(protocol, messageToSend, broadcast=True)
+    emit(protocol, messageToSend, room=room)
 
 
 """
@@ -133,11 +159,13 @@ def guess(messageReceived):
     clue = messageReceived["board"]["clueWord"]
     target_num = messageReceived["board"]["numOfGuesses"]
     team = messageReceived["board"]["turn"]["team"]
+    level = messageReceived["AIDifficulty"]
 
     spy = Predictor_spy(relevant_vectors_path='rsc/data/relevant_vectors',
                     board=board,
                     clue=clue,
-                    target_num=target_num)
+                    target_num=target_num,
+                    level=level)
     guesses = spy.run()
 
     redScore = messageReceived["board"]["redScore"]
@@ -280,11 +308,20 @@ def update_turn(turn):
 @socket_.on('endGame', namespace='/')
 def game_over(winTeam):
     room = winTeam['room']
-
     protocol = 'gameOver'
     messageToSend = {
         'Protocol': protocol,
         'winTeam': winTeam['winner']
+    }
+    emit(protocol, messageToSend, room=room)
+
+
+@socket_.on('restart', namespace='/')
+def restart(message):
+    room = message['room']
+    protocol = 'restartGame'
+    messageToSend = {
+        'Protocol': protocol
     }
     emit(protocol, messageToSend, room=room)
 
@@ -300,6 +337,11 @@ def disconnect_request():
          {'data': 'Disconnected!', 'count': session['receive_count']},
          callback=can_disconnect)
 
+
+@socket_.on('template', namespace='/') #i needed to write this for the python tests because I was having trouble
+def template_test(data):
+    print("Received: " + data)
+    emit("template", data)
 
 if __name__ == '__main__':
     socket_.run(app, debug=True)

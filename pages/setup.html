@@ -1,0 +1,128 @@
+
+<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Team 18's Codenames Project"/>
+    <link rel="shortcut icon" href="#">
+    <link href="../src/web/main.css" type="text/css" rel="stylesheet" />
+    <script src="../src/web/randomId.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Nottingham Codenames</title>
+</head>
+<body>
+    <div class='bg-[#ffdede] shadow-md mb-12'>
+        <h1 id="menuTitle" class='font-extrabold text-7xl uppercase leading-9 text-center pt-10 pb-10 text-gray-900 -rotate-3'>Host Game</h1>
+    </div>
+
+    <div class='mx-auto max-w-4xl text-3xl leading-6 font-bold text-gray-500 p-10 rounded-xl shadow-md'>
+        <div id="hostMenu" class='flex flex-col space-y-9'>
+            <div class='flex flex-row justify-between' id="nameRoom">
+                <p>Name your room:</p>
+                <input type="text" id="roomNameHost" placeholder="Auto generate" class='border-0 border-b-2 border-grey-dark text-right'></input>
+            </div>
+            <div class='flex flex-row justify-between'>
+                <p>Name yourself:</p>
+                <input type="text" id="yourNameHost" placeholder="Auto generate" class='border-0 border-b-2 border-grey-dark text-right'></input>
+            </div>
+            <div class='flex flex-row justify-between' id="aiDifficulty">
+                <p>Difficulty:</p>
+                <select id="difficulty">
+                    <option value="Easy">Easy</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Hard">Hard</option>
+                </select>
+            </div>
+            <div class='flex flex-row justify-between'>
+                <p>Bomb Card:</p>
+                <select id="isBomb">
+                    <option value="y">Yes</option>
+                    <option value="n">No</option>
+                </select>
+            </div>
+            <div class='flex flex-row justify-between'>
+                <p>Timer:</p>
+                <select id="timerLength">
+                    <option value="n">No</option>
+                    <option value="10">10s</option>
+                    <option value="20">20s</option>
+                    <option value="30">30s</option>
+                </select>
+            </div><br>
+        </div>
+
+        <div id="joinMenu" class='flex flex-col space-y-7'>
+            <div class='flex flex-row justify-between'>
+                <p>Room to join:</p>
+                <input type="text" id="roomNameJoin" class='border-0 border-b-2 border-grey-dark text-right'></input>
+            </div><br>
+            <div class='flex flex-row justify-between'>
+                <p>Name yourself:</p>
+                <input type="text" id="yourNameJoin" placeholder="Auto generate" class='border-0 border-b-2 border-grey-dark text-right'></input>
+            </div><br><br>
+        </div>
+
+        <div class='flex flex-row items-center justify-evenly text-gray-700'>
+            <a href="../index.html">
+                <button id="backMenu" class="bg-slate-100 shadow-md p-5 rounded-xl w-40 h-15 font-bold hover:text-gray-200 hover:bg-rose-400 rotate-3">
+                    Back
+                </button>
+            </a>
+            <button id="confirm" class='bg-slate-100 shadow-md p-5 rounded-xl w-40 h-15 font-bold hover:text-gray-200 hover:bg-sky-300 -rotate-3' onclick="confirmSetting()">
+                Confirm
+            </button>
+        </div>
+    </div>
+
+    <script>
+        var choice = parent.document.URL.charAt(parent.document.URL.length-1);
+        var roomId = "roomNameHost";
+        var yourId = "yourNameHost";
+
+        if (choice == 0) {
+            document.getElementById("joinMenu").style.display = "none";
+            document.getElementById("nameRoom").style.display = "none";
+            document.getElementById("menuTitle").innerHTML = "Single Player";
+        }
+        else if (choice == 1) {
+            document.getElementById("joinMenu").style.display = "none";
+            document.getElementById("aiDifficulty").style.display = "none";
+        }
+        else {
+            document.getElementById("hostMenu").style.display = "none";
+            document.getElementById("menuTitle").innerHTML = "Join Game";
+            roomId = "roomNameJoin";
+            yourId = "yourNameJoin"; 
+        }
+
+        function confirmSetting() {
+            var room = document.getElementById(roomId).value.replace(' ', '_');
+            var nickname = document.getElementById(yourId).value.replace(' ', '_');
+            if (room == '') {
+                if (choice != 2) room = autoGenName("room");
+                else {
+                    alert("Room name cannot be empty!");
+                    return;
+                }
+            }
+            if (nickname == '') nickname = autoGenName("player");
+            for (let char of ['?','#','!','@','$','%','&','*']) {
+                if (room.includes(char) || nickname.includes(char)) {
+                    alert("Illegal room id or username!");
+                    return;
+                }
+            }
+            if (choice != 2) {
+                var isBomb = document.getElementById("isBomb").value;
+                var timer = document.getElementById("timerLength").value;
+                var difficulty = document.getElementById("difficulty").value;
+                window.location.href = "game.html?#"+choice+"!"+room+"@"+nickname+"$"+isBomb+"&"+timer+"*"+difficulty;
+            } else {
+                window.location.href = "game.html?#"+choice+"!"+room+"@"+nickname+"$";
+            }
+        }
+    </script>
+</body>
+</html>
