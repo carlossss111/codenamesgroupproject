@@ -4,6 +4,7 @@ NEUTRAL_IMAGE = "url('../rsc/images/neutral.jpg')";
 BOMB_IMAGE = "url('../rsc/images/bomb.jpg')";
 
 DEBUG_SKIP_VALIDATION = false;
+STRESS_TEST = false;
 
 //Move sidebar and board left and right
 function moveSidebar() {
@@ -672,7 +673,8 @@ class BoardState extends Observer {
                 document.getElementById("winText").innerHTML = incoming.winTeam + " Wins!";
                 if (incoming.winTeam == "Blue Team") document.getElementById("winText").style.color = "#3399ff";
                 else document.getElementById("winText").style.color = "#ff5050";
-                if (choice == 2) document.getElementById("restart").style.display = "none"
+                if (choice == 2) document.getElementById("restart").style.display = "none";
+                if (choice == 1 && STRESS_TEST) server.sendToServer("restart", {"room": board.room});
                 break;
 
             case "restartGame":
@@ -747,3 +749,6 @@ document.getElementById("openSidebarMenu").onclick = function() {moveSidebar();}
 document.getElementById("welcomeConfirm").onclick = function() {welcomeConfirm();};
 document.getElementById("quitRoom").onclick = function() {quitRoom();};
 document.getElementById("restart").onclick = function() {server.sendToServer("restart", {"room": board.room});};
+
+if (board.room.includes("STRESSTEST")) STRESS_TEST = true;
+if (choice == 1 && STRESS_TEST) boardInitialize(isBombCard);
