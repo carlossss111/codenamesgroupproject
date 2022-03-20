@@ -30,6 +30,7 @@ class Chatbox extends Observer{
         });
     }
 
+
     /**
     * Prints chat messages from the server onto the screen.
     * Called whenever a "chat" message is received from the server.
@@ -51,6 +52,8 @@ class Chatbox extends Observer{
         
         newMessage.innerHTML = args['message'];
         chatboxReceive.appendChild(newMessage);
+
+        return{eventName,args};
     }
 }
 

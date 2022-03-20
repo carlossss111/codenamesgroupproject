@@ -52,9 +52,39 @@ const assert = chai.assert;
 
 /* Chat Tests */
 {
-    describe("Example Test", function () {
-        it("Example Test Description", function () {
-            assert.equal(true,true);
+    describe("chat.update() receiving message", function () {
+
+        var chatbox = new Chatbox();
+
+        var data = {
+            "Protocol" : "chat", 
+            "message" : "hello",
+            "room" : "room1",
+            "team" : "blue"
+        }
+
+        var eventl = "chat";
+        var chatTest = chatbox.update(eventl, data);
+
+        it("update for message", function () {
+            assert.equal(eventl,"chat");
+        });
+
+        
+        it("data = {Protcol : 'chat'}", function () {
+            assert.equal(chatTest.eventName,"chat");
+        });
+
+        it("Test if message being recieved", function () {
+            assert.equal(chatTest.args.message,"hello");
+        });
+
+        it("Test room code", function () {
+            assert.equal(chatTest.args.room,"room1");
+        });
+
+        it("Test team colour", function () {
+            assert.equal(chatTest.args.team,"blue");
         });
     });
 
