@@ -88,6 +88,19 @@ const assert = chai.assert;
         });
     });
 
+
+    describe("chat.sendChat() sending message", function () {
+
+
+        var chatTest = chatbox.sendChat();
+        
+
+        it("Testing send chat", function () {
+            assert.equal(chatTest.chatText, '');
+        });
+
+    });
+
 }
 
 /* Board Tests */

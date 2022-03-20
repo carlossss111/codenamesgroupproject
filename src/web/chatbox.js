@@ -28,6 +28,8 @@ class Chatbox extends Observer{
             "room" : board.room,
             "team" : board.player.team
         });
+
+        return {chatText};
     }
 
 
