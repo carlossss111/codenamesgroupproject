@@ -89,7 +89,8 @@ def chat_broadcast_message(messageReceived):
     messageToSend = {
         'Protocol': protocol,
         'message': messageReceived['message'],
-        'team' : messageReceived['team']
+        'team' : messageReceived['team'],
+        'role' : messageReceived['role']
     }
     # send to client
     emit(protocol, messageToSend, room=room)
@@ -212,23 +213,25 @@ def boardstate_broadcast_message(boardReceived):
 
     numOfGuesses = int(boardReceived['numberOfGuesses']) - 1
     turn = boardReceived['turn']
+    redScore = boardReceived['redScore']
+    blueScore = boardReceived['blueScore']
     isTurnOver = False
     bombPicked = False
 
-    cardI = int(boardReceived['cardChosen'].split(',')[0])
-    cardJ = int(boardReceived['cardChosen'].split(',')[1])
-    cardSelected = boardReceived['cards'][cardI][cardJ]
-    cardSelected['isRevealed'] = True
-    
-    redScore = boardReceived['redScore']
-    blueScore = boardReceived['blueScore']
-    colour = cardSelected['colour']
-    if colour == 'redTeam':
-        redScore += 1
-    elif colour == 'blueTeam':
-        blueScore += 1
-    elif colour == 'bombCard':
-        bombPicked = True
+    if boardReceived['endTurn']:
+        colour = 'unknown'
+    else:
+        cardI = int(boardReceived['cardChosen'].split(',')[0])
+        cardJ = int(boardReceived['cardChosen'].split(',')[1])
+        cardSelected = boardReceived['cards'][cardI][cardJ]
+        cardSelected['isRevealed'] = True
+        colour = cardSelected['colour']
+        if colour == 'redTeam':
+            redScore += 1
+        elif colour == 'blueTeam':
+            blueScore += 1
+        elif colour == 'bombCard':
+            bombPicked = True
 
     if numOfGuesses == 0 or colour[:len(colour)-4] != turn['team']:
         isTurnOver = True

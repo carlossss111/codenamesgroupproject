@@ -8,7 +8,6 @@ STRESS_TEST = false;
 
 //Move sidebar and board left and right
 function moveSidebar() {
-    var width = window.innerWidth;
     var container = document.querySelector(".sidebarContainer");
     var arrow = document.querySelector(".arrow");
     var noti = document.querySelector(".notificationIcon");
@@ -144,8 +143,27 @@ function enableSpyMode() {
         }
     }
     document.getElementById("clueButton").style.display = "none";
+    document.getElementById("endTurn").style.display = "inline-block";
     document.getElementById("clue").placeholder = "";
     document.getElementById("clue").readOnly = true;
+}
+
+function endSpyTurn() {
+    if (!board.isPlayersTurn()) return;
+    
+    server.sendToServer("sendBoardState", {
+        "Protocol" : "sendBoardState",
+        "clue" : board.clueWord,
+        "numberOfGuesses" : board.numOfGuesses,
+        "redScore" : board.redScore,
+        "blueScore" : board.blueScore,
+        "player" : board.player,
+        "turn" : board.turn,
+        "cardChosen" : null,
+        "cards" : board.cards,
+        "endTurn" : true,
+        "room" : board.room
+    });
 }
 
 function getAIConfig() {
@@ -438,8 +456,7 @@ class BoardState extends Observer {
             throw new Error("The card selected cannot not been found in the card array");
 
         //send board to server
-        server.sendToServer("sendBoardState",
-        {
+        server.sendToServer("sendBoardState", {
             "Protocol" : "sendBoardState",
             "clue" : this.clueWord,
             "numberOfGuesses" : this.numOfGuesses,
@@ -449,6 +466,7 @@ class BoardState extends Observer {
             "turn" : this.turn,
             "cardChosen" : `${i},${j}`,
             "cards" : this.cards,
+            "endTurn" : false,
             "room" : this.room
         });
     }
@@ -659,7 +677,8 @@ class BoardState extends Observer {
                         Protocol : "chat", 
                         message : `${incoming.message}`,
                         room : this.room,
-                        team : this.player.team
+                        team : this.player.team,
+                        role : this.player.role
                     });
                 break;
 
@@ -737,6 +756,7 @@ document.getElementById("welcomeText1").innerHTML = "Welcome to Codenames, " + n
 document.getElementById("welcomeText2").innerHTML = welcomeText;
 document.getElementById("teamBox").style.display = "none";
 document.getElementById("turnAlert").style.display = "none";
+document.getElementById("endTurn").style.display = "none";
 document.querySelector(".clueBox").style.display = "none";
 joinRoom()
 
@@ -747,6 +767,7 @@ document.getElementById("joinRedSm").onclick = function() {chooseRole("redSm");}
 document.getElementById("startGame").onclick = function() {boardInitialize(isBombCard);};
 document.getElementById("openSidebarMenu").onclick = function() {moveSidebar();};
 document.getElementById("welcomeConfirm").onclick = function() {welcomeConfirm();};
+document.getElementById("endTurn").onclick = function() {endSpyTurn();};
 document.getElementById("quitRoom").onclick = function() {quitRoom();};
 document.getElementById("restart").onclick = function() {server.sendToServer("restart", {"room": board.room});};
 
