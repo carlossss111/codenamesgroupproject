@@ -34,7 +34,26 @@ class Predictor_spy:
     """
     Generate a list of guesses
     """
-    def __init__(self, board, clue, target_num, level, relevant_vectors_path):
+    def __init__(self, 
+                 board, 
+                 clue, 
+                 target_num, 
+                 level, 
+                 relevant_vectors_path):
+        """
+        Parameters
+        ----------
+        board: json
+            : The current board state
+        clue: str
+            : The clue given by teammate
+        target_num: int
+            : The target number given by teammate
+        level: int
+            : The accuracy level for AI spy
+        relevant_vectors_path: str
+            : The path to the dictionary of relevant vectors
+        """
         self.board = board
         self.clue = str(clue).replace(" ", "").lower()
         self.target_num = int(target_num)
@@ -113,15 +132,15 @@ class Predictor_sm:
         Parameters
         ----------
         relevant_words_path: str
-                          : The path to the dictionary of relevant words
+            : The path to the dictionary of relevant words
         relevant_vectors_path: str
-                             : The path to the dictionary of relevant vectors
+            : The path to the dictionary of relevant vectors
         board: json
-             : The current board state
-        threshold: float (default = 0.4)
-           : The threshold before which the similarity is 0
+            : The current board state
+        threshold: float (default = 0.45)
+            : The threshold before which the similarity is 0
         trials: int (default = 100)
-              : The number of trials to use for the Monte-Carlo method
+            : The number of trials to use for the Monte-Carlo method
         """
         self.relevant_words_path = relevant_words_path
         self.relevant_vectors_path = relevant_vectors_path
@@ -132,10 +151,10 @@ class Predictor_sm:
 
         self.inactive_words = None
         self.words = None
-        self.blue, self.red, self.neutral, self.assassin = None, None, None, None
+        self.good, self.bad, self.neutral, self.assassin = None, None, None, None
         self.valid_guesses = None
 
-    def _calculate_expected_score(self, similarities, n_blue, trials):
+    def _calculate_expected_score(self, similarities, n_good, trials):
         """
         Calculate the expected score with a Monte-Carlo method
         """
@@ -145,7 +164,7 @@ class Predictor_sm:
             cumsum = np.cumsum(similarities)
             while True:
                 sample = binary_search(cumsum)
-                if sample < n_blue:
+                if sample < n_good:
                     if sample == 0:
                         cumsum[sample] = 0
                     else:
@@ -194,11 +213,8 @@ class Predictor_sm:
         """
         with open(self.relevant_words_path, 'rb') as f:
             relevant_words = pickle.load(f)
-        potential_guesses = set(chain.from_iterable(relevant_words[w] for w in self.blue))
-        # the following condition is not likely to happen
-        if len(potential_guesses) == 0:
-            print("Generate neutral clue")
-            potential_guesses = set(chain.from_iterable(relevant_words[w] for w in self.neutral))
+        potential_guesses = set(chain.from_iterable(relevant_words[w] for w in self.good))
+        
         return potential_guesses
 
     def _get_relevant_vectors(self):
@@ -217,13 +233,13 @@ class Predictor_sm:
         self.relevant_vectors = self._get_relevant_vectors()
         self.words = self._get_words()
 
-        self.blue, self.red, self.neutral, self.assassin = self._get_types()
+        self.good, self.bad, self.neutral, self.assassin = self._get_types()
         if self.assassin == "":
-            self.bad_words = self.red + self.neutral
+            self.bad_words = self.bad + self.neutral
         else:
-            self.bad_words = self.red + [self.assassin] + self.neutral
+            self.bad_words = self.bad + [self.assassin] + self.neutral
 
-        self.blue_vectors = np.array([self.relevant_vectors[w] for w in self.blue], dtype=np.float32)
+        self.good_vectors = np.array([self.relevant_vectors[w] for w in self.good], dtype=np.float32)
         self.bad_vectors = np.array([self.relevant_vectors[w] for w in self.bad_words], dtype=np.float32)
 
         self.valid_guesses = self._get_valid_guesses()
@@ -234,19 +250,19 @@ class Predictor_sm:
         """
         guess_vector = self.relevant_vectors[guess]
 
-        blue_similarities = np.array([cos_sim(guess_vector, v) for v in self.blue_vectors], dtype=np.float32)
+        good_similarities = np.array([cos_sim(guess_vector, v) for v in self.good_vectors], dtype=np.float32)
         bad_similarities = np.array([cos_sim(guess_vector, v) for v in self.bad_vectors], dtype=np.float32)
 
-        best_blue_similarities = blue_similarities[blue_similarities > self.threshold]
+        best_good_similarities = good_similarities[good_similarities > self.threshold]
         best_bad_similarities = bad_similarities[bad_similarities > self.threshold]
-        best_similarities = np.concatenate([best_blue_similarities, best_bad_similarities])
+        best_similarities = np.concatenate([best_good_similarities, best_bad_similarities])
 
         if len(best_bad_similarities) == 0:
-            score = (len(best_blue_similarities), np.sum(best_blue_similarities))
-        elif len(best_blue_similarities) == 0:
+            score = (len(best_good_similarities), np.sum(best_good_similarities))
+        elif len(best_good_similarities) == 0:
             score = (0, 0)
         else:
-            score = (self._calculate_expected_score(best_similarities, len(best_blue_similarities), self.trials), 0)
+            score = (self._calculate_expected_score(best_similarities, len(best_good_similarities), self.trials), 0)
 
         return score, guess
 
@@ -255,14 +271,14 @@ class Predictor_sm:
         Get the target words for a given guess and modal score
         """
         best_guess_vector = self.relevant_vectors[guess]
-        blue_similarities = np.array([cos_sim(best_guess_vector, self.relevant_vectors[w])
-                                      for w in self.blue])
-        sorted_idx = np.argsort(-blue_similarities)
-        best_blue = set(np.array(self.blue)[sorted_idx][:clue_score])
+        good_similarities = np.array([cos_sim(best_guess_vector, self.relevant_vectors[w])
+                                      for w in self.good])
+        sorted_idx = np.argsort(-good_similarities)
+        best_good = set(np.array(self.good)[sorted_idx][:clue_score])
 
         targets = []
         for card in self.board:
-            if card['word'].replace(' ', '') in best_blue:
+            if card['word'].replace(' ', '') in best_good:
                 targets.append(card["word"])
         return targets
 
