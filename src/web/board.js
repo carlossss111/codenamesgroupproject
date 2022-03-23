@@ -54,6 +54,7 @@ function quitRoom() {
         "team" : board.player.team,
         "choice" : choice
     })
+    alert("You have quit room " + board.room);
     window.location.href = "../index.html";
 }
 
@@ -706,7 +707,7 @@ class BoardState extends Observer {
                 //host quits room
                 if (choice == 2) {
                     alert("Host user quits room!");
-                    window.location.href = "../index.html";
+                    quitRoom();
                 }
                 break;
 

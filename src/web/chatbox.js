@@ -4,7 +4,7 @@
  * Receives chat messages from the python server using the Observer
  * pattern. Messages are displayed below.
  */
- class Chatbox extends Observer{
+class Chatbox extends Observer {
 
     /**
     * Adds an event listener to the HTML node with id="chatboxSend" 

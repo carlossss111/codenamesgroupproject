@@ -1,6 +1,6 @@
 import numpy as np
 from flask import Flask, session, copy_current_request_context, request
-from flask_socketio import SocketIO, emit, disconnect, join_room
+from flask_socketio import SocketIO, emit, disconnect, join_room, leave_room
 from threading import Lock
 from src.game.generateBoard import *
 from src.game.predictor import *
@@ -39,11 +39,13 @@ def on_quit(data):
     name = data['name']
     team = data['team']
     choice = data['choice']
+    leave_room(room)
 
     messageToSend = {
         'Protocol': 'chat',
         'message': name + ' has quit room ' + room,
-        'team': team
+        'team': team,
+        'role': "spy"
     }
     emit('chat', messageToSend, room=room)
     
