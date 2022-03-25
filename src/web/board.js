@@ -38,11 +38,13 @@ function welcomeConfirm() {
     initGameBgAudio();
 }
 
-function joinRoom() {
+function joinRoom(isJoined) {
     server.sendToServer("joinRoom", {
         "Protocol" : "joinRoom",
         "room" : board.room,
-        "name" : nickname
+        "name" : nickname,
+        "choice" : choice,
+        "isJoined" : isJoined
     })
 }
 
@@ -52,7 +54,8 @@ function quitRoom() {
         "room" : board.room,
         "name" : nickname,
         "team" : board.player.team,
-        "choice" : choice
+        "choice" : choice,
+        "numOfPeople" : numOfPeople
     })
     alert("You have quit room " + board.room);
     window.location.href = "../index.html";
@@ -113,18 +116,19 @@ function chooseRole(newRole) {
         "blueSm" : document.getElementById("blueSm").innerHTML,
         "redSpy" : document.getElementById("redSpy").innerHTML,
         "redSm" : document.getElementById("redSm").innerHTML,
+        "numOfPeople" : numOfPeople,
         "room" : board.room
     })
 }
 
-// When new client join the room, sync role choice
-function syncNewClient(type) {
-    server.sendToServer("syncRole", {
-        "type" : type,
+// When new client join the room, sync role choice and number of people
+function syncRoomInfo() {
+    server.sendToServer("syncRoomInfo", {
         "blueSpy" : document.getElementById("blueSpy").innerHTML,
         "blueSm" : document.getElementById("blueSm").innerHTML,
         "redSpy" : document.getElementById("redSpy").innerHTML,
         "redSm" : document.getElementById("redSm").innerHTML,
+        "numOfPeople" : numOfPeople,
         "room" : board.room
     })
 }
@@ -613,8 +617,10 @@ class BoardState extends Observer {
                 if (choice != 2) startGame();
                 break;
 
-            case "receiveRole":
-                //displays the player-name next to their role
+            case "receiveRoomInfo":
+                //update number of people and player-name next to their role
+                numOfPeople = incoming.numOfPeople;
+                document.getElementById("numOfPeople").innerHTML = numOfPeople;
                 document.getElementById("blueSpy").innerHTML = incoming.blueSpy;
                 document.getElementById("blueSm").innerHTML = incoming.blueSm;
                 document.getElementById("redSpy").innerHTML = incoming.redSpy;
@@ -623,13 +629,22 @@ class BoardState extends Observer {
 
             case "syncRequest":
                 //sync a new client to the room
-                if (choice != 2) syncNewClient('sync');
+                if (choice != 2) {
+                    numOfPeople += 1;
+                    syncRoomInfo();
+                }
+                break;
+
+            case "syncPeople":
+                //sync number of people in the room
+                numOfPeople = incoming;
+                document.getElementById("numOfPeople").innerHTML = numOfPeople;
                 break;
 
             case "changeTurn":
                 //styling
                 document.getElementById("turnAlert").style.display = "none";
-                document.getElementById("room").style.display = "block";
+                document.getElementById("room").style.display = "inline-block";
                 document.getElementById("blueSpy").style.color = "black";
                 document.getElementById("blueSm").style.color = "black";
                 document.getElementById("redSpy").style.color = "black";
@@ -666,7 +681,7 @@ class BoardState extends Observer {
                 //alert the player if their turn
                 if (this.isPlayersTurn()) {
                     document.getElementById("room").style.display = "none";
-                    document.getElementById("turnAlert").style.display = "block";
+                    document.getElementById("turnAlert").style.display = "inline-block";
                     document.getElementById("timerBar").style.backgroundColor = "red";
                 }
                 break;
@@ -681,6 +696,12 @@ class BoardState extends Observer {
                         team : this.player.team,
                         role : this.player.role
                     });
+                break;
+
+            case "roomError":
+                //hosting a room that id exists or joining a room that doesn't exist
+                alert(incoming);
+                window.location.href = "../index.html";
                 break;
 
             case "gameOver":
@@ -699,6 +720,7 @@ class BoardState extends Observer {
 
             case "restartGame":
                 //host restart game
+                link = link.slice(0, -1) + numOfPeople;
                 window.location.replace(link);
                 window.location.reload();
                 break;
@@ -732,12 +754,14 @@ var vocabulary;
 var tmpName = "";
 var role = "";
 var notiVal = 0;
+var numOfPeople = 1;
 var isSidebarOpen = false;
 
 if (choice != 2) {
     var isBombCard = link.substring(link.indexOf('$')+1, link.indexOf('&'));
     let timer = link.substring(link.indexOf('&')+1, link.indexOf('*'));
-    var difficulty = link.substring(link.indexOf('*')+1);
+    var difficulty = link.substring(link.indexOf('*')+1, link.indexOf('^'));
+    console.log(difficulty);
     if (isBombCard == 'y') isBombCard = true;
     else isBombCard = false;
     if (timer != 'n') board.timer.setMaxTime(timer);
@@ -750,16 +774,23 @@ if (choice != 2) {
 } else {
     var welcomeText = "Please wait for the host to start game";
     document.getElementById("startGame").style.display = "none";
-    syncNewClient('request');
+}
+if (link.charAt(link.length-2) == '|') {
+    joinRoom(true);
+    numOfPeople = parseInt(link.charAt(link.length-1), 10);
+    document.getElementById("numOfPeople").innerHTML = numOfPeople;
+} else {
+    joinRoom(false);
+    link = link + '|' + numOfPeople;
+    window.location.replace(link);
 }
 
-document.getElementById("welcomeText1").innerHTML = "Welcome to Codenames, " + nickname;
-document.getElementById("welcomeText2").innerHTML = welcomeText;
+document.getElementById("welcomeName").innerHTML = nickname;
+document.getElementById("welcomeText").innerHTML = welcomeText;
 document.getElementById("teamBox").style.display = "none";
 document.getElementById("turnAlert").style.display = "none";
 document.getElementById("endTurn").style.display = "none";
 document.querySelector(".clueBox").style.display = "none";
-joinRoom()
 
 document.getElementById("joinBlueSpy").onclick = function() {chooseRole("blueSpy");};
 document.getElementById("joinBlueSm").onclick = function() {chooseRole("blueSm");};

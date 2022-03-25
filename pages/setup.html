@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
@@ -108,7 +107,7 @@
                 }
             }
             if (nickname == '') nickname = autoGenName("player");
-            for (let char of ['?','#','!','@','$','%','&','*',"(AI)"]) {
+            for (let char of ['?','#','!','@','$','%','&','*','^',"(AI)"]) {
                 if (room.includes(char) || nickname.includes(char)) {
                     alert("Illegal room id or username!");
                     return;
@@ -118,7 +117,7 @@
                 var isBomb = document.getElementById("isBomb").value;
                 var timer = document.getElementById("timerLength").value;
                 var difficulty = document.getElementById("difficulty").value;
-                window.location.href = "game.html?#"+choice+"!"+room+"@"+nickname+"$"+isBomb+"&"+timer+"*"+difficulty;
+                window.location.href = "game.html?#"+choice+"!"+room+"@"+nickname+"$"+isBomb+"&"+timer+"*"+difficulty+"^";
             } else {
                 window.location.href = "game.html?#"+choice+"!"+room+"@"+nickname+"$";
             }

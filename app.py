@@ -11,6 +11,7 @@ app.config['SECRET_KEY'] = 'secret!'
 socket_ = SocketIO(app, async_mode=async_mode, cors_allowed_origins='*') #todo: remove CORS policy when hosted on uni server
 thread = None
 thread_lock = Lock()
+room_path = "rsc/data/rooms"
 
 """
 Join a game room
@@ -19,15 +20,31 @@ Join a game room
 def on_join(data):
     room = data['room']
     name = data['name']
-    join_room(room)
+    choice = data['choice']
+    isJoined = data['isJoined']
 
-    protocol = 'sendRoomInfo'
-    messageToSend = {
-        'Protocol': protocol,
-        'message': name + ' has entered room ' + room,
-        'name': name
-    }
-    emit(protocol, messageToSend, room=room)
+    with open(room_path, "r+") as f:
+        rooms = [line.rstrip() for line in f]
+        print(rooms)
+        if room in rooms and choice != '2' and not isJoined:
+            print("Room exist!")
+            emit('roomError', "The room name is taken by others, please try again.")
+        elif room not in rooms and choice == '2':
+            print("Room not exist!")
+            emit('roomError', "The room name doesn't exist, please try again.")
+        else:
+            if choice != '2' and not isJoined:
+                f.write(room + '\n')
+            if choice == '2' and not isJoined:
+                emit('syncRequest', "request sync", room=room)
+            join_room(room)
+            protocol = 'sendRoomInfo'
+            messageToSend = {
+                'Protocol': protocol,
+                'message': name + ' has entered room ' + room,
+                'name': name
+            }
+            emit(protocol, messageToSend, room=room)
 
 
 """
@@ -39,8 +56,10 @@ def on_quit(data):
     name = data['name']
     team = data['team']
     choice = data['choice']
+    numOfPeople = data['numOfPeople'] - 1
     leave_room(room)
 
+    emit('syncPeople', numOfPeople, room=room)
     messageToSend = {
         'Protocol': 'chat',
         'message': name + ' has quit room ' + room,
@@ -49,7 +68,14 @@ def on_quit(data):
     }
     emit('chat', messageToSend, room=room)
     
-    if choice == '1':
+    if choice != '2':
+        with open(room_path, "r+") as f:
+            rooms = f.readlines()
+            f.seek(0)
+            for r in rooms:
+                if r.rstrip() != room:
+                    f.write(r)
+            f.truncate()
         messageToSend = {
             'Protocol': 'hostQuit'
         }
@@ -266,36 +292,31 @@ def boardstate_broadcast_message(boardReceived):
 @socket_.on('chooseRole', namespace='/')
 def update_role(roleReceived):
     room = roleReceived['room']
-    protocol = 'receiveRole'
+    protocol = 'receiveRoomInfo'
     messageToSend = {
         'Protocol': protocol,
         'blueSpy' : roleReceived["blueSpy"],
         'blueSm' : roleReceived["blueSm"],
         'redSpy' : roleReceived["redSpy"],
-        'redSm' : roleReceived["redSm"]
+        'redSm' : roleReceived["redSm"],
+        'numOfPeople' : roleReceived["numOfPeople"]
     }
     emit(protocol, messageToSend, room=room)
 
 
-@socket_.on('syncRole', namespace='/')
+@socket_.on('syncRoomInfo', namespace='/')
 def sync_role(sync):
-    protocol = ''
-    messageToSend = {}
     room = sync['room']
-    if sync["type"] == "request":
-        protocol = 'syncRequest'
-        messageToSend = {
-            'Protocol': protocol,
-        }
-    elif sync["type"] == "sync":
-        protocol = 'receiveRole'
-        messageToSend = {
-            'Protocol': protocol,
-            'blueSpy' : sync["blueSpy"],
-            'blueSm' : sync["blueSm"],
-            'redSpy' : sync["redSpy"],
-            'redSm' : sync["redSm"]
-        }
+    numOfPeople = sync['numOfPeople']
+    protocol = 'receiveRoomInfo'
+    messageToSend = {
+        'Protocol': protocol,
+        'blueSpy' : sync["blueSpy"],
+        'blueSm' : sync["blueSm"],
+        'redSpy' : sync["redSpy"],
+        'redSm' : sync["redSm"],
+        'numOfPeople' : numOfPeople
+    }
     emit(protocol, messageToSend, room=room)
 
 
@@ -348,6 +369,13 @@ def template_test(data):
     print("Received: " + data)
     emit("template", data)
 
+
+def clean_room():
+    rooms = open(room_path, "w")
+    rooms.close()
+
+
+clean_room()
 
 if __name__ == '__main__':
     socket_.run(app, debug=True)

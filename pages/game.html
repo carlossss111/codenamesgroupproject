@@ -30,11 +30,13 @@
             <img class="set" id="set" src="../rsc/images/set.png" alt="" srcset="">
         </div>
         
-        <!-- Room Number -->
-        <div id="room" class="text-center text-md mt-3 font-bold text-amber-800"></div>
-        
-        <!-- "It's your turn!" notification -->
-        <div id="turnAlert" class="text-center text-md mt-3 font-bold text-amber-800 blink">It's your turn!</div>
+        <!-- Room Number & "It's your turn!" notification-->
+        <div class="text-center text-md mt-3 font-bold text-amber-800">
+            <span id="room"></span>
+            <span id="turnAlert" class="blink">It's your turn!</span>
+            <span><img id="people" src="../rsc/images/people.png" style="display: inline-block; width: 15px; margin-left: 20px;"></span>
+            <span id="numOfPeople">1</span>
+        </div>
 
         <!-- Scores -->
         <div id="scoringSys" class="text-center text-md mt-3 bg-white drop-shadow-md">
@@ -88,8 +90,9 @@
 
     <!-- Welcome Text -->
     <div id="welcome" style="text-align: center;">
-        <p id="welcomeText1" style="margin-top: 15vh; margin-bottom: 2vh; font-size: 1.5em;"></p>
-        <p id="welcomeText2" style="margin-bottom: 6vh; font-size: 1.5em;"></p>
+        <p style="margin-top: 15vh; margin-bottom: 1.5vh; font-size: 1.5em;">Welcome to Codenames</p>
+        <p id="welcomeName" style="margin-bottom: 1.5vh; font-size: 2em; font-weight: bold;"></p>
+        <p id="welcomeText" style="margin-bottom: 5vh; font-size: 1.5em;"></p>
         <button type="submit" id="welcomeConfirm" class="bg-slate-50 shadow-md hover:bg-slate-500 hover:text-white hover:animate-pulse w-80 h-20 p-5 rounded-xl text-2xl font-bold">Choose Role</button>
     </div>
 
