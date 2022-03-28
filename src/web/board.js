@@ -195,6 +195,14 @@ function finishGame(winTeam) {
     })
 }
 
+//Hint button gives 2 hints
+function getHintForSpy(){
+    server.sendToServer("hint", {
+        "Protocol" : "hint",
+        "board" : board
+    })
+}
+
 /*
  * Sets the timer maximum, runs it every second and handles
  * when the timer has ran out.
@@ -733,6 +741,52 @@ class BoardState extends Observer {
                 }
                 break;
 
+            case "spyHint":
+                //find card matching hint
+                var found = false;
+                var hintCard, falseCard, i, j;
+                for (i = 0; i < this.cards.length; i++) {
+                    for (j = 0; j < this.cards[i].length; j++) {
+                        if(this.cards[i][j].word == incoming.hint) {
+                            hintCard = this.cards[i][j].div;
+                            found = true; 
+                            break;
+                        }
+                    }
+                    if (found) break;
+                }
+                //style the true hint
+                if(this.player.team == "red") hintCard.classList.add("redTeam");
+                else hintCard.classList.add("blueTeam");
+
+                //pick another valid random card
+                while(true){
+                    i = Math.floor(Math.random() * this.cards.length);
+                    j = Math.floor(Math.random() * this.cards[i].length);
+                    falseCard = this.cards[i][j];
+                    
+                    //check the fake hint is valid
+                    if( falseCard.isRevealed == true
+                     || falseCard.div.childNodes[0].getAttribute("class") == "hint"
+                     || falseCard.colour == (this.turn.team + "Team"))
+                        continue; //retry another card
+                    
+                    falseCard = falseCard.div;
+                    break;
+                }
+                //style the random hint
+                if(this.player.team == "red") falseCard.classList.add("redTeam");
+                else falseCard.classList.add("blueTeam");
+
+                //remove hint after t milliseconds
+                setTimeout(function(){
+                    hintCard.classList.remove("redTeam");
+                    hintCard.classList.remove("blueTeam");
+                    falseCard.classList.remove("redTeam");
+                    falseCard.classList.remove("blueTeam");
+                },4000);
+
+
             default:
                 break;
         }
@@ -802,6 +856,7 @@ document.getElementById("welcomeConfirm").onclick = function() {welcomeConfirm()
 document.getElementById("endTurn").onclick = function() {endSpyTurn();};
 document.getElementById("quitRoom").onclick = function() {quitRoom();};
 document.getElementById("restart").onclick = function() {server.sendToServer("restart", {"room": board.room});};
+document.getElementById("hintButton").onclick = getHintForSpy;
 
 if (board.room.includes("STRESSTEST")) STRESS_TEST = true;
 if (choice == 1 && STRESS_TEST) boardInitialize(isBombCard);

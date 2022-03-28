@@ -163,6 +163,8 @@ def clue_broadcast_message_AI(messageReceived):
                           board=board,
                           turn=team)
     clue, clue_score, targets = spymaster.run()
+    #here
+
 
     nextTurn = {"team": team, "role": "spy"}
     room = messageReceived['board']['room']
@@ -178,6 +180,27 @@ def clue_broadcast_message_AI(messageReceived):
     }
     emit(protocol, messageToSend, room=room)
 
+"""
+Generate a hint
+"""
+@socket_.on("hint", namespace='/')
+def hint_broadcast(messageReceived):
+    board = list(chain.from_iterable(messageReceived["board"]["cards"]))
+    team = messageReceived["board"]["turn"]["team"]
+    room = messageReceived['board']['room']
+
+    spymaster = Predictor_sm(relevant_words_path='rsc/data/relevant_words',
+                          relevant_vectors_path='rsc/data/relevant_vectors',
+                          board=board,
+                          turn=team)
+    _, _, targets = spymaster.run()
+
+    protocol = "spyHint"
+    messageToSend = {
+        'Protocol' : protocol,
+        'hint' : targets[0],
+    }
+    emit(protocol, messageToSend, room=room)
 
 """
 Generate a list of guesses (AI)

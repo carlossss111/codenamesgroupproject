@@ -56,6 +56,7 @@
     align-items: center;
     margin: 10px;
     transition: transform 0.5s ease-in-out;
+    transition: background-color 2s ease-in-out; /*for hints*/
 }
 
 .card p {
@@ -118,6 +119,11 @@
     border: none;
     background: white;
     text-align: center;
+}
+
+#hintContainer{
+    display: inline-block;
+    margin-left:5em;
 }
 
 .clueBox button:hover,
@@ -387,6 +393,7 @@ input[type=range]::-webkit-slider-thumb {
         align-items: center;
         margin: 5px;
         transition: transform 0.5s ease-in-out;
+        transition: color 2s, font-size 2s; /* for hints */
     }
 
     .card p {
