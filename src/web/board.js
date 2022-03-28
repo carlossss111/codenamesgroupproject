@@ -197,6 +197,9 @@ function finishGame(winTeam) {
 
 //Hint button gives 2 hints
 function getHintForSpy(){
+    if(board.hintTakenThisTurn)
+        return;
+
     server.sendToServer("hint", {
         "Protocol" : "hint",
         "board" : board
@@ -365,6 +368,7 @@ class BoardState extends Observer {
         "team": null,
         "role": null
     };
+    hintTakenThisTurn;
 
     /*
      * Singleton implementation of the BoardState class
@@ -692,6 +696,10 @@ class BoardState extends Observer {
                     document.getElementById("turnAlert").style.display = "inline-block";
                     document.getElementById("timerBar").style.backgroundColor = "red";
                 }
+
+                //allow more hints
+                this.hintTakenThisTurn = false;
+
                 break;
 
             case "sendRoomInfo":
@@ -785,6 +793,9 @@ class BoardState extends Observer {
                     falseCard.classList.remove("redTeam");
                     falseCard.classList.remove("blueTeam");
                 },4000);
+
+                //no more hints this turn
+                this.hintTakenThisTurn = true;
 
 
             default:
