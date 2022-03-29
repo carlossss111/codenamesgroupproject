@@ -16,27 +16,39 @@ function initGameBgAudio() {
     }
     bgAudioCtx.play();
 }
+var flipAudioCtx = new Audio(GAME_FLIP_AUDIO);
+var gmAudioCtx = new Audio(GAME_OVER);
+var winAudioCtx = new Audio(WIN_SCORE);
+var loseAudioCtx = new Audio(LOSE_SCORE);
 
 function playFlipAudio() {
-    var flipAudioCtx = new Audio(GAME_FLIP_AUDIO);
+    if (!flipAudioCtx.paused || !gmAudioCtx.paused || !winAudioCtx.paused || !loseAudioCtx.paused ) {
+        return;
+      }
     flipAudioCtx.volume = effectAudioVolume;
     flipAudioCtx.play();
 }
 
 function gameOverAudio() {
-    var gmAudioCtx = new Audio(GAME_OVER);
+    if (!flipAudioCtx.paused || !gmAudioCtx.paused || !winAudioCtx.paused || !loseAudioCtx.paused ) {
+        return;
+      }
     gmAudioCtx.volume = effectAudioVolume;
     gmAudioCtx.play();
 }
 
 function addScoreAudio() {
-    var winAudioCtx = new Audio(WIN_SCORE);
+    if (!flipAudioCtx.paused || !gmAudioCtx.paused || !winAudioCtx.paused || !loseAudioCtx.paused ) {
+        return;
+      }
     winAudioCtx.volume = effectAudioVolume;
     winAudioCtx.play();
 }
 
 function loseScoreAudio() {
-    var loseAudioCtx = new Audio(LOSE_SCORE);
+    if (!flipAudioCtx.paused || !gmAudioCtx.paused || !winAudioCtx.paused || !loseAudioCtx.paused ) {
+        return;
+      }
     loseAudioCtx.volume = effectAudioVolume;
     loseAudioCtx.play();
 }
