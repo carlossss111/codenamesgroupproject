@@ -29,14 +29,15 @@ class Chatbox extends Observer {
             "team" : board.player.team,
             "role" : board.player.role
         });
+        document.getElementById("chatboxSend").reset();
         /**
          * The following block erases the messages in the chatbox after 
          * submission is detected.
          */
-        document.getElementById("chatboxSend").onsubmit = e => {
+        /*document.getElementById("chatboxSend").onsubmit = e => {
             e.target.submit();
             e.target.reset();
-         };
+         };*/
         return {chatText};
     }
 
