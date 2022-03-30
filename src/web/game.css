@@ -55,7 +55,8 @@
     justify-content: center;
     align-items: center;
     margin: 10px;
-    transition: transform 0.5s ease-in-out;
+    transition: transform 0.5s ease-in-out,      /*for flipping*/
+                background-color 1s ease-in-out; /*for hints*/
 }
 
 .card p {
@@ -104,8 +105,18 @@
     text-align: center;
 }
 
+.clueBox{
+    margin-bottom:0;
+}
+
 .clueBox input {
     width: 9em;
+}
+
+.clueBox form{
+    width:fit-content;
+    margin:auto; 
+    display:inline-block;
 }
 
 .clueBox input,
@@ -118,6 +129,23 @@
     border: none;
     background: white;
     text-align: center;
+}
+
+#hintContainer{
+    display: inline-block;
+    width: fit-content;
+    margin-left:2em;
+}
+
+#hintText{
+    display: inline-block;
+    margin-right:2em;
+}
+
+#hintCluster{
+    margin-top:0.25em;
+    font-size:1.2em;
+    transition: opacity 1s;
 }
 
 .clueBox button:hover,
@@ -424,6 +452,7 @@ input[type=range]::-webkit-slider-thumb {
         align-items: center;
         margin: 5px;
         transition: transform 0.5s ease-in-out;
+        transition: color 2s, font-size 2s; /* for hints */
     }
 
     .card p {
@@ -451,4 +480,7 @@ input[type=range]::-webkit-slider-thumb {
         font-size: 1em;
     }
 
+    #hintContainer{
+        margin-top:0.5em;
+    }
 }

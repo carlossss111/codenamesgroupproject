@@ -57,22 +57,31 @@
             </span>
         </div>
 
-        <!-- Clue box and options -->
-        <form class="clueBox" action="#" onsubmit="board.forwardClue()">
-            <input type="text" id="clue" placeholder="Enter clue"></input>
-            <select id="maxClues">
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-                <option value="6">6</option>
-                <option value="7">7</option>
-                <option value="8">8</option>
-            </select>
-            <button type="submit" id="clueButton">Give Clue</button>
-            <button id="endTurn">End Turn</button>
-        </form>
+        <div class="clueBox">
+            <!-- Clue box and options -->
+            <form action="#" onsubmit="board.forwardClue()">
+                <input type="text" id="clue" placeholder="Enter clue"></input>
+                <select id="maxClues">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                </select>
+                <button type="submit" id="clueButton">Give Clue</button>
+                <button id="endTurn">End Turn</button>
+            </form>
+
+            <!--Hint-->
+            <div id="hintContainer">
+                <button id="hintButton" type="text">Hint</button>
+                <p id="hintText">(Remaining: <span id="totalHints"></span>)</p>
+            </div>
+            <p id="hintCluster" style="opacity:0;">...</p>
+        </div>
 
         <!-- Gameover Box -->
         <div id="gameOver" style="display: none;">
