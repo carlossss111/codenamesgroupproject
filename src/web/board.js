@@ -805,3 +805,19 @@ document.getElementById("restart").onclick = function() {server.sendToServer("re
 
 if (board.room.includes("STRESSTEST")) STRESS_TEST = true;
 if (choice == 1 && STRESS_TEST) boardInitialize(isBombCard);
+
+
+const indicator = document.querySelector('.barIndicator');
+const items = document.querySelectorAll('.nav-item');
+
+function handleIndicator(el) {
+  
+  indicator.style.width = `${el.offsetWidth}px`;
+  indicator.style.left = `${el.offsetLeft}px`;
+  indicator.style.backgroundColor = "red";
+
+}
+
+items.forEach((item, index) => {
+  item.addEventListener('click', (e) => { handleIndicator(e.target)});
+});
