@@ -105,6 +105,10 @@
     text-align: center;
 }
 
+.clueBox{
+    margin-bottom:0;
+}
+
 .clueBox input {
     width: 9em;
 }
