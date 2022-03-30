@@ -196,32 +196,25 @@ function finishGame(winTeam) {
 }
 
 //Gives up to 3 hints, 1 per turn.
-function getHint(){
+function getHint() {
     //check if hint is valid
     var hintText = document.getElementById("hintText");
-    if(board.hintTakenThisTurn){
-        let tempText = hintText.innerHTML;
-        hintText.innerHTML = "Only one hint can be taken per turn!"
-        setTimeout(function(){
-            hintText.innerHTML = tempText;
-        },1000);
-        return;
-    }
-    if(board.totalHintsLeft < 1){
-        let tempText = hintText.innerHTML;
-        hintText.innerHTML = "Out of hints!"
-        setTimeout(function(){
-            hintText.innerHTML = tempText;
-        },1000);
-        return;
-    }
+    document.getElementById("hintButton").style.display = "none"
 
-    //no more hints this turn
-    board.hintTakenThisTurn = true;
+    let tempText = hintText.innerHTML;
+    if (board.player.role == "spy") {
+        hintText.innerHTML = "Only one hint is correct!"
+    } else {
+        hintText.innerHTML = "Clue can be made from these words!"
+    }
 
     //-1 to total hints
     board.totalHintsLeft--;
-    document.getElementById("totalHints").innerHTML = board.totalHintsLeft;
+
+    setTimeout(function() {
+        hintText.innerHTML = tempText;
+        document.getElementById("totalHints").innerHTML = board.totalHintsLeft;
+    }, 4000);
 
     //send for a hint
     server.sendToServer("hint", {
@@ -378,6 +371,7 @@ class BoardState extends Observer {
     redScore;
     blueScore;
     timer;
+    totalHintsLeft;
     ai = {
         "blueSm" : true,
         "blueSpy" : true,
@@ -392,8 +386,6 @@ class BoardState extends Observer {
         "team": null,
         "role": null
     };
-    hintTakenThisTurn;
-    totalHintsLeft;
 
     /*
      * Singleton implementation of the BoardState class
@@ -420,11 +412,11 @@ class BoardState extends Observer {
         this.numOfGuesses = null;
         this.redScore = 0;
         this.blueScore = 0;
+        this.totalHintsLeft = 3;
         this.cards = new Array(5);
         for (var i = 0; i < this.cards.length; i++) {
             this.cards[i] = new Array(5);
         }
-        this.totalHintsLeft = 3;
         document.getElementById("totalHints").innerHTML = this.totalHintsLeft;
     }
 
@@ -553,9 +545,6 @@ class BoardState extends Observer {
             "turn" : this.turn,
             "room" : this.room
         })
-
-        //additionally hide hints if they were showing
-        document.getElementById("hintCluster").style.opacity = 0;
     }
 
     /*
@@ -686,6 +675,7 @@ class BoardState extends Observer {
             case "changeTurn":
                 //styling
                 document.getElementById("turnAlert").style.display = "none";
+                document.getElementById("hintButton").style.display = "none";
                 document.getElementById("room").style.display = "inline-block";
                 document.getElementById("blueSpy").style.color = "black";
                 document.getElementById("blueSm").style.color = "black";
@@ -725,11 +715,9 @@ class BoardState extends Observer {
                     document.getElementById("room").style.display = "none";
                     document.getElementById("turnAlert").style.display = "inline-block";
                     document.getElementById("timerBar").style.backgroundColor = "red";
+                    if (choice == 0 && this.totalHintsLeft > 0)
+                        document.getElementById("hintButton").style.display = "inline-block";
                 }
-
-                //allow more hints
-                this.hintTakenThisTurn = false;
-
                 break;
 
             case "sendRoomInfo":
@@ -785,7 +773,7 @@ class BoardState extends Observer {
                 var hintCard, falseCard, i, j;
                 for (i = 0; i < this.cards.length; i++) {
                     for (j = 0; j < this.cards[i].length; j++) {
-                        if(this.cards[i][j].word == incoming.hint) {
+                        if (this.cards[i][j].word == incoming.hint) {
                             hintCard = this.cards[i][j].div;
                             found = true; 
                             break;
@@ -794,17 +782,17 @@ class BoardState extends Observer {
                     if (found) break;
                 }
                 //style the true hint
-                if(this.player.team == "red") hintCard.classList.add("redTeam");
+                if (this.player.team == "red") hintCard.classList.add("redTeam");
                 else hintCard.classList.add("blueTeam");
 
                 //pick another valid random card
-                while(true){
+                while (true) {
                     i = Math.floor(Math.random() * this.cards.length);
                     j = Math.floor(Math.random() * this.cards[i].length);
                     falseCard = this.cards[i][j];
                     
                     //check the fake hint is valid
-                    if( falseCard.isRevealed == true
+                    if (falseCard.isRevealed == true
                      || falseCard.div.childNodes[0].getAttribute("class") == "hint"
                      || falseCard.colour == (this.turn.team + "Team"))
                         continue; //retry another card
@@ -813,23 +801,37 @@ class BoardState extends Observer {
                     break;
                 }
                 //style the random hint
-                if(this.player.team == "red") falseCard.classList.add("redTeam");
+                if (this.player.team == "red") falseCard.classList.add("redTeam");
                 else falseCard.classList.add("blueTeam");
 
                 //remove hint after t milliseconds
-                setTimeout(function(){
+                setTimeout(function() {
                     hintCard.classList.remove("redTeam");
                     hintCard.classList.remove("blueTeam");
                     falseCard.classList.remove("redTeam");
                     falseCard.classList.remove("blueTeam");
-                },4000);
+                }, 4000);
                 break;
             
             case "spymasterHint":
                 //show clustered words on the board
-                var clusteredWords = document.getElementById("hintCluster");
-                clusteredWords.innerHTML = "Clustered Words: " + incoming.hint;
-                clusteredWords.style.opacity = 1;
+                var hintList = incoming.hint;
+                for (i = 0; i < this.cards.length; i++) {
+                    for (j = 0; j < this.cards[i].length; j++) {
+                        if (hintList.includes(this.cards[i][j].word)) {
+                            let hintCard = this.cards[i][j].div;
+                            hintCard.classList.add("hintCluster");
+                            setTimeout(function() {
+                                hintCard.classList.remove("hintCluster");
+                            }, 4000)
+                        }
+                    }
+                }
+                break;
+
+            case "hintError":
+                alert(incoming);
+                break;
 
             default:
                 break;
@@ -868,10 +870,16 @@ if (choice != 2) {
         welcomeText = "Please choose your team and role";
         document.getElementById("room").innerHTML = "Difficulty: " + difficulty;
         document.querySelector(".sidebarContainer").style.display = "none";
+        document.getElementById("people").style.display = "none";
+        document.getElementById("numOfPeople").style.display = "none";
     }
 } else {
     var welcomeText = "Please wait for the host to start game";
     document.getElementById("startGame").style.display = "none";
+}
+if (choice != 0) {
+    document.getElementById("hintText").style.display = "none";
+    document.getElementById("hintButton").style.display = "none";
 }
 if (link.charAt(link.length-2) == '|') {
     joinRoom(true);
@@ -897,15 +905,14 @@ document.getElementById("joinRedSm").onclick = function() {chooseRole("redSm");}
 document.getElementById("startGame").onclick = function() {boardInitialize(isBombCard);};
 document.getElementById("openSidebarMenu").onclick = function() {moveSidebar();};
 document.getElementById("welcomeConfirm").onclick = function() {welcomeConfirm();};
+document.getElementById("clueButton").onclick = function() {board.forwardClue();};
 document.getElementById("endTurn").onclick = function() {endSpyTurn();};
+document.getElementById("hintButton").onclick = function() {getHint();};
 document.getElementById("quitRoom").onclick = function() {quitRoom();};
 document.getElementById("restart").onclick = function() {server.sendToServer("restart", {"room": board.room});};
-document.getElementById("hintButton").onclick = getHint;
 
 if (board.room.includes("STRESSTEST")) STRESS_TEST = true;
 if (choice == 1 && STRESS_TEST) boardInitialize(isBombCard);
-
-
 
 
 // Colour Scheme Settings functions

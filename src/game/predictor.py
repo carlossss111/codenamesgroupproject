@@ -294,4 +294,4 @@ class Predictor_sm:
         print("Generated clue:", clue)
         print("Targets:", targets)
 
-        return clue, clue_score, targets
+        return clue, targets

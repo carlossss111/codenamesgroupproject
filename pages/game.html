@@ -30,12 +30,13 @@
             <img class="set" id="set" src="../rsc/images/set.png" alt="" srcset="">
         </div>
         
-        <!-- Room Number & "It's your turn!" notification-->
+        <!-- Room Number & "It's your turn!" notification & Hint button -->
         <div class="text-center text-md mt-3 font-bold text-amber-800">
             <span id="room"></span>
             <span id="turnAlert" class="blink">It's your turn!</span>
             <span><img id="people" src="../rsc/images/people.png" style="display: inline-block; width: 15px; margin-left: 20px;"></span>
             <span id="numOfPeople">1</span>
+            <p id="hintText" style="display: inline-block; margin-left: 20px;">(Remaining Hint: <span id="totalHints"></span>)</p>
         </div>
 
         <!-- Scores -->
@@ -59,28 +60,20 @@
 
         <div class="clueBox">
             <!-- Clue box and options -->
-            <form action="#" onsubmit="board.forwardClue()">
-                <input type="text" id="clue" placeholder="Enter clue"></input>
-                <select id="maxClues">
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                    <option value="4">4</option>
-                    <option value="5">5</option>
-                    <option value="6">6</option>
-                    <option value="7">7</option>
-                    <option value="8">8</option>
-                </select>
-                <button type="submit" id="clueButton">Give Clue</button>
-                <button id="endTurn">End Turn</button>
-            </form>
-
-            <!--Hint-->
-            <div id="hintContainer">
-                <button id="hintButton" type="text">Hint</button>
-                <p id="hintText">(Remaining: <span id="totalHints"></span>)</p>
-            </div>
-            <p id="hintCluster" style="opacity:0;">...</p>
+            <input type="text" id="clue" placeholder="Enter clue"></input>
+            <select id="maxClues">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+            </select>
+            <button id="clueButton">Give Clue</button>
+            <button id="endTurn">End Turn</button>
+            <button id="hintButton">Hint</button>
         </div>
 
         <!-- Gameover Box -->

@@ -12,6 +12,8 @@ socket_ = SocketIO(app, async_mode=async_mode, cors_allowed_origins='*') #todo: 
 thread = None
 thread_lock = Lock()
 room_path = "rsc/data/rooms"
+relevant_words_path = "rsc/data/relevant_words"
+relevant_vectors_path = "rsc/data/relevant_vectors"
 
 """
 Join a game room
@@ -158,11 +160,11 @@ def clue_broadcast_message_AI(messageReceived):
     board = list(chain.from_iterable(messageReceived["board"]["cards"]))
     team = messageReceived["board"]["turn"]["team"]
 
-    spymaster = Predictor_sm(relevant_words_path='rsc/data/relevant_words',
-                          relevant_vectors_path='rsc/data/relevant_vectors',
+    spymaster = Predictor_sm(relevant_words_path=relevant_words_path,
+                          relevant_vectors_path=relevant_vectors_path,
                           board=board,
                           turn=team)
-    clue, clue_score, targets = spymaster.run()
+    clue, targets = spymaster.run()
 
     nextTurn = {"team": team, "role": "spy"}
     room = messageReceived['board']['room']
@@ -178,6 +180,7 @@ def clue_broadcast_message_AI(messageReceived):
     }
     emit(protocol, messageToSend, room=room)
 
+
 """
 Generate a hint
 """
@@ -185,17 +188,19 @@ Generate a hint
 def hint_broadcast(messageReceived):
     board = list(chain.from_iterable(messageReceived["board"]["cards"]))
     team = messageReceived["board"]["turn"]["team"]
-    room = messageReceived['board']['room']
     role = messageReceived["board"]["player"]["role"]
 
-    spymaster = Predictor_sm(relevant_words_path='rsc/data/relevant_words',
-                          relevant_vectors_path='rsc/data/relevant_vectors',
+    spymaster = Predictor_sm(relevant_words_path=relevant_words_path,
+                          relevant_vectors_path=relevant_vectors_path,
                           board=board,
                           turn=team)
-    clue, _, targets = spymaster.run()
+    clue, targets = spymaster.run()
 
-    #it is easier in board.js to split into two different messages...
-    if role == "spy":
+    if len(targets) == 0:
+        protocol = "hintError"
+        messageToSend = "Too few words to give a hint!"
+        
+    elif role == "spy":
         protocol = "spyHint"
         messageToSend = {
             'Protocol' : protocol,
@@ -207,8 +212,8 @@ def hint_broadcast(messageReceived):
             'Protocol' : protocol,
             'hint' : targets,
         }
+    emit(protocol, messageToSend)
 
-    emit(protocol, messageToSend, room=room)
 
 """
 Generate a list of guesses (AI)
@@ -221,7 +226,7 @@ def guess(messageReceived):
     team = messageReceived["board"]["turn"]["team"]
     level = messageReceived["AIDifficulty"]
 
-    spy = Predictor_spy(relevant_vectors_path='rsc/data/relevant_vectors',
+    spy = Predictor_spy(relevant_vectors_path=relevant_vectors_path,
                     board=board,
                     clue=clue,
                     target_num=target_num,
