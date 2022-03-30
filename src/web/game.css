@@ -381,7 +381,7 @@
     background-color: rgb(255, 129, 129);
 }
 
-.nav-item {
+.navItem {
     text-decoration: none;
     z-index: 1;
     position: relative;

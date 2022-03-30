@@ -906,8 +906,11 @@ if (board.room.includes("STRESSTEST")) STRESS_TEST = true;
 if (choice == 1 && STRESS_TEST) boardInitialize(isBombCard);
 
 
+
+
+// Colour Scheme Settings functions
 const indicator = document.querySelector('.barIndicator');
-const items = document.querySelectorAll('.nav-item');
+const items = document.querySelectorAll('.navItem');
 
 function handleIndicator(el) {
   
@@ -920,3 +923,16 @@ function handleIndicator(el) {
 items.forEach((item, index) => {
   item.addEventListener('click', (e) => { handleIndicator(e.target)});
 });
+
+//Add all colour blind options 
+function Deuteranopiafunction() {
+    document.body.style.backgroundColor = "green";
+}
+
+function Tritanopiafunction() {
+
+}
+
+function Protanopiafunction() {
+
+}
