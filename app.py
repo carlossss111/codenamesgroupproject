@@ -163,8 +163,6 @@ def clue_broadcast_message_AI(messageReceived):
                           board=board,
                           turn=team)
     clue, clue_score, targets = spymaster.run()
-    #here
-
 
     nextTurn = {"team": team, "role": "spy"}
     room = messageReceived['board']['room']
@@ -188,18 +186,28 @@ def hint_broadcast(messageReceived):
     board = list(chain.from_iterable(messageReceived["board"]["cards"]))
     team = messageReceived["board"]["turn"]["team"]
     room = messageReceived['board']['room']
+    role = messageReceived["board"]["player"]["role"]
 
     spymaster = Predictor_sm(relevant_words_path='rsc/data/relevant_words',
                           relevant_vectors_path='rsc/data/relevant_vectors',
                           board=board,
                           turn=team)
-    _, _, targets = spymaster.run()
+    clue, _, targets = spymaster.run()
 
-    protocol = "spyHint"
-    messageToSend = {
-        'Protocol' : protocol,
-        'hint' : targets[0],
-    }
+    #it is easier in board.js to split into two different messages...
+    if role == "spy":
+        protocol = "spyHint"
+        messageToSend = {
+            'Protocol' : protocol,
+            'hint' : targets[0],
+        }
+    else:
+        protocol = "spymasterHint"
+        messageToSend = {
+            'Protocol' : protocol,
+            'hint' : targets,
+        }
+
     emit(protocol, messageToSend, room=room)
 
 """

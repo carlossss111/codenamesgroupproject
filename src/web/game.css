@@ -109,6 +109,12 @@
     width: 9em;
 }
 
+.clueBox form{
+    width:fit-content;
+    margin:auto; 
+    display:inline-block;
+}
+
 .clueBox input,
 .clueBox select,
 .clueBox button,
@@ -123,12 +129,19 @@
 
 #hintContainer{
     display: inline-block;
-    margin-left:5em;
+    width: fit-content;
+    margin-left:2em;
 }
 
 #hintText{
     display: inline-block;
     margin-right:2em;
+}
+
+#hintCluster{
+    margin-top:0.25em;
+    font-size:1.2em;
+    transition: opacity 1s;
 }
 
 .clueBox button:hover,
@@ -426,4 +439,7 @@ input[type=range]::-webkit-slider-thumb {
         font-size: 1em;
     }
 
+    #hintContainer{
+        margin-top:0.5em;
+    }
 }

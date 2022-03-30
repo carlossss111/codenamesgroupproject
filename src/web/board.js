@@ -195,8 +195,8 @@ function finishGame(winTeam) {
     })
 }
 
-//Hint button gives 2 hints
-function getHintForSpy(){
+//Gives up to 3 hints, 1 per turn.
+function getHint(){
     //check if hint is valid
     var hintText = document.getElementById("hintText");
     if(board.hintTakenThisTurn){
@@ -553,6 +553,9 @@ class BoardState extends Observer {
             "turn" : this.turn,
             "room" : this.room
         })
+
+        //additionally hide hints if they were showing
+        document.getElementById("hintCluster").style.opacity = 0;
     }
 
     /*
@@ -820,7 +823,13 @@ class BoardState extends Observer {
                     falseCard.classList.remove("redTeam");
                     falseCard.classList.remove("blueTeam");
                 },4000);
-
+                break;
+            
+            case "spymasterHint":
+                //show clustered words on the board
+                var clusteredWords = document.getElementById("hintCluster");
+                clusteredWords.innerHTML = "Clustered Words: " + incoming.hint;
+                clusteredWords.style.opacity = 1;
 
             default:
                 break;
@@ -891,7 +900,7 @@ document.getElementById("welcomeConfirm").onclick = function() {welcomeConfirm()
 document.getElementById("endTurn").onclick = function() {endSpyTurn();};
 document.getElementById("quitRoom").onclick = function() {quitRoom();};
 document.getElementById("restart").onclick = function() {server.sendToServer("restart", {"room": board.room});};
-document.getElementById("hintButton").onclick = getHintForSpy;
+document.getElementById("hintButton").onclick = getHint;
 
 if (board.room.includes("STRESSTEST")) STRESS_TEST = true;
 if (choice == 1 && STRESS_TEST) boardInitialize(isBombCard);
