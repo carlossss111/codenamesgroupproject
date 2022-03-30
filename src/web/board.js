@@ -195,6 +195,41 @@ function finishGame(winTeam) {
     })
 }
 
+//Gives up to 3 hints, 1 per turn.
+function getHint(){
+    //check if hint is valid
+    var hintText = document.getElementById("hintText");
+    if(board.hintTakenThisTurn){
+        let tempText = hintText.innerHTML;
+        hintText.innerHTML = "Only one hint can be taken per turn!"
+        setTimeout(function(){
+            hintText.innerHTML = tempText;
+        },1000);
+        return;
+    }
+    if(board.totalHintsLeft < 1){
+        let tempText = hintText.innerHTML;
+        hintText.innerHTML = "Out of hints!"
+        setTimeout(function(){
+            hintText.innerHTML = tempText;
+        },1000);
+        return;
+    }
+
+    //no more hints this turn
+    board.hintTakenThisTurn = true;
+
+    //-1 to total hints
+    board.totalHintsLeft--;
+    document.getElementById("totalHints").innerHTML = board.totalHintsLeft;
+
+    //send for a hint
+    server.sendToServer("hint", {
+        "Protocol" : "hint",
+        "board" : board
+    })
+}
+
 /*
  * Sets the timer maximum, runs it every second and handles
  * when the timer has ran out.
@@ -357,6 +392,8 @@ class BoardState extends Observer {
         "team": null,
         "role": null
     };
+    hintTakenThisTurn;
+    totalHintsLeft;
 
     /*
      * Singleton implementation of the BoardState class
@@ -387,6 +424,8 @@ class BoardState extends Observer {
         for (var i = 0; i < this.cards.length; i++) {
             this.cards[i] = new Array(5);
         }
+        this.totalHintsLeft = 3;
+        document.getElementById("totalHints").innerHTML = this.totalHintsLeft;
     }
 
     /*
@@ -514,6 +553,9 @@ class BoardState extends Observer {
             "turn" : this.turn,
             "room" : this.room
         })
+
+        //additionally hide hints if they were showing
+        document.getElementById("hintCluster").style.opacity = 0;
     }
 
     /*
@@ -684,6 +726,10 @@ class BoardState extends Observer {
                     document.getElementById("turnAlert").style.display = "inline-block";
                     document.getElementById("timerBar").style.backgroundColor = "red";
                 }
+
+                //allow more hints
+                this.hintTakenThisTurn = false;
+
                 break;
 
             case "sendRoomInfo":
@@ -732,6 +778,58 @@ class BoardState extends Observer {
                     quitRoom();
                 }
                 break;
+
+            case "spyHint":
+                //find card matching hint
+                var found = false;
+                var hintCard, falseCard, i, j;
+                for (i = 0; i < this.cards.length; i++) {
+                    for (j = 0; j < this.cards[i].length; j++) {
+                        if(this.cards[i][j].word == incoming.hint) {
+                            hintCard = this.cards[i][j].div;
+                            found = true; 
+                            break;
+                        }
+                    }
+                    if (found) break;
+                }
+                //style the true hint
+                if(this.player.team == "red") hintCard.classList.add("redTeam");
+                else hintCard.classList.add("blueTeam");
+
+                //pick another valid random card
+                while(true){
+                    i = Math.floor(Math.random() * this.cards.length);
+                    j = Math.floor(Math.random() * this.cards[i].length);
+                    falseCard = this.cards[i][j];
+                    
+                    //check the fake hint is valid
+                    if( falseCard.isRevealed == true
+                     || falseCard.div.childNodes[0].getAttribute("class") == "hint"
+                     || falseCard.colour == (this.turn.team + "Team"))
+                        continue; //retry another card
+                    
+                    falseCard = falseCard.div;
+                    break;
+                }
+                //style the random hint
+                if(this.player.team == "red") falseCard.classList.add("redTeam");
+                else falseCard.classList.add("blueTeam");
+
+                //remove hint after t milliseconds
+                setTimeout(function(){
+                    hintCard.classList.remove("redTeam");
+                    hintCard.classList.remove("blueTeam");
+                    falseCard.classList.remove("redTeam");
+                    falseCard.classList.remove("blueTeam");
+                },4000);
+                break;
+            
+            case "spymasterHint":
+                //show clustered words on the board
+                var clusteredWords = document.getElementById("hintCluster");
+                clusteredWords.innerHTML = "Clustered Words: " + incoming.hint;
+                clusteredWords.style.opacity = 1;
 
             default:
                 break;
@@ -802,6 +900,7 @@ document.getElementById("welcomeConfirm").onclick = function() {welcomeConfirm()
 document.getElementById("endTurn").onclick = function() {endSpyTurn();};
 document.getElementById("quitRoom").onclick = function() {quitRoom();};
 document.getElementById("restart").onclick = function() {server.sendToServer("restart", {"room": board.room});};
+document.getElementById("hintButton").onclick = getHint;
 
 if (board.room.includes("STRESSTEST")) STRESS_TEST = true;
 if (choice == 1 && STRESS_TEST) boardInitialize(isBombCard);

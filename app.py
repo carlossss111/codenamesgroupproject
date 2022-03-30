@@ -178,6 +178,37 @@ def clue_broadcast_message_AI(messageReceived):
     }
     emit(protocol, messageToSend, room=room)
 
+"""
+Generate a hint
+"""
+@socket_.on("hint", namespace='/')
+def hint_broadcast(messageReceived):
+    board = list(chain.from_iterable(messageReceived["board"]["cards"]))
+    team = messageReceived["board"]["turn"]["team"]
+    room = messageReceived['board']['room']
+    role = messageReceived["board"]["player"]["role"]
+
+    spymaster = Predictor_sm(relevant_words_path='rsc/data/relevant_words',
+                          relevant_vectors_path='rsc/data/relevant_vectors',
+                          board=board,
+                          turn=team)
+    clue, _, targets = spymaster.run()
+
+    #it is easier in board.js to split into two different messages...
+    if role == "spy":
+        protocol = "spyHint"
+        messageToSend = {
+            'Protocol' : protocol,
+            'hint' : targets[0],
+        }
+    else:
+        protocol = "spymasterHint"
+        messageToSend = {
+            'Protocol' : protocol,
+            'hint' : targets,
+        }
+
+    emit(protocol, messageToSend, room=room)
 
 """
 Generate a list of guesses (AI)
