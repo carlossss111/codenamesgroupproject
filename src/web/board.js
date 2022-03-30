@@ -197,9 +197,33 @@ function finishGame(winTeam) {
 
 //Hint button gives 2 hints
 function getHintForSpy(){
-    if(board.hintTakenThisTurn)
+    //check if hint is valid
+    var hintText = document.getElementById("hintText");
+    if(board.hintTakenThisTurn){
+        let tempText = hintText.innerHTML;
+        hintText.innerHTML = "Only one hint can be taken per turn!"
+        setTimeout(function(){
+            hintText.innerHTML = tempText;
+        },1000);
         return;
+    }
+    if(board.totalHintsLeft < 1){
+        let tempText = hintText.innerHTML;
+        hintText.innerHTML = "Out of hints!"
+        setTimeout(function(){
+            hintText.innerHTML = tempText;
+        },1000);
+        return;
+    }
 
+    //no more hints this turn
+    board.hintTakenThisTurn = true;
+
+    //-1 to total hints
+    board.totalHintsLeft--;
+    document.getElementById("totalHints").innerHTML = board.totalHintsLeft;
+
+    //send for a hint
     server.sendToServer("hint", {
         "Protocol" : "hint",
         "board" : board
@@ -369,6 +393,7 @@ class BoardState extends Observer {
         "role": null
     };
     hintTakenThisTurn;
+    totalHintsLeft;
 
     /*
      * Singleton implementation of the BoardState class
@@ -399,6 +424,8 @@ class BoardState extends Observer {
         for (var i = 0; i < this.cards.length; i++) {
             this.cards[i] = new Array(5);
         }
+        this.totalHintsLeft = 3;
+        document.getElementById("totalHints").innerHTML = this.totalHintsLeft;
     }
 
     /*
@@ -793,9 +820,6 @@ class BoardState extends Observer {
                     falseCard.classList.remove("redTeam");
                     falseCard.classList.remove("blueTeam");
                 },4000);
-
-                //no more hints this turn
-                this.hintTakenThisTurn = true;
 
 
             default:

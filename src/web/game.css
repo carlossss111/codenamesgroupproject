@@ -126,6 +126,11 @@
     margin-left:5em;
 }
 
+#hintText{
+    display: inline-block;
+    margin-right:2em;
+}
+
 .clueBox button:hover,
 #gameOver button:hover {
     background-color: lightGreen;
