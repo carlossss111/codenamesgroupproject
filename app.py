@@ -1,3 +1,4 @@
+import time
 import numpy as np
 from flask import Flask, session, copy_current_request_context, request
 from flask_socketio import SocketIO, emit, disconnect, join_room, leave_room
@@ -14,6 +15,9 @@ thread_lock = Lock()
 room_path = "rsc/data/rooms"
 relevant_words_path = "rsc/data/relevant_words"
 relevant_vectors_path = "rsc/data/relevant_vectors"
+minimum_time_spy_think = 2
+minimum_time_spy_pick_a_card = 1
+minimum_time_spymaster_think = 4
 
 """
 Join a game room
@@ -170,7 +174,7 @@ def clue_broadcast_message_AI(messageReceived):
     room = messageReceived['board']['room']
     numGuesses = max(len(targets), 1)
 
-    #emit back to the socket
+    time.sleep(minimum_time_spymaster_think)
     protocol = 'forwardClue'
     messageToSend = {
         'Protocol' : protocol,
@@ -223,8 +227,12 @@ def guess(messageReceived):
     board = list(chain.from_iterable(messageReceived["board"]["cards"]))
     clue = messageReceived["board"]["clueWord"]
     target_num = messageReceived["board"]["numOfGuesses"]
+    turn = messageReceived["board"]["turn"]
     team = messageReceived["board"]["turn"]["team"]
     level = messageReceived["AIDifficulty"]
+    room = messageReceived['board']['room']
+    redScore = messageReceived["board"]["redScore"]
+    blueScore = messageReceived["board"]["blueScore"]
 
     spy = Predictor_spy(relevant_vectors_path=relevant_vectors_path,
                     board=board,
@@ -233,39 +241,58 @@ def guess(messageReceived):
                     level=level)
     guesses = spy.run()
 
-    redScore = messageReceived["board"]["redScore"]
-    blueScore = messageReceived["board"]["blueScore"]
-    bombPicked = False
-    for card in board:
-        if card["word"] in guesses:
-            card["isRevealed"] = True
-            if card["colour"] == "redTeam":
-                redScore += 1
-            elif card["colour"] == "blueTeam":
-                blueScore += 1
-            elif card["colour"] == "bombCard":
-                bombPicked = True
-
     if (team == "blue"):
         nextTurn = {"team": "red", "role": "spymaster"}
     else:
         nextTurn = {"team": "blue", "role": "spymaster"}
-
-    room = messageReceived['board']['room']
-
+    
     protocol = 'receiveBoardState'
-    messageToSend = {
-        'Protocol': protocol, \
-        'clue': clue, \
-        'numberOfGuesses': target_num, \
-        'redScore': redScore, \
-        'blueScore': blueScore, \
-        'turn': nextTurn, \
-        'turnOver': True, \
-        'bombPicked': bombPicked, \
-        'cards': np.reshape(board,(5,5)).tolist() \
-    }
-    emit(protocol, messageToSend, room=room)
+    bombPicked = False
+    turnOver = False
+    maxGuess = len(guesses)
+    guessNum = 0
+    time.sleep(minimum_time_spy_think)
+    
+    for card in board:
+        if card["word"] in guesses and not turnOver:
+            card["isRevealed"] = True
+            guessNum += 1
+
+            if card["colour"] == "redTeam":
+                redScore += 1
+                if team == "blue":
+                    turnOver = True
+                    turn = nextTurn
+            elif card["colour"] == "blueTeam":
+                blueScore += 1
+                if team == "red":
+                    turnOver = True
+                    turn = nextTurn
+            elif card["colour"] == "bombCard":
+                bombPicked = True
+                turnOver = True
+                turn = nextTurn
+            else:
+                turnOver = True
+                turn = nextTurn
+
+            if guessNum == maxGuess:
+                turnOver = True
+                turn = nextTurn
+
+            time.sleep(minimum_time_spy_pick_a_card)
+            messageToSend = {
+                'Protocol': protocol, \
+                'clue': clue, \
+                'numberOfGuesses': target_num, \
+                'redScore': redScore, \
+                'blueScore': blueScore, \
+                'turn': turn, \
+                'turnOver': turnOver, \
+                'bombPicked': bombPicked, \
+                'cards': np.reshape(board,(5,5)).tolist() \
+            }
+            emit(protocol, messageToSend, room=room)
 
 
 """

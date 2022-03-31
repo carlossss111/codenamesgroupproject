@@ -338,7 +338,6 @@ class Card {
                 default:
                     this.div.style.backgroundImage = NEUTRAL_IMAGE;
             }
-
             this.div.style.backgroundSize = "cover";
         }, 200)
     }
@@ -553,6 +552,79 @@ class BoardState extends Observer {
      */
     update(eventName, incoming) {
         switch (eventName) {
+            case "receiveRoomInfo":
+                //update number of people and player-name next to their role
+                numOfPeople = incoming.numOfPeople;
+                document.getElementById("numOfPeople").innerHTML = numOfPeople;
+                document.getElementById("blueSpy").innerHTML = incoming.blueSpy;
+                document.getElementById("blueSm").innerHTML = incoming.blueSm;
+                document.getElementById("redSpy").innerHTML = incoming.redSpy;
+                document.getElementById("redSm").innerHTML = incoming.redSm;
+                break;
+
+            case "syncRequest":
+                //sync a new client to the room
+                if (choice != 2) {
+                    numOfPeople += 1;
+                    syncRoomInfo();
+                }
+                break;
+
+            case "syncPeople":
+                //sync number of people in the room
+                numOfPeople = incoming;
+                document.getElementById("numOfPeople").innerHTML = numOfPeople;
+                break;
+
+            case "sendRoomInfo":
+                //resend the room info
+                if (incoming.name == nickname)
+                    server.sendToServer("chat", {
+                        Protocol : "chat", 
+                        message : `${incoming.message}`,
+                        room : this.room,
+                        team : this.player.team,
+                        role : this.player.role
+                    });
+                break;
+
+            case "roomError":
+                //hosting a room that id exists or joining a room that doesn't exist
+                alert(incoming);
+                window.location.href = "../index.html";
+                break;
+
+            case "sendInitialBoardState":
+                let receivedBoard = incoming.board;
+                vocabulary = incoming.vocabulary;
+                this.timer.setMaxTime(incoming.timerLength);
+
+                //show timer
+                if (this.timer.maxTime != null) {
+                    document.getElementById("timerBar").style.display = "block";
+                }
+
+                //card set up
+                for (let i = 0; i < this.cards.length; i++) {
+                    for (let j = 0; j < this.cards[0].length; j++){
+                        let team = receivedBoard[i*this.cards.length+j]["type"];
+                        let word = receivedBoard[i*this.cards.length+j]["name"];
+                        this.cards[i][j] = new Card(team, word);
+                    }
+                }
+
+                //AI configuration
+                getAIConfig();
+                console.log(this.ai);
+
+                //configure roles and start game
+                if (this.player.role == "spy") enableSpyMode();
+                document.getElementById("welcome").style.display = "none";
+                document.getElementById("teamBox").style.display = "none";
+                document.querySelector(".clueBox").style.display = "block";
+                if (choice != 2) startGame();
+                break;
+
             case "receiveBoardState":
                 //assign new board attributes
                 this.clueWord = incoming.clue;
@@ -600,7 +672,7 @@ class BoardState extends Observer {
 
                 //continue game
                 this.turn = incoming.turn;
-                if ((incoming.turnOver && this.isPlayersTurn()) || (choice != 2 && this.isAITurn()) )
+                if ( incoming.turnOver && (this.isPlayersTurn() || (choice != 2 && this.isAITurn())) )
                     updateTurnState();
                 break;
 
@@ -615,156 +687,6 @@ class BoardState extends Observer {
                 //print the new clue on screen
                 document.getElementById("clue").value = incoming.clue;
                 document.getElementById("maxClues").value = incoming.numberOfGuesses;
-                break;
-
-            case "sendInitialBoardState":
-                let receivedBoard = incoming.board;
-                vocabulary = incoming.vocabulary;
-                this.timer.setMaxTime(incoming.timerLength);
-
-                //show timer
-                if (this.timer.maxTime != null) {
-                    document.getElementById("timerBar").style.display = "block";
-                }
-
-                //card set up
-                for (let i = 0; i < this.cards.length; i++) {
-                    for (let j = 0; j < this.cards[0].length; j++){
-                        let team = receivedBoard[i*this.cards.length+j]["type"];
-                        let word = receivedBoard[i*this.cards.length+j]["name"];
-                        this.cards[i][j] = new Card(team, word);
-                    }
-                }
-
-                //AI configuration
-                getAIConfig();
-                console.log(this.ai);
-
-                //configure roles and start game
-                if (this.player.role == "spy") enableSpyMode();
-                document.getElementById("welcome").style.display = "none";
-                document.getElementById("teamBox").style.display = "none";
-                document.querySelector(".clueBox").style.display = "block";
-                if (choice != 2) startGame();
-                break;
-
-            case "receiveRoomInfo":
-                //update number of people and player-name next to their role
-                numOfPeople = incoming.numOfPeople;
-                document.getElementById("numOfPeople").innerHTML = numOfPeople;
-                document.getElementById("blueSpy").innerHTML = incoming.blueSpy;
-                document.getElementById("blueSm").innerHTML = incoming.blueSm;
-                document.getElementById("redSpy").innerHTML = incoming.redSpy;
-                document.getElementById("redSm").innerHTML = incoming.redSm;
-                break;
-
-            case "syncRequest":
-                //sync a new client to the room
-                if (choice != 2) {
-                    numOfPeople += 1;
-                    syncRoomInfo();
-                }
-                break;
-
-            case "syncPeople":
-                //sync number of people in the room
-                numOfPeople = incoming;
-                document.getElementById("numOfPeople").innerHTML = numOfPeople;
-                break;
-
-            case "changeTurn":
-                //styling
-                document.getElementById("turnAlert").style.display = "none";
-                document.getElementById("hintButton").style.display = "none";
-                document.getElementById("room").style.display = "inline-block";
-                document.getElementById("blueSpy").style.color = "black";
-                document.getElementById("blueSm").style.color = "black";
-                document.getElementById("redSpy").style.color = "black";
-                document.getElementById("redSm").style.color = "black";
-                document.getElementById("timerBar").style.backgroundColor = "green";
-                
-                //change the turn and handle AI
-                this.turn = incoming.currentTurn;
-                console.log(this.turn);
-                if (this.turn["team"] == "blue") {
-                    if (this.turn["role"] == "spymaster") {
-                        document.getElementById("blueSm").style.color = "lightgreen";;
-                        if (choice != 2 && this.ai.blueSm) generateClue();
-                    }
-                    else {
-                        document.getElementById("blueSpy").style.color = "lightgreen";;
-                        if (choice != 2 && this.ai.blueSpy) generateGuess();
-                    }
-                } 
-                else if (this.turn["team"] == "red"){
-                    if (this.turn["role"] == "spymaster") {
-                        document.getElementById("redSm").style.color = "lightgreen";;
-                        if (choice != 2 && this.ai.redSm) generateClue();
-                    }
-                    else {
-                        document.getElementById("redSpy").style.color = "lightgreen";;
-                        if (choice != 2 && this.ai.redSpy) generateGuess();
-                    }
-                }
-
-                //reset the timer
-                this.timer.reset();
-
-                //alert the player if their turn
-                if (this.isPlayersTurn()) {
-                    document.getElementById("room").style.display = "none";
-                    document.getElementById("turnAlert").style.display = "inline-block";
-                    document.getElementById("timerBar").style.backgroundColor = "red";
-                    if (choice == 0 && this.totalHintsLeft > 0)
-                        document.getElementById("hintButton").style.display = "inline-block";
-                }
-                break;
-
-            case "sendRoomInfo":
-                //resend the room info
-                if (incoming.name == nickname)
-                    server.sendToServer("chat", {
-                        Protocol : "chat", 
-                        message : `${incoming.message}`,
-                        room : this.room,
-                        team : this.player.team,
-                        role : this.player.role
-                    });
-                break;
-
-            case "roomError":
-                //hosting a room that id exists or joining a room that doesn't exist
-                alert(incoming);
-                window.location.href = "../index.html";
-                break;
-
-            case "gameOver":
-                //display winning text
-                gameOverAudio();
-                document.querySelector(".clueBox").style.display = "none";
-                document.getElementById("timerBar").style.width = "0";
-                document.getElementById("timerBar").style.opacity = "1";
-                document.getElementById("gameOver").style.display = "block";
-                document.getElementById("winText").innerHTML = incoming.winTeam + " Wins!";
-                if (incoming.winTeam == "Blue Team") document.getElementById("winText").style.color = "#3399ff";
-                else document.getElementById("winText").style.color = "#ff5050";
-                if (choice == 2) document.getElementById("restart").style.display = "none";
-                if (choice == 1 && STRESS_TEST) server.sendToServer("restart", {"room": board.room});
-                break;
-
-            case "restartGame":
-                //host restart game
-                link = link.slice(0, -1) + numOfPeople;
-                window.location.replace(link);
-                window.location.reload();
-                break;
-
-            case "hostQuit":
-                //host quits room
-                if (choice == 2) {
-                    alert("Host user quits room!");
-                    quitRoom();
-                }
                 break;
 
             case "spyHint":
@@ -831,6 +753,91 @@ class BoardState extends Observer {
 
             case "hintError":
                 alert(incoming);
+                break;
+
+            case "changeTurn":
+                //styling
+                document.getElementById("turnAlert").style.display = "none";
+                document.getElementById("hintButton").style.display = "none";
+                document.getElementById("room").style.display = "inline-block";
+                document.getElementById("blueSpy").style.color = "black";
+                document.getElementById("blueSm").style.color = "black";
+                document.getElementById("redSpy").style.color = "black";
+                document.getElementById("redSm").style.color = "black";
+                document.getElementById("blueSpy").classList.remove("blink");
+                document.getElementById("blueSm").classList.remove("blink");
+                document.getElementById("redSpy").classList.remove("blink");
+                document.getElementById("redSm").classList.remove("blink");
+                document.getElementById("timerBar").style.backgroundColor = "green";
+                
+                //change the turn and handle AI
+                this.turn = incoming.currentTurn;
+                console.log(this.turn);
+                if (this.turn["team"] == "blue") {
+                    if (this.turn["role"] == "spymaster") {
+                        document.getElementById("blueSm").style.color = "lightgreen";
+                        document.getElementById("blueSm").classList.add("blink");
+                        if (choice != 2 && this.ai.blueSm) generateClue();
+                    }
+                    else {
+                        document.getElementById("blueSpy").style.color = "lightgreen";
+                        document.getElementById("blueSpy").classList.add("blink");
+                        if (choice != 2 && this.ai.blueSpy) generateGuess();
+                    }
+                } 
+                else if (this.turn["team"] == "red"){
+                    if (this.turn["role"] == "spymaster") {
+                        document.getElementById("redSm").style.color = "lightgreen";
+                        document.getElementById("redSm").classList.add("blink");
+                        if (choice != 2 && this.ai.redSm) generateClue();
+                    }
+                    else {
+                        document.getElementById("redSpy").style.color = "lightgreen";
+                        document.getElementById("redSpy").classList.add("blink");
+                        if (choice != 2 && this.ai.redSpy) generateGuess();
+                    }
+                }
+
+                //reset the timer
+                this.timer.reset();
+
+                //alert the player if their turn
+                if (this.isPlayersTurn()) {
+                    document.getElementById("room").style.display = "none";
+                    document.getElementById("turnAlert").style.display = "inline-block";
+                    document.getElementById("timerBar").style.backgroundColor = "red";
+                    if (choice == 0 && this.totalHintsLeft > 0)
+                        document.getElementById("hintButton").style.display = "inline-block";
+                }
+                break;
+
+            case "gameOver":
+                //display winning text
+                gameOverAudio();
+                document.querySelector(".clueBox").style.display = "none";
+                document.getElementById("timerBar").style.width = "0";
+                document.getElementById("timerBar").style.opacity = "1";
+                document.getElementById("gameOver").style.display = "block";
+                document.getElementById("winText").innerHTML = incoming.winTeam + " Wins!";
+                if (incoming.winTeam == "Blue Team") document.getElementById("winText").style.color = "#3399ff";
+                else document.getElementById("winText").style.color = "#ff5050";
+                if (choice == 2) document.getElementById("restart").style.display = "none";
+                if (choice == 1 && STRESS_TEST) server.sendToServer("restart", {"room": board.room});
+                break;
+
+            case "restartGame":
+                //host restart game
+                link = link.slice(0, -1) + numOfPeople;
+                window.location.replace(link);
+                window.location.reload();
+                break;
+
+            case "hostQuit":
+                //host quits room
+                if (choice == 2) {
+                    alert("Host user quits room!");
+                    quitRoom();
+                }
                 break;
 
             default:
