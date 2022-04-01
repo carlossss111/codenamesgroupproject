@@ -164,21 +164,19 @@
 
         <!-- Colourblind option-->
         <div class="setItem">
-            Colour Scheme
             <nav class = "optionPointer">
                 <ul class="navList"> 
                     <li><a onclick="Deuteranopiafunction()" href="#" class="navItem" >Deuteranopia</a></li>
                     <li><a onclick="Tritanopiafunction()" href="#" class="navItem" >Tritanopia</a></li>
                     <li><a onclick="Protanopiafunction()" href="#" class="navItem" >Protanopia</a></li>
                     <li><a onclick="normalColours()" href="#" class="navItem" >Normal</a></li>
-
                 </ul>
                 <span class="barIndicator"></span>
             </nav>
         </div>
-        <div class="setSubTit space-x-3">
-            <button onclick="saveState()" class='bg-sky-200 rounded-md p-2 mt-10 hover:text-gray-500'>save state</button>
-            <button onclick="reStart()" class='bg-sky-200 rounded-md p-2 mt-10 hover:text-gray-500'>resume</button>
+        <div class="space-x-10" style="text-align: center; margin-top: 20px; display: none;" id="localStorage">
+            <button onclick="saveState()" class='bg-sky-200 rounded-md p-1 mt-5 hover:text-gray-500' style="width: 9em;">Save game state</button>
+            <button onclick="reStart()" class='bg-sky-200 rounded-md p-1 mt-5 hover:text-gray-500' style="width: 9em;">Restore game</button>
         </div>
     </div>
     <!-- End of Settings -->

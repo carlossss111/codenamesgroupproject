@@ -74,7 +74,7 @@
 
 /* coloured cards */
 .neutral {
-    background-color: #d2b48c;
+    background-color: tan;
     border: sienna dashed 3px;
     border-radius: 10px;
 }
@@ -97,7 +97,7 @@
     border-radius: 10px;
 }
 
-.hintCluster {
+.hintCard {
     color: white;
     border: white dashed 3px;
 }
@@ -306,9 +306,10 @@
 
 .setSubTit {
     text-align: center;
-    font-size: 20px;
+    font-size: 1.5em;
     font-weight: bold;
     margin-top: 5vh;
+    margin-bottom: 1.5em;
 }
 
 /* individual settings */

@@ -199,13 +199,13 @@ function finishGame(winTeam) {
 function getHint() {
     //check if hint is valid
     var hintText = document.getElementById("hintText");
-    document.getElementById("hintButton").style.display = "none"
+    document.getElementById("hintButton").style.display = "none";
 
     let tempText = hintText.innerHTML;
     if (board.player.role == "spy") {
-        hintText.innerHTML = "Only one hint is correct!"
+        hintText.innerHTML = "Only one hint is correct!";
     } else {
-        hintText.innerHTML = "Clue can be made from these words!"
+        hintText.innerHTML = "Clue can be made from these words!";
     }
 
     //-1 to total hints
@@ -224,9 +224,18 @@ function getHint() {
 }
 
 function saveState() {
+    if (document.getElementById('startGame').style.display != 'none' || 
+        document.getElementById('welcome').style.display != 'none') {
+        alert('Please start game first!');
+        return;
+    }
+    if (!board.isPlayersTurn()) {
+        alert('Please save game in your turn!');
+        return;
+    }
     console.log('save state');
     board.saveToLocal();
-    alert('state saved!');
+    alert('State saved!');
 }
 
 function reStart() {
@@ -234,17 +243,18 @@ function reStart() {
     const data = JSON.parse(localStorage.getItem('state'));
     if (document.getElementById('startGame').style.display != 'none' || 
         document.getElementById('welcome').style.display != 'none') {
-        alert('start first!');
+        alert('Please start game first!');
         return;
     }
     if (data) {
         console.log(data);
+        board.update('receiveRoomInfo', data);
         board.update('reStartState', data);
         board.update('receiveBoardState', data);
-        board.update('forwardClue', data);
-        alert('restart saved state!');
+        board.update('changeTurn', data);
+        alert('State restored!');
     } else {
-        alert('no save state!');
+        alert('No saved state!');
     }
 }
 
@@ -510,15 +520,23 @@ class BoardState extends Observer {
         //send board to server
         console.log('save to local');
         const data = {
-          clue: this.clueWord,
-          numberOfGuesses: this.numOfGuesses,
-          redScore: this.redScore,
-          blueScore: this.blueScore,
-          player: this.player,
-          turn: this.turn,
-          cards: this.cards,
-          endTurn: false,
-          room: this.room,
+            nickname: nickname,
+            clue: this.clueWord,
+            numberOfGuesses: this.numOfGuesses,
+            totalHintsLeft: this.totalHintsLeft,
+            redScore: this.redScore,
+            blueScore: this.blueScore,
+            currentTurn: this.turn,
+            player: this.player,
+            turn: this.turn,
+            ai: this.ai,
+            cards: this.cards,
+            endTurn: false,
+            numOfPeople: 1,
+            blueSpy: document.getElementById("blueSpy").innerHTML,
+            blueSm: document.getElementById("blueSm").innerHTML,
+            redSpy: document.getElementById("redSpy").innerHTML,
+            redSm: document.getElementById("redSm").innerHTML,
         };
         console.log(data);
         localStorage.setItem('state', JSON.stringify(data));
@@ -748,6 +766,17 @@ class BoardState extends Observer {
                         this.cards[i][j].coverCard();
                     }
                 }
+                //player set up
+                nickname = incoming.nickname;
+                this.player = incoming.player;
+                this.turn = incoming.turn;
+                this.ai = incoming.ai;
+                this.totalHintsLeft = incoming.totalHintsLeft;
+
+                //text set up
+                document.getElementById("clue").value = incoming.clue;
+                document.getElementById("maxClues").value = incoming.numberOfGuesses;
+                document.getElementById("totalHints").innerHTML = incoming.totalHintsLeft;
                 break;
                 
             case "forwardClue":
@@ -755,12 +784,13 @@ class BoardState extends Observer {
                 this.clueWord = incoming.clue;
                 this.numOfGuesses = incoming.numberOfGuesses;
                 this.turn = incoming.turn;
-                if ( this.isPlayersTurn() || (choice != 2 && this.isAITurn()) )
-                    updateTurnState();
-
+                
                 //print the new clue on screen
                 document.getElementById("clue").value = incoming.clue;
                 document.getElementById("maxClues").value = incoming.numberOfGuesses;
+
+                if ( this.isPlayersTurn() || (choice != 2 && this.isAITurn()) )
+                    updateTurnState();
                 break;
 
             case "spyHint":
@@ -777,10 +807,6 @@ class BoardState extends Observer {
                     }
                     if (found) break;
                 }
-                //style the true hint
-                if (this.player.team == "red") hintCard.classList.add("redTeam");
-                else hintCard.classList.add("blueTeam");
-
                 //pick another valid random card
                 while (true) {
                     i = Math.floor(Math.random() * this.cards.length);
@@ -796,16 +822,14 @@ class BoardState extends Observer {
                     falseCard = falseCard.div;
                     break;
                 }
-                //style the random hint
-                if (this.player.team == "red") falseCard.classList.add("redTeam");
-                else falseCard.classList.add("blueTeam");
+                //style the hints
+                hintCard.classList.add("hintCard");
+                falseCard.classList.add("hintCard");
 
                 //remove hint after t milliseconds
                 setTimeout(function() {
-                    hintCard.classList.remove("redTeam");
-                    hintCard.classList.remove("blueTeam");
-                    falseCard.classList.remove("redTeam");
-                    falseCard.classList.remove("blueTeam");
+                    hintCard.classList.remove("hintCard");
+                    falseCard.classList.remove("hintCard");
                 }, 4000);
                 break;
             
@@ -816,9 +840,9 @@ class BoardState extends Observer {
                     for (j = 0; j < this.cards[i].length; j++) {
                         if (hintList.includes(this.cards[i][j].word)) {
                             let hintCard = this.cards[i][j].div;
-                            hintCard.classList.add("hintCluster");
+                            hintCard.classList.add("hintCard");
                             setTimeout(function() {
-                                hintCard.classList.remove("hintCluster");
+                                hintCard.classList.remove("hintCard");
                             }, 4000)
                         }
                     }
@@ -953,6 +977,7 @@ if (choice != 2) {
         document.querySelector(".sidebarContainer").style.display = "none";
         document.getElementById("people").style.display = "none";
         document.getElementById("numOfPeople").style.display = "none";
+        document.getElementById("localStorage").style.display = "block";
     }
 } else {
     var welcomeText = "Please wait for the host to start game";
@@ -995,17 +1020,14 @@ document.getElementById("restart").onclick = function() {server.sendToServer("re
 if (board.room.includes("STRESSTEST")) STRESS_TEST = true;
 if (choice == 1 && STRESS_TEST) boardInitialize(isBombCard);
 
-
 // Colour Scheme Settings functions
 const indicator = document.querySelector('.barIndicator');
 const items = document.querySelectorAll('.navItem');
 
 function handleIndicator(el) {
-  
   indicator.style.width = `${el.offsetWidth}px`;
   indicator.style.left = `${el.offsetLeft}px`;
   indicator.style.backgroundColor = "red";
-
 }
 
 items.forEach((item, index) => {
@@ -1040,7 +1062,6 @@ function Tritanopiafunction() {
     for(i = 0; i < cols.length; i++) {
       cols[i].style.backgroundColor = "#D7ACB9";
     }
-
 }
 
 function Protanopiafunction() {
@@ -1073,6 +1094,6 @@ function normalColours() {
 
     var cols = document.getElementsByClassName('neutral');
     for(i = 0; i < cols.length; i++) {
-      cols[i].style.backgroundColor = "#d2b48c";
+      cols[i].style.backgroundColor = "tan";
     }
 }
