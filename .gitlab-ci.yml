@@ -1,0 +1,13 @@
+stages:
+  - python_test
+  - javascript_test
+
+python_test:
+  stage: python_test
+  script:
+    - echo "Running test/python/runTests.sh..."
+    - cd ./test/python/
+    - ./runTests.sh
+  only:
+    - Integration
+    - main
