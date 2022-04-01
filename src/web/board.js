@@ -1014,13 +1014,65 @@ items.forEach((item, index) => {
 
 //Add all colour blind options 
 function Deuteranopiafunction() {
-    document.body.style.backgroundColor = "green";
+    var cols = document.getElementsByClassName('blueTeam');
+    for(i = 0; i < cols.length; i++) {
+      cols[i].style.backgroundColor = "#3399ff";
+    }
+
+    var cols = document.getElementsByClassName('redTeam');
+    for(i = 0; i < cols.length; i++) {
+      cols[i].style.backgroundColor = "#A27800";
+    }
+
+    var cols = document.getElementsByClassName('neutral');
+    for(i = 0; i < cols.length; i++) {
+      cols[i].style.backgroundColor = "#D9B08C";
+    }
 }
 
 function Tritanopiafunction() {
+    var cols = document.getElementsByClassName('blueTeam');
+    for(i = 0; i < cols.length; i++) {
+      cols[i].style.backgroundColor = "#00A5B1";
+    }
+
+    var cols = document.getElementsByClassName('neutral');
+    for(i = 0; i < cols.length; i++) {
+      cols[i].style.backgroundColor = "#D7ACB9";
+    }
 
 }
 
 function Protanopiafunction() {
+    var cols = document.getElementsByClassName('blueTeam');
+    for(i = 0; i < cols.length; i++) {
+      cols[i].style.backgroundColor = "#6792FA";
+    }
 
+    var cols = document.getElementsByClassName('redTeam');
+    for(i = 0; i < cols.length; i++) {
+      cols[i].style.backgroundColor = "#998E65";
+    }
+
+    var cols = document.getElementsByClassName('neutral');
+    for(i = 0; i < cols.length; i++) {
+      cols[i].style.backgroundColor = "#C4B78D";
+    }
+}
+
+function normalColours() {
+    var cols = document.getElementsByClassName('blueTeam');
+    for(i = 0; i < cols.length; i++) {
+      cols[i].style.backgroundColor = "#3399ff";
+    }
+
+    var cols = document.getElementsByClassName('redTeam');
+    for(i = 0; i < cols.length; i++) {
+      cols[i].style.backgroundColor = "#ff5050";
+    }
+
+    var cols = document.getElementsByClassName('neutral');
+    for(i = 0; i < cols.length; i++) {
+      cols[i].style.backgroundColor = "#d2b48c";
+    }
 }
