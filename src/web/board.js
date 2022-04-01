@@ -223,6 +223,31 @@ function getHint() {
     })
 }
 
+function saveState() {
+    console.log('save state');
+    board.saveToLocal();
+    alert('state saved!');
+}
+
+function reStart() {
+    console.log('find local data');
+    const data = JSON.parse(localStorage.getItem('state'));
+    if (document.getElementById('startGame').style.display != 'none' || 
+        document.getElementById('welcome').style.display != 'none') {
+        alert('start first!');
+        return;
+    }
+    if (data) {
+        console.log(data);
+        board.update('reStartState', data);
+        board.update('receiveBoardState', data);
+        board.update('forwardClue', data);
+        alert('restart saved state!');
+    } else {
+        alert('no save state!');
+    }
+}
+
 /*
  * Sets the timer maximum, runs it every second and handles
  * when the timer has ran out.
@@ -309,6 +334,19 @@ class Card {
 
         //add click listener to card
         this.div.addEventListener("click", this.cardListener.bind(this));
+    }
+
+    updateText() {
+        this.div.innerHTML = `<p>${this.word}</p>`;
+    }
+    
+    coverCard() {
+        //set attributes and remove text
+        this.isRevealed = false;
+        this.div.style.transform = 'rotateY(0deg)';
+        this.div.innerHTML = `<p>${this.word}</p>`;
+        this.div.setAttribute('class', 'card neutral');
+        this.div.style.backgroundImage = '';
     }
 
     /*
@@ -466,6 +504,24 @@ class BoardState extends Observer {
             return false;
 
         return true;
+    }
+
+    saveToLocal() {
+        //send board to server
+        console.log('save to local');
+        const data = {
+          clue: this.clueWord,
+          numberOfGuesses: this.numOfGuesses,
+          redScore: this.redScore,
+          blueScore: this.blueScore,
+          player: this.player,
+          turn: this.turn,
+          cards: this.cards,
+          endTurn: false,
+          room: this.room,
+        };
+        console.log(data);
+        localStorage.setItem('state', JSON.stringify(data));
     }
 
     /*
@@ -676,6 +732,24 @@ class BoardState extends Observer {
                     updateTurnState();
                 break;
 
+            case 'reStartState':
+                //card set up
+                var bid = document.getElementById('board');
+                var child = bid.lastElementChild;
+                while (child) {
+                    bid.removeChild(child);
+                    child = bid.lastElementChild;
+                }
+                for (let i = 0; i < this.cards.length; i++) {
+                    for (let j = 0; j < this.cards[0].length; j++) {
+                        let team = incoming.cards[i][j]['colour'];
+                        let word = incoming.cards[i][j]['word'];
+                        this.cards[i][j] = new Card(team, word);
+                        this.cards[i][j].coverCard();
+                    }
+                }
+                break;
+                
             case "forwardClue":
                 //assign new clue and turn to the client board object
                 this.clueWord = incoming.clue;
