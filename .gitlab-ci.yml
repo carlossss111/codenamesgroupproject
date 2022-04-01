@@ -7,7 +7,7 @@ python_test:
   script:
     - echo "Running test/python/runTests.sh..."
     - cd ./test/python/
-    - ./runTests.sh
+    - bash -x runTests.sh
   only:
     - Integration
     - main

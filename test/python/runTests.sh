@@ -24,5 +24,5 @@ if [ "$exitCode" -eq 1 ]; then
     echo $tests/$totalTests passed.
     exit 1
 fi
-echo Done, $tests/$totalTests passed.
+echo -e "***\nDone, \u001b[32m$tests/$totalTests passed.\u001b[0m\n***"
 exit 0
