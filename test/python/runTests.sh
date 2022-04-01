@@ -10,7 +10,7 @@ timeout 2 python3 test.py
 exitCode="$?"
 
 #stop python server
-procs=`ps -u | grep "../../app.py" | head -n 1`
+procs=`ps -aux | grep "../../app.py" | head -n 1`
 procArr=($procs)
 kill ${procArr[1]}
 
