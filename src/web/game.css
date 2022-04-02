@@ -362,6 +362,7 @@
 }
 
 .navItem {
+    cursor: pointer;
     text-decoration: none;
     z-index: 1;
     position: relative;

@@ -166,17 +166,17 @@
         <div class="setItem">
             <nav class = "optionPointer">
                 <ul class="navList"> 
-                    <li><a onclick="Deuteranopiafunction()" href="#" class="navItem" >Deuteranopia</a></li>
-                    <li><a onclick="Tritanopiafunction()" href="#" class="navItem" >Tritanopia</a></li>
-                    <li><a onclick="Protanopiafunction()" href="#" class="navItem" >Protanopia</a></li>
-                    <li><a onclick="normalColours()" href="#" class="navItem" >Normal</a></li>
+                    <li><a onclick="Deuteranopiafunction()" class="navItem" >Deuteranopia</a></li>
+                    <li><a onclick="Tritanopiafunction()" class="navItem" >Tritanopia</a></li>
+                    <li><a onclick="Protanopiafunction()" class="navItem" >Protanopia</a></li>
+                    <li><a onclick="normalColours()" class="navItem" >Normal</a></li>
                 </ul>
                 <span class="barIndicator"></span>
             </nav>
         </div>
         <div class="space-x-10" style="text-align: center; margin-top: 20px; display: none;" id="localStorage">
             <button onclick="saveState()" class='bg-sky-200 rounded-md p-1 mt-5 hover:text-gray-500' style="width: 9em;">Save game state</button>
-            <button onclick="reStart()" class='bg-sky-200 rounded-md p-1 mt-5 hover:text-gray-500' style="width: 9em;">Restore game</button>
+            <button onclick="restoreState()" class='bg-sky-200 rounded-md p-1 mt-5 hover:text-gray-500' style="width: 9em;">Restore game</button>
         </div>
     </div>
     <!-- End of Settings -->

@@ -224,7 +224,7 @@ function getHint() {
 }
 
 function saveState() {
-    if (document.getElementById('startGame').style.display != 'none' || 
+    if (document.getElementById('teamBox').style.display != 'none' || 
         document.getElementById('welcome').style.display != 'none') {
         alert('Please start game first!');
         return;
@@ -233,28 +233,45 @@ function saveState() {
         alert('Please save game in your turn!');
         return;
     }
+    console.log('find local data');
+    const data = JSON.parse(localStorage.getItem('state'));
+    if (data) {
+        let savedTime = data.time;
+        if (!confirm('Last save: ' + savedTime + '\nDo you want to save again?\nLast saved state will be lost.'))
+            return;
+    }
     console.log('save state');
     board.saveToLocal();
     alert('State saved!');
 }
 
-function reStart() {
+function restoreState() {
     console.log('find local data');
     const data = JSON.parse(localStorage.getItem('state'));
-    if (document.getElementById('startGame').style.display != 'none' || 
-        document.getElementById('welcome').style.display != 'none') {
-        alert('Please start game first!');
+    if (!board.isPlayersTurn()) {
+        alert('Please restore game in your turn or before game starts!');
         return;
     }
     if (data) {
+        let savedTime = data.time;
+        if (!confirm('Last save: ' + savedTime + '\nDo you want to restore?\nAll current state will be lost.'))
+            return;
         console.log(data);
         board.update('receiveRoomInfo', data);
-        board.update('reStartState', data);
+        board.update('restoreState', data);
         board.update('receiveBoardState', data);
         board.update('changeTurn', data);
-        alert('State restored!');
+        document.getElementById("setBox").style.display = "none";
     } else {
         alert('No saved state!');
+        return;
+    }
+    if (document.getElementById('teamBox').style.display != 'none' || 
+        document.getElementById('welcome').style.display != 'none') {
+        document.getElementById("welcome").style.display = "none";
+        document.getElementById("teamBox").style.display = "none";
+        document.querySelector(".clueBox").style.display = "block";
+        initGameBgAudio();
     }
 }
 
@@ -269,8 +286,7 @@ class Timer {
 
     //set the max time
     setMaxTime(mTime) {
-        if (mTime)
-            this.maxTime = mTime;
+        if (mTime) this.maxTime = mTime;
         else if (mTime != null)
             console.log("Warning: setMaxTime() has tried to use a falsy parameter (e.g undefined)");
     }
@@ -300,9 +316,7 @@ class Timer {
 
     //restart the timer
     reset = () => {
-        if(this.maxTime == null)
-            return;
-
+        if (this.maxTime == null) return;
         clearInterval(this.timerVar);
         this.timeLeft = this.maxTime;
         console.log(this);
@@ -355,7 +369,6 @@ class Card {
         this.isRevealed = false;
         this.div.style.transform = 'rotateY(0deg)';
         this.div.innerHTML = `<p>${this.word}</p>`;
-        this.div.setAttribute('class', 'card neutral');
         this.div.style.backgroundImage = '';
     }
 
@@ -396,10 +409,7 @@ class Card {
      */
     cardListener() {
         var board = BoardState.getInstance();
-
-        if (!board.validateClick(this))
-            return;
-
+        if (!board.validateClick(this)) return;
         board.sendBoardState(this);
     }
 }
@@ -520,7 +530,11 @@ class BoardState extends Observer {
         //send board to server
         console.log('save to local');
         const data = {
+            time: current.toLocaleString(),
             nickname: nickname,
+            vocabulary: vocabulary,
+            difficulty: difficulty,
+            timerLength: this.timer.maxTime,
             clue: this.clueWord,
             numberOfGuesses: this.numOfGuesses,
             totalHintsLeft: this.totalHintsLeft,
@@ -588,7 +602,7 @@ class BoardState extends Observer {
         let maxGuesses = document.getElementById("maxClues").value;
 
         //check that it is this player's turn and it is the spymaster's turn
-        if (!this.isPlayersTurn || this.turn.role != "spymaster")
+        if (!this.isPlayersTurn() || this.turn.role != "spymaster")
             return;
 
         /*
@@ -750,7 +764,7 @@ class BoardState extends Observer {
                     updateTurnState();
                 break;
 
-            case 'reStartState':
+            case 'restoreState':
                 //card set up
                 var bid = document.getElementById('board');
                 var child = bid.lastElementChild;
@@ -768,15 +782,26 @@ class BoardState extends Observer {
                 }
                 //player set up
                 nickname = incoming.nickname;
+                vocabulary = incoming.vocabulary;
+                difficulty = incoming.difficulty;
                 this.player = incoming.player;
                 this.turn = incoming.turn;
                 this.ai = incoming.ai;
                 this.totalHintsLeft = incoming.totalHintsLeft;
-
+                this.timer.maxTime = incoming.timerLength;
+                clearInterval(this.timer.timerVar);
+                if (this.timer.maxTime != null) document.getElementById("timerBar").style.display = "block";
+                else document.getElementById("timerBar").style.display = "none";
+                if (this.player.role == "spy") enableSpyMode();
+                else {
+                    document.getElementById("clueButton").style.display = "inline-block";
+                    document.getElementById("endTurn").style.display = "none";
+                }
                 //text set up
                 document.getElementById("clue").value = incoming.clue;
                 document.getElementById("maxClues").value = incoming.numberOfGuesses;
                 document.getElementById("totalHints").innerHTML = incoming.totalHintsLeft;
+                document.getElementById("room").innerHTML = "Difficulty: " + difficulty;
                 break;
                 
             case "forwardClue":
@@ -945,6 +970,7 @@ class BoardState extends Observer {
 }
 
 // Game starts here
+var current = new Date();
 var board = BoardState.getInstance();
 server.registerObserver(board);
 console.log(server.observers);
