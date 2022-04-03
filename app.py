@@ -6,6 +6,7 @@ from threading import Lock
 from src.game.generateBoard import *
 from src.game.predictor import *
 
+
 async_mode = None
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
@@ -15,9 +16,10 @@ thread_lock = Lock()
 room_path = "rsc/data/rooms"
 relevant_words_path = "rsc/data/relevant_words"
 relevant_vectors_path = "rsc/data/relevant_vectors"
-minimum_time_spy_think = 2
+minimum_time_spy_think = 1
 minimum_time_spy_pick_a_card = 1
-minimum_time_spymaster_think = 4
+minimum_time_spymaster_think = 2
+
 
 """
 Join a game room
@@ -198,7 +200,7 @@ def hint_broadcast(messageReceived):
                           relevant_vectors_path=relevant_vectors_path,
                           board=board,
                           turn=team)
-    clue, targets = spymaster.run()
+    _, targets = spymaster.run()
 
     if len(targets) == 0:
         protocol = "hintError"
