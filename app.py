@@ -34,7 +34,7 @@ def on_join(data):
 
     with open(room_path, "r+") as f:
         rooms = [line.rstrip() for line in f]
-        print(rooms)
+        print("Current rooms:", rooms)
         if room in rooms and choice != '2' and not isJoined:
             print("Room exist!")
             emit('roomError', "The room name is taken by others, please try again.")
