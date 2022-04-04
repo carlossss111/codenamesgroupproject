@@ -29,8 +29,9 @@ class Chatbox extends Observer {
             "team" : board.player.team,
             "role" : board.player.role
         });
+        var returnchatText = chatText
         document.getElementById("chatboxSend").reset();
-        return {chatText};
+        return {returnchatText};
     }
 
     /**
