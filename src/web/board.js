@@ -602,8 +602,10 @@ class BoardState extends Observer {
         let maxGuesses = document.getElementById("maxClues").value;
 
         //check that it is this player's turn and it is the spymaster's turn
-        if (!this.isPlayersTurn() || this.turn.role != "spymaster")
+        if (!this.isPlayersTurn() || this.turn.role != "spymaster"){
+            document.getElementById("clueForm").reset();
             return;
+        }
 
         /*
         * check that both
@@ -614,9 +616,11 @@ class BoardState extends Observer {
             for (let j = 0; j < this.cards[0].length; j++) {
                 if (clue.toLowerCase() == this.cards[i][j].word) {
                     alert("Clue cannot be the same as board words!");
+                    document.getElementById("clueForm").reset();
                     return;
                 } else if (!vocabulary.includes(clue.toLowerCase()) && this.isAISpy()) {
                     alert("Word not recognized by AI spy. Please try again.");
+                    document.getElementById("clueForm").reset();
                     return;
                 }
             }
@@ -632,6 +636,7 @@ class BoardState extends Observer {
             "turn" : this.turn,
             "room" : this.room
         })
+
     }
 
     /*
