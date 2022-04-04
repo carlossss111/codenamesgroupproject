@@ -4,7 +4,7 @@
  * Receives chat messages from the python server using the Observer
  * pattern. Messages are displayed below.
  */
-class Chatbox extends Observer{
+class Chatbox extends Observer {
 
     /**
     * Adds an event listener to the HTML node with id="chatboxSend" 
@@ -26,8 +26,11 @@ class Chatbox extends Observer{
             "Protocol" : "chat", 
             "message" : message,
             "room" : board.room,
-            "team" : board.player.team
+            "team" : board.player.team,
+            "role" : board.player.role
         });
+        document.getElementById("chatboxSend").reset();
+        return {chatText};
     }
 
     /**
@@ -49,8 +52,17 @@ class Chatbox extends Observer{
         notiVal += 1;
         document.getElementById('noti').innerHTML = notiVal;
         
-        newMessage.innerHTML = args['message'];
+        var role = args['role'];
+        //When game starts, spymasters can see all messages, while spies cannot see spymaster messages.
+        if (role == "spy" || role == board.player.role || board.turn.team == null)
+            newMessage.innerHTML = args['message'];
+        else {
+            newMessage.innerHTML = "<-- Encrypted Spymaster Message -->";
+            newMessage.style.opacity = "0.5";
+        }
         chatboxReceive.appendChild(newMessage);
+
+        return{eventName,args};
     }
 }
 

@@ -5,38 +5,35 @@ WIN_SCORE = "../rsc/audio/win.mp3";
 LOSE_SCORE = "../rsc/audio/lose.wav";
 
 var audioPlayerInstance = null;
-var bgAudioCtx;
 var effectAudioVolume = 1;
+var bgAudioCtx = new Audio(GAME_BG_AUDIO);
+var flipAudioCtx = new Audio(GAME_FLIP_AUDIO);
+var gmAudioCtx = new Audio(GAME_OVER);
+var winAudioCtx = new Audio(WIN_SCORE);
+var loseAudioCtx = new Audio(LOSE_SCORE);
 
 function initGameBgAudio() {
-    bgAudioCtx = new Audio(GAME_BG_AUDIO);
     // loop play
-    bgAudioCtx.onended = function () {
-        bgAudioCtx.play();
-    }
+    bgAudioCtx.onended = function () {bgAudioCtx.play();}
     bgAudioCtx.play();
 }
 
 function playFlipAudio() {
-    var flipAudioCtx = new Audio(GAME_FLIP_AUDIO);
     flipAudioCtx.volume = effectAudioVolume;
     flipAudioCtx.play();
 }
 
 function gameOverAudio() {
-    var gmAudioCtx = new Audio(GAME_OVER);
     gmAudioCtx.volume = effectAudioVolume;
     gmAudioCtx.play();
 }
 
 function addScoreAudio() {
-    var winAudioCtx = new Audio(WIN_SCORE);
     winAudioCtx.volume = effectAudioVolume;
     winAudioCtx.play();
 }
 
 function loseScoreAudio() {
-    var loseAudioCtx = new Audio(LOSE_SCORE);
     loseAudioCtx.volume = effectAudioVolume;
     loseAudioCtx.play();
 }

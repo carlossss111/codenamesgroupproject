@@ -4,29 +4,30 @@ NEUTRAL_IMAGE = "url('../rsc/images/neutral.jpg')";
 BOMB_IMAGE = "url('../rsc/images/bomb.jpg')";
 
 DEBUG_SKIP_VALIDATION = false;
+STRESS_TEST = false;
 
 //Move sidebar and board left and right
 function moveSidebar() {
-    var width = window.innerWidth;
     var container = document.querySelector(".sidebarContainer");
     var arrow = document.querySelector(".arrow");
     var noti = document.querySelector(".notificationIcon");
 
     if (isSidebarOpen) {
         notiVal = 0;
+        document.getElementById('sidebarMenu').style.opacity = "0";
         document.getElementById('noti').innerHTML = notiVal;
         document.getElementById("board").style.transform = "translateX(15%)";
         arrow.style.transform = "rotate(135deg)";
         noti.style.display = "block";
-        if (width <= 600) container.style.right = "-90%";
-        else container.style.right = "-20%";
+        container.style.width = "0";
         isSidebarOpen = false;
     }
     else {
+        document.getElementById('sidebarMenu').style.opacity = "1";
         document.getElementById("board").style.transform = "translateX(0)";
         arrow.style.transform = "rotate(-45deg)";
         noti.style.display = "none"; 
-        container.style.right = "0";
+        container.style.width = "20em";
         isSidebarOpen = true;
     }
 }
@@ -37,11 +38,13 @@ function welcomeConfirm() {
     initGameBgAudio();
 }
 
-function joinRoom() {
+function joinRoom(isJoined) {
     server.sendToServer("joinRoom", {
         "Protocol" : "joinRoom",
         "room" : board.room,
-        "name" : nickname
+        "name" : nickname,
+        "choice" : choice,
+        "isJoined" : isJoined
     })
 }
 
@@ -51,8 +54,10 @@ function quitRoom() {
         "room" : board.room,
         "name" : nickname,
         "team" : board.player.team,
-        "choice" : choice
+        "choice" : choice,
+        "numOfPeople" : numOfPeople
     })
+    alert("You have quit room " + board.room);
     window.location.href = "../index.html";
 }
 
@@ -111,18 +116,19 @@ function chooseRole(newRole) {
         "blueSm" : document.getElementById("blueSm").innerHTML,
         "redSpy" : document.getElementById("redSpy").innerHTML,
         "redSm" : document.getElementById("redSm").innerHTML,
+        "numOfPeople" : numOfPeople,
         "room" : board.room
     })
 }
 
-// When new client join the room, sync role choice
-function syncNewClient(type) {
-    server.sendToServer("syncRole", {
-        "type" : type,
+// When new client join the room, sync role choice and number of people
+function syncRoomInfo() {
+    server.sendToServer("syncRoomInfo", {
         "blueSpy" : document.getElementById("blueSpy").innerHTML,
         "blueSm" : document.getElementById("blueSm").innerHTML,
         "redSpy" : document.getElementById("redSpy").innerHTML,
         "redSm" : document.getElementById("redSm").innerHTML,
+        "numOfPeople" : numOfPeople,
         "room" : board.room
     })
 }
@@ -142,8 +148,27 @@ function enableSpyMode() {
         }
     }
     document.getElementById("clueButton").style.display = "none";
+    document.getElementById("endTurn").style.display = "inline-block";
     document.getElementById("clue").placeholder = "";
     document.getElementById("clue").readOnly = true;
+}
+
+function endSpyTurn() {
+    if (!board.isPlayersTurn()) return;
+    
+    server.sendToServer("sendBoardState", {
+        "Protocol" : "sendBoardState",
+        "clue" : board.clueWord,
+        "numberOfGuesses" : board.numOfGuesses,
+        "redScore" : board.redScore,
+        "blueScore" : board.blueScore,
+        "player" : board.player,
+        "turn" : board.turn,
+        "cardChosen" : null,
+        "cards" : board.cards,
+        "endTurn" : true,
+        "room" : board.room
+    });
 }
 
 function getAIConfig() {
@@ -170,6 +195,86 @@ function finishGame(winTeam) {
     })
 }
 
+//Gives up to 3 hints, 1 per turn.
+function getHint() {
+    //check if hint is valid
+    var hintText = document.getElementById("hintText");
+    document.getElementById("hintButton").style.display = "none";
+
+    let tempText = hintText.innerHTML;
+    if (board.player.role == "spy") {
+        hintText.innerHTML = "Only one hint is correct!";
+    } else {
+        hintText.innerHTML = "Clue can be made from these words!";
+    }
+
+    //-1 to total hints
+    board.totalHintsLeft--;
+
+    setTimeout(function() {
+        hintText.innerHTML = tempText;
+        document.getElementById("totalHints").innerHTML = board.totalHintsLeft;
+    }, 4000);
+
+    //send for a hint
+    server.sendToServer("hint", {
+        "Protocol" : "hint",
+        "board" : board
+    })
+}
+
+function saveState() {
+    if (document.getElementById('teamBox').style.display != 'none' || 
+        document.getElementById('welcome').style.display != 'none') {
+        alert('Please start game first!');
+        return;
+    }
+    if (!board.isPlayersTurn()) {
+        alert('Please save game in your turn!');
+        return;
+    }
+    console.log('find local data');
+    const data = JSON.parse(localStorage.getItem('state'));
+    if (data) {
+        let savedTime = data.time;
+        if (!confirm('Last save: ' + savedTime + '\nDo you want to save again?\nLast saved state will be lost.'))
+            return;
+    }
+    console.log('save state');
+    board.saveToLocal();
+    alert('State saved!');
+}
+
+function restoreState() {
+    console.log('find local data');
+    const data = JSON.parse(localStorage.getItem('state'));
+    if (!board.isPlayersTurn()) {
+        alert('Please restore game in your turn or before game starts!');
+        return;
+    }
+    if (data) {
+        let savedTime = data.time;
+        if (!confirm('Last save: ' + savedTime + '\nDo you want to restore?\nAll current state will be lost.'))
+            return;
+        console.log(data);
+        board.update('receiveRoomInfo', data);
+        board.update('restoreState', data);
+        board.update('receiveBoardState', data);
+        board.update('changeTurn', data);
+        document.getElementById("setBox").style.display = "none";
+    } else {
+        alert('No saved state!');
+        return;
+    }
+    if (document.getElementById('teamBox').style.display != 'none' || 
+        document.getElementById('welcome').style.display != 'none') {
+        document.getElementById("welcome").style.display = "none";
+        document.getElementById("teamBox").style.display = "none";
+        document.querySelector(".clueBox").style.display = "block";
+        initGameBgAudio();
+    }
+}
+
 /*
  * Sets the timer maximum, runs it every second and handles
  * when the timer has ran out.
@@ -181,8 +286,7 @@ class Timer {
 
     //set the max time
     setMaxTime(mTime) {
-        if (mTime)
-            this.maxTime = mTime;
+        if (mTime) this.maxTime = mTime;
         else if (mTime != null)
             console.log("Warning: setMaxTime() has tried to use a falsy parameter (e.g undefined)");
     }
@@ -212,9 +316,7 @@ class Timer {
 
     //restart the timer
     reset = () => {
-        if(this.maxTime == null)
-            return;
-
+        if (this.maxTime == null) return;
         clearInterval(this.timerVar);
         this.timeLeft = this.maxTime;
         console.log(this);
@@ -258,6 +360,18 @@ class Card {
         this.div.addEventListener("click", this.cardListener.bind(this));
     }
 
+    updateText() {
+        this.div.innerHTML = `<p>${this.word}</p>`;
+    }
+    
+    coverCard() {
+        //set attributes and remove text
+        this.isRevealed = false;
+        this.div.style.transform = 'rotateY(0deg)';
+        this.div.innerHTML = `<p>${this.word}</p>`;
+        this.div.style.backgroundImage = '';
+    }
+
     /*
      * Reveals the card on the board by changing the image and setting isRevealed to true. 
      * This should be called whenever an updated boardstate is received from the server.
@@ -285,7 +399,6 @@ class Card {
                 default:
                     this.div.style.backgroundImage = NEUTRAL_IMAGE;
             }
-
             this.div.style.backgroundSize = "cover";
         }, 200)
     }
@@ -296,10 +409,7 @@ class Card {
      */
     cardListener() {
         var board = BoardState.getInstance();
-
-        if (!board.validateClick(this))
-            return;
-
+        if (!board.validateClick(this)) return;
         board.sendBoardState(this);
     }
 }
@@ -318,6 +428,7 @@ class BoardState extends Observer {
     redScore;
     blueScore;
     timer;
+    totalHintsLeft;
     ai = {
         "blueSm" : true,
         "blueSpy" : true,
@@ -358,10 +469,12 @@ class BoardState extends Observer {
         this.numOfGuesses = null;
         this.redScore = 0;
         this.blueScore = 0;
+        this.totalHintsLeft = 3;
         this.cards = new Array(5);
         for (var i = 0; i < this.cards.length; i++) {
             this.cards[i] = new Array(5);
         }
+        document.getElementById("totalHints").innerHTML = this.totalHintsLeft;
     }
 
     /*
@@ -413,6 +526,36 @@ class BoardState extends Observer {
         return true;
     }
 
+    saveToLocal() {
+        //send board to server
+        console.log('save to local');
+        const data = {
+            time: current.toLocaleString(),
+            nickname: nickname,
+            vocabulary: vocabulary,
+            difficulty: difficulty,
+            timerLength: this.timer.maxTime,
+            clue: this.clueWord,
+            numberOfGuesses: this.numOfGuesses,
+            totalHintsLeft: this.totalHintsLeft,
+            redScore: this.redScore,
+            blueScore: this.blueScore,
+            currentTurn: this.turn,
+            player: this.player,
+            turn: this.turn,
+            ai: this.ai,
+            cards: this.cards,
+            endTurn: false,
+            numOfPeople: 1,
+            blueSpy: document.getElementById("blueSpy").innerHTML,
+            blueSm: document.getElementById("blueSm").innerHTML,
+            redSpy: document.getElementById("redSpy").innerHTML,
+            redSm: document.getElementById("redSm").innerHTML,
+        };
+        console.log(data);
+        localStorage.setItem('state', JSON.stringify(data));
+    }
+
     /*
      * Sends the new boardstate and the card chosen to the server.
      * The server should then reply starting from the update() function.
@@ -436,8 +579,7 @@ class BoardState extends Observer {
             throw new Error("The card selected cannot not been found in the card array");
 
         //send board to server
-        server.sendToServer("sendBoardState",
-        {
+        server.sendToServer("sendBoardState", {
             "Protocol" : "sendBoardState",
             "clue" : this.clueWord,
             "numberOfGuesses" : this.numOfGuesses,
@@ -447,6 +589,7 @@ class BoardState extends Observer {
             "turn" : this.turn,
             "cardChosen" : `${i},${j}`,
             "cards" : this.cards,
+            "endTurn" : false,
             "room" : this.room
         });
     }
@@ -459,7 +602,7 @@ class BoardState extends Observer {
         let maxGuesses = document.getElementById("maxClues").value;
 
         //check that it is this player's turn and it is the spymaster's turn
-        if (!this.isPlayersTurn || this.turn.role != "spymaster")
+        if (!this.isPlayersTurn() || this.turn.role != "spymaster")
             return;
 
         /*
@@ -497,6 +640,79 @@ class BoardState extends Observer {
      */
     update(eventName, incoming) {
         switch (eventName) {
+            case "receiveRoomInfo":
+                //update number of people and player-name next to their role
+                numOfPeople = incoming.numOfPeople;
+                document.getElementById("numOfPeople").innerHTML = numOfPeople;
+                document.getElementById("blueSpy").innerHTML = incoming.blueSpy;
+                document.getElementById("blueSm").innerHTML = incoming.blueSm;
+                document.getElementById("redSpy").innerHTML = incoming.redSpy;
+                document.getElementById("redSm").innerHTML = incoming.redSm;
+                break;
+
+            case "syncRequest":
+                //sync a new client to the room
+                if (choice != 2) {
+                    numOfPeople += 1;
+                    syncRoomInfo();
+                }
+                break;
+
+            case "syncPeople":
+                //sync number of people in the room
+                numOfPeople = incoming;
+                document.getElementById("numOfPeople").innerHTML = numOfPeople;
+                break;
+
+            case "sendRoomInfo":
+                //resend the room info
+                if (incoming.name == nickname)
+                    server.sendToServer("chat", {
+                        Protocol : "chat", 
+                        message : `${incoming.message}`,
+                        room : this.room,
+                        team : this.player.team,
+                        role : this.player.role
+                    });
+                break;
+
+            case "roomError":
+                //hosting a room that id exists or joining a room that doesn't exist
+                alert(incoming);
+                window.location.href = "../index.html";
+                break;
+
+            case "sendInitialBoardState":
+                let receivedBoard = incoming.board;
+                vocabulary = incoming.vocabulary;
+                this.timer.setMaxTime(incoming.timerLength);
+
+                //show timer
+                if (this.timer.maxTime != null) {
+                    document.getElementById("timerBar").style.display = "block";
+                }
+
+                //card set up
+                for (let i = 0; i < this.cards.length; i++) {
+                    for (let j = 0; j < this.cards[0].length; j++){
+                        let team = receivedBoard[i*this.cards.length+j]["type"];
+                        let word = receivedBoard[i*this.cards.length+j]["name"];
+                        this.cards[i][j] = new Card(team, word);
+                    }
+                }
+
+                //AI configuration
+                getAIConfig();
+                console.log(this.ai);
+
+                //configure roles and start game
+                if (this.player.role == "spy") enableSpyMode();
+                document.getElementById("welcome").style.display = "none";
+                document.getElementById("teamBox").style.display = "none";
+                document.querySelector(".clueBox").style.display = "block";
+                if (choice != 2) startGame();
+                break;
+
             case "receiveBoardState":
                 //assign new board attributes
                 this.clueWord = incoming.clue;
@@ -544,75 +760,137 @@ class BoardState extends Observer {
 
                 //continue game
                 this.turn = incoming.turn;
-                if ((incoming.turnOver && this.isPlayersTurn()) || (choice != 2 && this.isAITurn()) )
+                if ( incoming.turnOver && (this.isPlayersTurn() || (choice != 2 && this.isAITurn())) )
                     updateTurnState();
                 break;
 
+            case 'restoreState':
+                //card set up
+                var bid = document.getElementById('board');
+                var child = bid.lastElementChild;
+                while (child) {
+                    bid.removeChild(child);
+                    child = bid.lastElementChild;
+                }
+                for (let i = 0; i < this.cards.length; i++) {
+                    for (let j = 0; j < this.cards[0].length; j++) {
+                        let team = incoming.cards[i][j]['colour'];
+                        let word = incoming.cards[i][j]['word'];
+                        this.cards[i][j] = new Card(team, word);
+                        this.cards[i][j].coverCard();
+                    }
+                }
+                //player set up
+                nickname = incoming.nickname;
+                vocabulary = incoming.vocabulary;
+                difficulty = incoming.difficulty;
+                this.player = incoming.player;
+                this.turn = incoming.turn;
+                this.ai = incoming.ai;
+                this.totalHintsLeft = incoming.totalHintsLeft;
+                this.timer.maxTime = incoming.timerLength;
+                clearInterval(this.timer.timerVar);
+                if (this.timer.maxTime != null) document.getElementById("timerBar").style.display = "block";
+                else document.getElementById("timerBar").style.display = "none";
+                if (this.player.role == "spy") enableSpyMode();
+                else {
+                    document.getElementById("clueButton").style.display = "inline-block";
+                    document.getElementById("endTurn").style.display = "none";
+                }
+                //text set up
+                document.getElementById("clue").value = incoming.clue;
+                document.getElementById("maxClues").value = incoming.numberOfGuesses;
+                document.getElementById("totalHints").innerHTML = incoming.totalHintsLeft;
+                document.getElementById("room").innerHTML = "Difficulty: " + difficulty;
+                break;
+                
             case "forwardClue":
                 //assign new clue and turn to the client board object
                 this.clueWord = incoming.clue;
                 this.numOfGuesses = incoming.numberOfGuesses;
                 this.turn = incoming.turn;
-                if ( this.isPlayersTurn() || (choice != 2 && this.isAITurn()) )
-                    updateTurnState();
-
+                
                 //print the new clue on screen
                 document.getElementById("clue").value = incoming.clue;
                 document.getElementById("maxClues").value = incoming.numberOfGuesses;
+
+                if ( this.isPlayersTurn() || (choice != 2 && this.isAITurn()) )
+                    updateTurnState();
                 break;
 
-            case "sendInitialBoardState":
-                let receivedBoard = incoming.board;
-                vocabulary = incoming.vocabulary;
-                this.timer.setMaxTime(incoming.timerLength);
-
-                //show timer
-                if (this.timer.maxTime != null) {
-                    document.getElementById("timerBar").style.display = "block";
+            case "spyHint":
+                //find card matching hint
+                var found = false;
+                var hintCard, falseCard, i, j;
+                for (i = 0; i < this.cards.length; i++) {
+                    for (j = 0; j < this.cards[i].length; j++) {
+                        if (this.cards[i][j].word == incoming.hint) {
+                            hintCard = this.cards[i][j].div;
+                            found = true; 
+                            break;
+                        }
+                    }
+                    if (found) break;
                 }
+                //pick another valid random card
+                while (true) {
+                    i = Math.floor(Math.random() * this.cards.length);
+                    j = Math.floor(Math.random() * this.cards[i].length);
+                    falseCard = this.cards[i][j];
+                    
+                    //check the fake hint is valid
+                    if (falseCard.isRevealed == true
+                     || falseCard.div.childNodes[0].getAttribute("class") == "hint"
+                     || falseCard.colour == (this.turn.team + "Team"))
+                        continue; //retry another card
+                    
+                    falseCard = falseCard.div;
+                    break;
+                }
+                //style the hints
+                hintCard.classList.add("hintCard");
+                falseCard.classList.add("hintCard");
 
-                //card set up
-                for (let i = 0; i < this.cards.length; i++) {
-                    for (let j = 0; j < this.cards[0].length; j++){
-                        let team = receivedBoard[i*this.cards.length+j]["type"];
-                        let word = receivedBoard[i*this.cards.length+j]["name"];
-                        this.cards[i][j] = new Card(team, word);
+                //remove hint after t milliseconds
+                setTimeout(function() {
+                    hintCard.classList.remove("hintCard");
+                    falseCard.classList.remove("hintCard");
+                }, 4000);
+                break;
+            
+            case "spymasterHint":
+                //show clustered words on the board
+                var hintList = incoming.hint;
+                for (i = 0; i < this.cards.length; i++) {
+                    for (j = 0; j < this.cards[i].length; j++) {
+                        if (hintList.includes(this.cards[i][j].word)) {
+                            let hintCard = this.cards[i][j].div;
+                            hintCard.classList.add("hintCard");
+                            setTimeout(function() {
+                                hintCard.classList.remove("hintCard");
+                            }, 4000)
+                        }
                     }
                 }
-
-                //AI configuration
-                getAIConfig();
-                console.log(this.ai);
-
-                //configure roles and start game
-                if (this.player.role == "spy") enableSpyMode();
-                document.getElementById("welcome").style.display = "none";
-                document.getElementById("teamBox").style.display = "none";
-                document.querySelector(".clueBox").style.display = "block";
-                if (choice != 2) startGame();
                 break;
 
-            case "receiveRole":
-                //displays the player-name next to their role
-                document.getElementById("blueSpy").innerHTML = incoming.blueSpy;
-                document.getElementById("blueSm").innerHTML = incoming.blueSm;
-                document.getElementById("redSpy").innerHTML = incoming.redSpy;
-                document.getElementById("redSm").innerHTML = incoming.redSm;
-                break;
-
-            case "syncRequest":
-                //sync a new client to the room
-                if (choice != 2) syncNewClient('sync');
+            case "hintError":
+                alert(incoming);
                 break;
 
             case "changeTurn":
                 //styling
                 document.getElementById("turnAlert").style.display = "none";
-                document.getElementById("room").style.display = "block";
+                document.getElementById("hintButton").style.display = "none";
+                document.getElementById("room").style.display = "inline-block";
                 document.getElementById("blueSpy").style.color = "black";
                 document.getElementById("blueSm").style.color = "black";
                 document.getElementById("redSpy").style.color = "black";
                 document.getElementById("redSm").style.color = "black";
+                document.getElementById("blueSpy").classList.remove("blink");
+                document.getElementById("blueSm").classList.remove("blink");
+                document.getElementById("redSpy").classList.remove("blink");
+                document.getElementById("redSm").classList.remove("blink");
                 document.getElementById("timerBar").style.backgroundColor = "green";
                 
                 //change the turn and handle AI
@@ -620,21 +898,25 @@ class BoardState extends Observer {
                 console.log(this.turn);
                 if (this.turn["team"] == "blue") {
                     if (this.turn["role"] == "spymaster") {
-                        document.getElementById("blueSm").style.color = "lightgreen";;
+                        document.getElementById("blueSm").style.color = "lightgreen";
+                        document.getElementById("blueSm").classList.add("blink");
                         if (choice != 2 && this.ai.blueSm) generateClue();
                     }
                     else {
-                        document.getElementById("blueSpy").style.color = "lightgreen";;
+                        document.getElementById("blueSpy").style.color = "lightgreen";
+                        document.getElementById("blueSpy").classList.add("blink");
                         if (choice != 2 && this.ai.blueSpy) generateGuess();
                     }
                 } 
                 else if (this.turn["team"] == "red"){
                     if (this.turn["role"] == "spymaster") {
-                        document.getElementById("redSm").style.color = "lightgreen";;
+                        document.getElementById("redSm").style.color = "lightgreen";
+                        document.getElementById("redSm").classList.add("blink");
                         if (choice != 2 && this.ai.redSm) generateClue();
                     }
                     else {
-                        document.getElementById("redSpy").style.color = "lightgreen";;
+                        document.getElementById("redSpy").style.color = "lightgreen";
+                        document.getElementById("redSpy").classList.add("blink");
                         if (choice != 2 && this.ai.redSpy) generateGuess();
                     }
                 }
@@ -645,20 +927,11 @@ class BoardState extends Observer {
                 //alert the player if their turn
                 if (this.isPlayersTurn()) {
                     document.getElementById("room").style.display = "none";
-                    document.getElementById("turnAlert").style.display = "block";
+                    document.getElementById("turnAlert").style.display = "inline-block";
                     document.getElementById("timerBar").style.backgroundColor = "red";
+                    if (choice == 0 && this.totalHintsLeft > 0)
+                        document.getElementById("hintButton").style.display = "inline-block";
                 }
-                break;
-
-            case "sendRoomInfo":
-                //resend the room info
-                if (incoming.name == nickname)
-                    server.sendToServer("chat", {
-                        Protocol : "chat", 
-                        message : `${incoming.message}`,
-                        room : this.room,
-                        team : this.player.team
-                    });
                 break;
 
             case "gameOver":
@@ -671,11 +944,13 @@ class BoardState extends Observer {
                 document.getElementById("winText").innerHTML = incoming.winTeam + " Wins!";
                 if (incoming.winTeam == "Blue Team") document.getElementById("winText").style.color = "#3399ff";
                 else document.getElementById("winText").style.color = "#ff5050";
-                if (choice == 2) document.getElementById("restart").style.display = "none"
+                if (choice == 2) document.getElementById("restart").style.display = "none";
+                if (choice == 1 && STRESS_TEST) server.sendToServer("restart", {"room": board.room});
                 break;
 
             case "restartGame":
                 //host restart game
+                link = link.slice(0, -1) + numOfPeople;
                 window.location.replace(link);
                 window.location.reload();
                 break;
@@ -684,7 +959,7 @@ class BoardState extends Observer {
                 //host quits room
                 if (choice == 2) {
                     alert("Host user quits room!");
-                    window.location.href = "../index.html";
+                    quitRoom();
                 }
                 break;
 
@@ -695,6 +970,7 @@ class BoardState extends Observer {
 }
 
 // Game starts here
+var current = new Date();
 var board = BoardState.getInstance();
 server.registerObserver(board);
 console.log(server.observers);
@@ -709,12 +985,14 @@ var vocabulary;
 var tmpName = "";
 var role = "";
 var notiVal = 0;
+var numOfPeople = 1;
 var isSidebarOpen = false;
 
 if (choice != 2) {
     var isBombCard = link.substring(link.indexOf('$')+1, link.indexOf('&'));
     let timer = link.substring(link.indexOf('&')+1, link.indexOf('*'));
-    var difficulty = link.substring(link.indexOf('*')+1);
+    var difficulty = link.substring(link.indexOf('*')+1, link.indexOf('^'));
+    console.log(difficulty);
     if (isBombCard == 'y') isBombCard = true;
     else isBombCard = false;
     if (timer != 'n') board.timer.setMaxTime(timer);
@@ -723,19 +1001,34 @@ if (choice != 2) {
         welcomeText = "Please choose your team and role";
         document.getElementById("room").innerHTML = "Difficulty: " + difficulty;
         document.querySelector(".sidebarContainer").style.display = "none";
+        document.getElementById("people").style.display = "none";
+        document.getElementById("numOfPeople").style.display = "none";
+        document.getElementById("localStorage").style.display = "block";
     }
 } else {
     var welcomeText = "Please wait for the host to start game";
     document.getElementById("startGame").style.display = "none";
-    syncNewClient('request');
+}
+if (choice != 0) {
+    document.getElementById("hintText").style.display = "none";
+    document.getElementById("hintButton").style.display = "none";
+}
+if (link.charAt(link.length-2) == '|') {
+    joinRoom(true);
+    numOfPeople = parseInt(link.charAt(link.length-1), 10);
+    document.getElementById("numOfPeople").innerHTML = numOfPeople;
+} else {
+    joinRoom(false);
+    link = link + '|' + numOfPeople;
+    window.location.replace(link);
 }
 
-document.getElementById("welcomeText1").innerHTML = "Welcome to Codenames, " + nickname;
-document.getElementById("welcomeText2").innerHTML = welcomeText;
+document.getElementById("welcomeName").innerHTML = nickname;
+document.getElementById("welcomeText").innerHTML = welcomeText;
 document.getElementById("teamBox").style.display = "none";
 document.getElementById("turnAlert").style.display = "none";
+document.getElementById("endTurn").style.display = "none";
 document.querySelector(".clueBox").style.display = "none";
-joinRoom()
 
 document.getElementById("joinBlueSpy").onclick = function() {chooseRole("blueSpy");};
 document.getElementById("joinBlueSm").onclick = function() {chooseRole("blueSm");};
@@ -744,5 +1037,89 @@ document.getElementById("joinRedSm").onclick = function() {chooseRole("redSm");}
 document.getElementById("startGame").onclick = function() {boardInitialize(isBombCard);};
 document.getElementById("openSidebarMenu").onclick = function() {moveSidebar();};
 document.getElementById("welcomeConfirm").onclick = function() {welcomeConfirm();};
+document.getElementById("clueButton").onclick = function() {board.forwardClue();};
+document.getElementById("endTurn").onclick = function() {endSpyTurn();};
+document.getElementById("hintButton").onclick = function() {getHint();};
 document.getElementById("quitRoom").onclick = function() {quitRoom();};
 document.getElementById("restart").onclick = function() {server.sendToServer("restart", {"room": board.room});};
+
+if (board.room.includes("STRESSTEST")) STRESS_TEST = true;
+if (choice == 1 && STRESS_TEST) boardInitialize(isBombCard);
+
+// Colour Scheme Settings functions
+const indicator = document.querySelector('.barIndicator');
+const items = document.querySelectorAll('.navItem');
+
+function handleIndicator(el) {
+  indicator.style.width = `${el.offsetWidth}px`;
+  indicator.style.left = `${el.offsetLeft}px`;
+  indicator.style.backgroundColor = "red";
+}
+
+items.forEach((item, index) => {
+  item.addEventListener('click', (e) => { handleIndicator(e.target)});
+});
+
+//Add all colour blind options 
+function Deuteranopiafunction() {
+    var cols = document.getElementsByClassName('blueTeam');
+    for(i = 0; i < cols.length; i++) {
+      cols[i].style.backgroundColor = "#3399ff";
+    }
+
+    var cols = document.getElementsByClassName('redTeam');
+    for(i = 0; i < cols.length; i++) {
+      cols[i].style.backgroundColor = "#A27800";
+    }
+
+    var cols = document.getElementsByClassName('neutral');
+    for(i = 0; i < cols.length; i++) {
+      cols[i].style.backgroundColor = "#D9B08C";
+    }
+}
+
+function Tritanopiafunction() {
+    var cols = document.getElementsByClassName('blueTeam');
+    for(i = 0; i < cols.length; i++) {
+      cols[i].style.backgroundColor = "#00A5B1";
+    }
+
+    var cols = document.getElementsByClassName('neutral');
+    for(i = 0; i < cols.length; i++) {
+      cols[i].style.backgroundColor = "#D7ACB9";
+    }
+}
+
+function Protanopiafunction() {
+    var cols = document.getElementsByClassName('blueTeam');
+    for(i = 0; i < cols.length; i++) {
+      cols[i].style.backgroundColor = "#6792FA";
+    }
+
+    var cols = document.getElementsByClassName('redTeam');
+    for(i = 0; i < cols.length; i++) {
+      cols[i].style.backgroundColor = "#998E65";
+    }
+
+    var cols = document.getElementsByClassName('neutral');
+    for(i = 0; i < cols.length; i++) {
+      cols[i].style.backgroundColor = "#C4B78D";
+    }
+}
+
+function normalColours() {
+    var cols = document.getElementsByClassName('blueTeam');
+    for(i = 0; i < cols.length; i++) {
+      cols[i].style.backgroundColor = "#3399ff";
+    }
+
+    var cols = document.getElementsByClassName('redTeam');
+    for(i = 0; i < cols.length; i++) {
+      cols[i].style.backgroundColor = "#ff5050";
+    }
+
+    var cols = document.getElementsByClassName('neutral');
+    for(i = 0; i < cols.length; i++) {
+      cols[i].style.backgroundColor = "tan";
+    }
+}
