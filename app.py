@@ -1,4 +1,5 @@
 import time
+import sys
 import numpy as np
 from flask import Flask, session, copy_current_request_context, request
 from flask_socketio import SocketIO, emit, disconnect, join_room, leave_room
@@ -442,5 +443,8 @@ def clean_room():
 
 clean_room()
 
-if __name__ == '__main__':
-    socket_.run(app, debug=True)
+#starts the server (by default on port 5000)
+if __name__ == '__main__': 
+    servPort = 5000
+    if (len(sys.argv) > 1): servPort = sys.argv[1]
+    socket_.run(app, debug=True, port=servPort)

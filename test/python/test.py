@@ -1,4 +1,5 @@
 import socketio
+import sys
 
 ##########
 # Setup  #
@@ -19,7 +20,9 @@ def tFail(text):
     
 # Client Creation
 client_ = socketio.Client()
-client_.connect('http://localhost:5000')
+servPort = 5000
+if (len(sys.argv) > 1): servPort = sys.argv[1]
+client_.connect('http://localhost:' + str(servPort))
 
 @client_.event
 def connect():
