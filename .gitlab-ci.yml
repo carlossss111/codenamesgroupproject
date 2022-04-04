@@ -1,9 +1,19 @@
 stages:
-  - python_test
-  - javascript_test
+  - Server_Start
+  - Protocol_Tests
 
-python_test:
-  stage: python_test
+Server_Start:
+  stage: Server_Start
+  script:
+    - echo "Testing that the python server runs..."
+    - test -f app.py
+    - timeout 2 python3 app.py || [[ $? -eq 124 ]]
+  only:
+    - Integration
+    - main
+
+Protocol_Tests:
+  stage: Protocol_Tests
   script:
     - echo "Running test/python/runTests.sh..."
     - cd ./test/python/
