@@ -1,4 +1,5 @@
 import socketio
+import sys
 
 ##########
 # Setup  #
@@ -19,7 +20,9 @@ def tFail(text):
     
 # Client Creation
 client_ = socketio.Client()
-client_.connect('http://localhost:5000')
+servPort = 5000
+if (len(sys.argv) > 1): servPort = sys.argv[1]
+client_.connect('http://localhost:' + str(servPort))
 
 @client_.event
 def connect():
@@ -29,7 +32,9 @@ def connect():
 roomDict = {
     "Protocol" : "joinRoom",
     "room" : "AABBCC",
-    "name" : "test"
+    "name" : "test",
+    "choice" : 0, # singleplayer
+    "isJoined" : 1, 
 }
 room = roomDict['room']
 client_.emit("joinRoom", roomDict, namespace='/')
@@ -50,7 +55,8 @@ input = {
     "Protocol" : "chat",
     "message" : "Test Name: Hello World",
     "room" : room,
-    "team" : "red"
+    "team" : "red",
+    "role" : "spy"
 }
 client_.emit('chat', input, namespace='/')
 
@@ -60,7 +66,8 @@ def chat_test(data):
     expectedOutput = {
     "Protocol" : "chat",
     "message" : "Test Name: Hello World",
-    "team" : "red"
+    "team" : "red",
+    "role" : "spy"
     }
 
     print("Chat Protocol Test: ", end="")
