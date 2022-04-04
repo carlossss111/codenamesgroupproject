@@ -29,7 +29,9 @@ def connect():
 roomDict = {
     "Protocol" : "joinRoom",
     "room" : "AABBCC",
-    "name" : "test"
+    "name" : "test",
+    "choice" : 0, # singleplayer
+    "isJoined" : 1, 
 }
 room = roomDict['room']
 client_.emit("joinRoom", roomDict, namespace='/')
@@ -50,7 +52,8 @@ input = {
     "Protocol" : "chat",
     "message" : "Test Name: Hello World",
     "room" : room,
-    "team" : "red"
+    "team" : "red",
+    "role" : "spy"
 }
 client_.emit('chat', input, namespace='/')
 
@@ -60,7 +63,8 @@ def chat_test(data):
     expectedOutput = {
     "Protocol" : "chat",
     "message" : "Test Name: Hello World",
-    "team" : "red"
+    "team" : "red",
+    "role" : "spy"
     }
 
     print("Chat Protocol Test: ", end="")

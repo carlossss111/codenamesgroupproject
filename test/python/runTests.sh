@@ -1,7 +1,7 @@
 #!/bin/bash
 #start python server
 echo Running app.py...
-python3 ../../app.py > /dev/null 2>&1 &
+(cd ../../;python3 app.py > /dev/null 2>&1) &
 sleep 1
 
 #run test script (for 3 seconds)
@@ -10,9 +10,7 @@ timeout 2 python3 test.py
 exitCode="$?"
 
 #stop python server
-procs=`ps -aux | grep "../../app.py" | head -n 1`
-procArr=($procs)
-kill ${procArr[1]}
+pkill python3
 
 #count number of tests to make sure all have come back
 totalTests=`cat test.py | grep -o "assert" | wc -l`
