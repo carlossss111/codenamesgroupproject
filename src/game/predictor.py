@@ -2,6 +2,7 @@ import random
 import pickle
 import numpy as np
 from itertools import chain
+from sklearn.cluster import DBSCAN
 
 
 def cos_sim(u, v):
@@ -87,21 +88,22 @@ class Predictor_spy:
         """
         Get a list of guesses according to clue and target number
         """
+        print("\n----- Spy AI working -----")
         self._setup()
         x = self._calculate_card_score(self.clue)
         card_score = dict(sorted(x.items(), key=lambda item:item[1], reverse=True))
         if (self.target_num == 0):
             self.target_num = 1
         guesses = list(card_score.keys())[:self.target_num]
+        print("Guess sequence:", list(card_score.keys()))
 
         if len(x) >= 2*self.target_num:
             for i in range(self.target_num):
                 if (self.level == "Easy" and random.random() < 0.3) or (self.level == "Medium" and random.random() < 0.2):
                     guesses[i] = list(card_score.keys())[self.target_num+i]
 
-        print("Using clue [", self.clue, "] with accuracy level:", self.level)
-        for guess in guesses:
-            print("Guess:", guess)
+        print("Using clue [", self.clue, "] with mode [", self.level, ']')
+        print("Guess:", guesses)
         return guesses
 
 
@@ -114,7 +116,7 @@ class Predictor_sm:
                  relevant_vectors_path,
                  board,
                  turn,
-                 threshold=0.45):
+                 threshold=0.4):
         """
         Parameters
         ----------
@@ -124,8 +126,9 @@ class Predictor_sm:
             : The path to the dictionary of relevant vectors
         board: json
             : The current board state
-        threshold: float (default = 0.45)
-            : The threshold before which the similarity is 0
+        threshold: float
+            : The threshold before which the similarity is 0, 
+              words having cosine similarity less than threshold could seen as not related
         """
         self.relevant_words_path = relevant_words_path
         self.relevant_vectors_path = relevant_vectors_path
@@ -196,11 +199,16 @@ class Predictor_sm:
         if self.assassin == "":
             self.bad_words = self.bad + self.neutral
         else:
-            self.bad_words = self.bad + [self.assassin] + self.neutral
+            self.bad_words = [self.assassin] + self.bad + self.neutral
 
         self.good_vectors = np.array([self.relevant_vectors[w] for w in self.good], dtype=np.float32)
         self.bad_vectors = np.array([self.relevant_vectors[w] for w in self.bad_words], dtype=np.float32)
         self.valid_guesses = self._get_valid_guesses()
+
+        clustering = DBSCAN(eps=1-self.threshold, min_samples=2, metric='cosine').fit(self.good_vectors)
+        self.cluster_labels = clustering.labels_
+        print("Clustering labels:", clustering.labels_)
+        print("Corresponding words:", self.good)
 
     def _calculate_guess_score(self, guess):
         """
@@ -213,8 +221,14 @@ class Predictor_sm:
 
         best_good_similarities = good_similarities[good_similarities > self.threshold]
         best_bad_similarities = bad_similarities[bad_similarities > self.threshold]
+        #print(len(best_good_similarities), len(best_bad_similarities))
 
         score = np.sum(best_good_similarities) - np.sum(best_bad_similarities)
+        for index in range(len(good_similarities)):
+            if self.cluster_labels[index] == 0:
+                score += good_similarities[index]
+        if self.assassin != "":
+            score -= bad_similarities[0]
         return score, guess
 
     def _get_targets(self, clue):
@@ -237,6 +251,7 @@ class Predictor_sm:
         """
         Get the best clue, it's score (rounded down to an integer) and the words it is supposed to link to
         """
+        print("\n----- Spymaster AI working -----")
         self._setup()
         guess_scores = [self._calculate_guess_score(g) for g in self.valid_guesses]
         _, clue = max(guess_scores, key=lambda x: x[0])
