@@ -7,7 +7,7 @@ Server_Start:
   script:
     - echo "Testing that the python server runs..."
     - test -f app.py
-    - timeout 2 python3 app.py || [[ $? -eq 124 ]]
+    - timeout 2 python3 app.py 5001 || [[ $? -eq 124 ]]
   only:
     - Integration
     - main
