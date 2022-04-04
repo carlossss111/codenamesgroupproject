@@ -600,7 +600,6 @@ class BoardState extends Observer {
     forwardClue() {
         let clue = document.getElementById("clue").value;
         let maxGuesses = document.getElementById("maxClues").value;
-
         //check that it is this player's turn and it is the spymaster's turn
         if (!this.isPlayersTurn() || this.turn.role != "spymaster"){
             document.getElementById("clueForm").reset();
@@ -819,8 +818,9 @@ class BoardState extends Observer {
                 document.getElementById("clue").value = incoming.clue;
                 document.getElementById("maxClues").value = incoming.numberOfGuesses;
 
-                if ( this.isPlayersTurn() || (choice != 2 && this.isAITurn()) )
+                if ( this.isPlayersTurn() || (choice != 2 && this.isAITurn()) ){
                     updateTurnState();
+                }
                 break;
 
             case "spyHint":
@@ -934,8 +934,12 @@ class BoardState extends Observer {
                     document.getElementById("room").style.display = "none";
                     document.getElementById("turnAlert").style.display = "inline-block";
                     document.getElementById("timerBar").style.backgroundColor = "red";
-                    if (choice == 0 && this.totalHintsLeft > 0)
+                    if (choice == 0 && this.totalHintsLeft > 0){
                         document.getElementById("hintButton").style.display = "inline-block";
+                    }
+                    if (this.player.role == "spymaster"){
+                        document.getElementById("clueForm").reset();
+                    }
                 }
                 break;
 
