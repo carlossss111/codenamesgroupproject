@@ -22,7 +22,6 @@ class Chatbox extends Observer {
     sendChat() {
         var chatText = document.getElementById("chatText").value;
         var message = nickname + ": " + chatText;
-        var returnchatText = chatText;
         server.sendToServer("chat", {
             "Protocol" : "chat", 
             "message" : message,
@@ -31,7 +30,7 @@ class Chatbox extends Observer {
             "role" : board.player.role
         });
         document.getElementById("chatboxSend").reset();
-        return {returnchatText};
+        return {chatText};
     }
 
     /**
