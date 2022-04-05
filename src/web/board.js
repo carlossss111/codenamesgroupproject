@@ -1018,9 +1018,12 @@ if (link.charAt(link.length-2) == '|') {
     numOfPeople = parseInt(link.charAt(link.length-1), 10);
     document.getElementById("numOfPeople").innerHTML = numOfPeople;
 } else {
-    joinRoom(false);
-    link = link + '|' + numOfPeople;
-    window.location.replace(link);
+    href = window.location.pathname;
+    if(href.search("runner.html") == -1){ //special case so the test script is not broken
+        joinRoom(false);
+        link = link + '|' + numOfPeople;
+        window.location.replace(link);
+    }
 }
 
 document.getElementById("welcomeName").innerHTML = nickname;

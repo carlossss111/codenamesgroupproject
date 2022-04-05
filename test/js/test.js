@@ -103,15 +103,6 @@ const assert = chai.assert;
 
 }
 
-/* Board Tests */
-{
-    describe("Example Test", function () {
-        it("Example Test Description", function () {
-            assert.equal(true,true);
-        });
-    });
-
-}
 
 /* Other Tests */
 {
