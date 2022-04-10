@@ -426,9 +426,6 @@ input[type=range]::-webkit-slider-thumb {
         width: 100px;
         height: 50px;
         margin: 5px;
-    }
-
-    .card p {
         font-size: 15px;
     }
 
