@@ -58,7 +58,7 @@
             </span>
         </div>
 
-        <div class="clueBox">
+        <form class="clueBox" id="clueForm">
             <!-- Clue box and options -->
             <input type="text" id="clue" placeholder="Enter clue"></input>
             <select id="maxClues">
@@ -75,7 +75,7 @@
             <button id="clueButton">Give Clue</button>
             <button id="endTurn">End Turn</button>
             <button id="hintButton">Hint</button>
-        </div>
+        </form>
 
         <!-- Gameover Box -->
         <div id="gameOver" style="display: none;">
@@ -160,6 +160,17 @@
             <input value="100" id="music" class="setItemRange" type="range">
             <div id="musicVal" class="setItemRangeVal">
                 100
+            </div>
+        </div>
+
+        <!-- Font -->
+        <div class="setItem">
+            <div class="setItemDesc">
+                Font
+            </div>
+            <input value="70" id="font" class="setItemRange" type="range">
+            <div id="fontVal" class="setItemRangeVal">
+                70
             </div>
         </div>
 

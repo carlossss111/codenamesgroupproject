@@ -614,9 +614,11 @@ class BoardState extends Observer {
             for (let j = 0; j < this.cards[0].length; j++) {
                 if (clue.toLowerCase() == this.cards[i][j].word) {
                     alert("Clue cannot be the same as board words!");
+                    document.getElementById("clueForm").reset();
                     return;
                 } else if (!vocabulary.includes(clue.toLowerCase()) && this.isAISpy()) {
                     alert("Word not recognized by AI spy. Please try again.");
+                    document.getElementById("clueForm").reset();
                     return;
                 }
             }
@@ -931,6 +933,8 @@ class BoardState extends Observer {
                     document.getElementById("timerBar").style.backgroundColor = "red";
                     if (choice == 0 && this.totalHintsLeft > 0)
                         document.getElementById("hintButton").style.display = "inline-block";
+                    if (this.player.role == "spymaster")
+                        document.getElementById("clueForm").reset();
                 }
                 break;
 
@@ -1062,6 +1066,22 @@ function handleIndicator(el) {
 items.forEach((item, index) => {
   item.addEventListener('click', (e) => { handleIndicator(e.target)});
 });
+
+
+//Font Settings functions
+document.getElementById("font").onchange = function () {
+    let val = this.value;
+    document.getElementById("fontVal").innerText = val;
+    var arr = document.getElementsByClassName('card');
+    for(i=0;i<arr.length;i++)
+    {
+        if(val<=20) arr[i].style.fontSize = "0.5vw";
+        else if(val<=40) arr[i].style.fontSize = "1vw";
+        else if(val<=60) arr[i].style.fontSize = "1.5vw";
+        else if(val<=80) arr[i].style.fontSize = "2vw";
+        else arr[i].style.fontSize = "2.5vw";
+    }
+}
 
 //Add all colour blind options 
 function Deuteranopiafunction() {

@@ -75,7 +75,7 @@ const assert = chai.assert;
             assert.equal(chatTest.eventName,"chat");
         });
 
-        it("Test if message being recieved", function () {
+        it("Test if message being received", function () {
             assert.equal(chatTest.args.message,"hello");
         });
 

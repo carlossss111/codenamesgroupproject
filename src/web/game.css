@@ -55,16 +55,13 @@
     justify-content: center;
     align-items: center;
     margin: 10px;
+    font-weight: bold;
+    font-size: 2vw;
+    text-transform: uppercase;
     transition: transform 0.5s ease-in-out,         /*for flipping*/
                 background-color 1s ease-in-out,    /*for hints*/
                 color 1s ease-in-out,               /*for hints*/
                 border 1s ease-in-out;              /*for hints*/
-}
-
-.card p {
-    font-weight: bold;
-    font-size: 2vw;
-    text-transform: uppercase;
 }
 
 .card:hover {
