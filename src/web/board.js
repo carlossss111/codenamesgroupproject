@@ -1064,6 +1064,22 @@ items.forEach((item, index) => {
   item.addEventListener('click', (e) => { handleIndicator(e.target)});
 });
 
+
+//Font Settings functions
+document.getElementById("font").onchange = function () {
+    let val = this.value;
+    document.getElementById("fontVal").innerText = val;
+    var arr = document.getElementsByClassName('card');
+    for(i=0;i<arr.length;i++)
+    {
+        if(val<=20) arr[i].style.fontSize = "0.5vw";
+        else if(val<=40) arr[i].style.fontSize = "1vw";
+        else if(val<=60) arr[i].style.fontSize = "1.5vw";
+        else if(val<=80) arr[i].style.fontSize = "2vw";
+        else arr[i].style.fontSize = "2.5vw";
+    }
+}
+
 //Add all colour blind options 
 function Deuteranopiafunction() {
     var cols = document.getElementsByClassName('blueTeam');
