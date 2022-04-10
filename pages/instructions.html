@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Team 18's Codenames Project"/>
+    <link rel="shortcut icon" href="#">
+    <link href="../src/web/main.css" type="text/css" rel="stylesheet" />
+    <title>Nottingham Codenames</title>
+</head>
+<body>
+    <style>
+        div{
+            width:60%;
+            margin:40px auto;
+        }
+
+        ul{
+            margin-left:20px;
+        }
+
+        h1{
+            font-size:2.5rem;
+        }
+
+        h2{
+            margin-top:20px;
+            font-size:1.75rem;
+        }
+
+        li,p{
+            font-size:1.5rem;
+        }
+
+        span{
+            display: block;
+            text-align: center;
+        }
+
+        img{
+            width:500px;
+            margin:0 auto;
+        }
+
+        .space{
+            margin-top: 5px;
+        }
+
+        @media only screen and (max-width: 600px) {
+            div{
+                margin:20px auto;
+                width:90%;
+                text-align: justify;
+            }
+
+            img{
+                width:95%;
+            }
+        }
+
+    </style>
+
+    <div>
+        <h1>How to play</h1>
+        <p>The game is split between two teams, red and blue, over a 5x5 board of word cards and the objective is to be the first to get to 9 points. Each team has a spy and a spymaster.</p>
+
+        <h2>Spymaster</h2>
+        <ul>
+            <li>You will see the team-colour of every card on the board.</li>
+            <li>Enter a clue word that relates to a number of cards on the board.</li>
+            <li>The clue cannot be the same as a word on the board.</li>
+            <li>Enter the number of related cards and now it becomes your spy's turn.</li>
+        </ul>
+        <p class="space">The spymaster's board looks like this:</p>
+        <span>
+            <img src="../rsc/images/spymaster_screen.png"/>
+        </span>
+
+        <h2>Spy</h2>
+        <ul>
+            <li>You will the board without team-colours. You will get the spymaster's word clue and number of related cards.</li>
+            <li>Pick the right cards relating to the word clue.</li>
+            <li>e.g. If you get the clue "ocean-2" then the 2 cards "surf" and "water" might be correct.</li>
+            <li>Your turn ends and the other team's turn begins when you either find all the correct cards or when you first pick a wrong card.</li>
+        </ul>
+        <p class="space">The spy's board looks like this:</p>
+        <span>
+            <img src="../rsc/images/spy_screen.png"/>
+        </span>
+    </div>
+</body>
+</html>
