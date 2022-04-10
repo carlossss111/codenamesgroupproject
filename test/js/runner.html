@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en" data-framework="backbonejs">
+  <head>
+    <meta charset="utf-8">
+    <title>Test Runner</title>
+    <link rel="stylesheet" href="./node_modules/mocha/mocha.css">
+  </head>
+  <body>
+
+    <!-- *** Files to test and the tags they require *** -->
+
+    <!-- Server-->
+    <script src="https://cdn.socket.io/4.4.0/socket.io.min.js" integrity="sha384-1fOn6VtTq3PWwfsOrk45LnYcGosJwzMHv+Xh/Jx5303FVOXzEnw0EpLv30mtjmlj" crossorigin="anonymous"></script>
+    <script src="../../src/web/server.js"></script>
+
+    <!-- Chatbox -->
+    <div class="hide">
+        <div id="noti"></div><div id="chatboxText"></div>
+        <div id="chatboxSend"></div><div id="chatboxReceive"></div>
+        <input id="chatText" type="text">hello world</input>
+    </div>
+    <script src="../../src/web/chatbox.js"></script>
+
+    <!-- Board -->
+    <div class="hide">
+      <div id="totalHints"></div>
+      <div id="room"></div>
+      <div id="welcomeName"></div>
+      <div id="welcomeText"></div>
+      <div id="teamBox"></div>
+      <div id="turnAlert"></div>
+      <div id="endTurn"></div>
+      <div class="clueBox"></div>
+      <div id="joinBlueSpy"></div>
+      <div id="joinBlueSm"></div>
+      <div id="joinRedSpy"></div>
+      <div id="joinRedSm"></div>
+      <div id="startGame"></div>
+      <div id="openSidebarMenu"></div>
+      <div id="welcomeConfirm"></div>
+      <div id="clueButton"></div>
+      <div id="endTurn"></div>
+      <div id="hintButton"></div>
+      <div id="quitRoom"></div>
+      <div id="restart"></div>
+      <div id="hintText"></div>
+      <div id="hintButton"></div>
+    </div>
+    <script src="../../src/web/board.js"></script>
+
+    <!-- Mocha/Chai Libraries-->
+    <h1 style="font-size:46px;text-align:center;">Javascript Tests</h1>
+    <div id="mocha"></div>
+    <script src="./node_modules/mocha/mocha.js"></script>
+    <script src="./node_modules/chai/chai.js"></script>
+    <script>
+        mocha.ui('bdd'); 
+        mocha.reporter('html');
+        var expect = chai.expect;
+    </script>
+    <style>
+      *{
+        font-family: monospace; /* because why not*/
+      }
+
+      .hide{
+        visibility: hidden !important;
+        position: absolute !important;
+      }
+    </style>
+
+    <!-- *** Test Scripts ***-->
+    <script src="./test.js"></script>
+
+    <!-- Run Mocha -->
+    <script defer>
+        mocha.run();
+    </script>
+  </body>
+</html>

@@ -1,91 +1,82 @@
-/*card containers*/
-#board {
-    max-width: 1150px;
-    width: 100%;
-    display: grid;
-    grid-template-columns: 200px 200px 200px 200px 200px;
-    grid-template-rows: 120px 120px 120px 120px 120px;
-    grid-gap: 30px;
-    transform: translateX(15%);
-    transition: transform 250ms ease-in-out;
+/*
+* GAME BOARD CONTAINER
+*/
 
+#board {
+    width: 85%;
+    display: grid;
+    grid-template-columns: 13vw 13vw 13vw 13vw 13vw;
+    grid-template-rows: 12vh 12vh 12vh 12vh 12vh;
+    column-gap: 2vw;
+    row-gap: 2vh;
+    transition: transform 250ms ease-in-out;
+    transform: translateX(15%);
 }
 
-/*cards*/
+/*
+* BLINK ANIMATION
+*/
+.blink {
+    animation: blink-animation 1s steps(5, start) infinite;
+    -webkit-animation: blink-animation 1s steps(5, start) infinite;
+}
+@keyframes blink-animation {
+    to {
+        visibility: hidden;
+    }
+}
+@-webkit-keyframes blink-animation {
+    to {
+        visibility: hidden;
+    }
+}
+
+/*
+* SCORING SYSTEM
+*/
+#scores {
+    font-size: 4em;
+}
+
+#blueMember,
+#redMember {
+    font-size: 1.2vw;
+}
+
+/*
+* CARDS
+*/
+
+/* all cards */
 .card {
-    width: 200px;
-    height: 120px;
+    width: 13vw;
+    height: 12vh;
     display: flex;
     justify-content: center;
     align-items: center;
     margin: 10px;
-    transition: transform 0.5s ease-in-out;
-}
-
-.card p {
     font-weight: bold;
-    font-size: 2em;
+    font-size: 2vw;
     text-transform: uppercase;
+    transition: transform 0.5s ease-in-out,         /*for flipping*/
+                background-color 1s ease-in-out,    /*for hints*/
+                color 1s ease-in-out,               /*for hints*/
+                border 1s ease-in-out;              /*for hints*/
 }
 
-.clueBox {
-    width: 400px;
-    margin: 0 auto;
-}
-
-.clueBox input {
-    width: 150px;
-    margin: 5px 10px 5px 0;
-    padding: 10px;
-    border-radius: 7px;
-    text-align: center;
-    margin: 0 auto;
-}
-
-
-.clueBox input {
-    width: 150px;
-    margin: 5px 10px 5px 0;
-    padding: 10px;
-    border-radius: 7px;
-    margin: 0 auto;
-}
-
-.clueBox input {
-    width: 150px;
-    margin: 5px 10px 5px 0;
-    padding: 10px;
-    border-radius: 7px;
-
-}
-
-.clueBox button {
-    padding: 10px 20px;
+.card:hover {
+    box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
     cursor: pointer;
-    border-radius: 7px;
-
 }
 
-.clueBox button:hover {
-    background-color: lightGreen;
-}
-
-#maxClues {
-    padding: 10px 20px;
-    cursor: pointer;
-    border-radius: 7px;
-
-}
-
+/* coloured cards */
 .neutral {
-
     background-color: tan;
     border: sienna dashed 3px;
     border-radius: 10px;
 }
 
 .blueTeam {
-    background-image: url("");
     background-color: #3399ff;
     border: darkblue dashed 3px;
     border-radius: 10px;
@@ -97,162 +88,208 @@
     border-radius: 10px;
 }
 
-.revealed {
-    background-image: url('../../rsc/images/neutral.jpg');
-}
-
 .bombCard {
     background-color: #5e5e5e;
     border: #1f1f1f dashed 3px;
     border-radius: 10px;
 }
 
-/*side panel*/
-.chatbox {
-    margin: 1rem auto;
-    width: 80%;
-    height: 25rem;
-    background-color: white;
-    border-radius: 15px;
-
+.hintCard {
+    color: white;
+    border: white dashed 3px;
 }
 
-.score {
-    margin: 1rem auto;
-    width: 80%;
-    height: 10rem;
-    background-color: #97CAEF;
-    border-radius: 10px;
+/*
+* CLUE BOX & GAMEOVER BOX
+*/
+
+.clueBox,
+#gameOver {
+    margin: 1em auto;
+    text-align: center;
+}
+
+.clueBox input {
+    width: 9em;
+}
+
+.clueBox input,
+.clueBox select,
+.clueBox button,
+#gameOver button {
+    font-size: 1em;
+    padding: 0.5em;
+    border-radius: 0.4em;
+    border: none;
+    background: white;
+    text-align: center;
+}
+
+.clueBox button:hover,
+#gameOver button:hover {
+    background-color: lightGreen;
+}
+
+/* drop down menu */
+#maxClues {
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 7px;
+}
+
+/*
+* SIDE PANEL
+*/
+
+.sidebarContainer{
+    position: absolute;
+    z-index: 1;
+    top: 0;
+    right: 4em;
+    height: 100vh;
+    width: 0;
+    transition: all 250ms ease-in-out;
+}
+
+#openSidebarMenu {
+    position: relative;
+    float: left;
+    width: 20%;
+    height: 10%;
+    top: 0%;
+    /* div centering is one of the greatest achievements
+    of computer science */
+}
+
+#openSidebarMenu input {
+    cursor: pointer;
+    position: relative;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
 }
 
 #sidebarMenu {
-    border-radius: 10px;
-    height: 100%;
     position: fixed;
-    right: 0;
-    width: 20%;
-    top: 0;
-    transform: translateX(250%);
-    transition: transform 250ms ease-in-out;
-    background: linear-gradient(180deg, darkred 0%, darkred 100%);
-}
-
-.sidebarMenuInner {
-    margin: 0;
-    padding: 0;
-    border-top: 1px solid rgba(255, 255, 255, 0.10);
-}
-
-.sidebarMenuInner li {
-    list-style: none;
-    color: #fff;
-    text-transform: uppercase;
-    font-weight: bold;
-    padding: 20px;
-    cursor: pointer;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.10);
-}
-
-.sidebarMenuInner li span {
-    display: block;
-    font-size: 14px;
-    color: rgba(255, 255, 255, 0.50);
-}
-
-.sidebarMenuInner li a {
-    color: #fff;
-    text-transform: uppercase;
-    font-weight: bold;
-    cursor: pointer;
-    text-decoration: none;
-}
-
-.openSidebarMenu:checked~#sidebarMenu {
-    transform: translateX(0);
-}
-
-.openSidebarMenu:checked~.arrow {
-    transform: translateX(0);
-}
-
-.openSidebarMenu {
-    transition: all 0.3s;
-    box-sizing: border-box;
-    display: none;
-}
-
-.sidebarIconToggle {
-    transition: all 0.3s;
-    box-sizing: border-box;
-    cursor: pointer;
-    position: absolute;
-
-    z-index: 99;
-    height: 100%;
-    width: 100%;
-    top: 50%;
-    right: 15px;
-    height: 22px;
-    width: 22px;
-}
-
-.spinner {
-    transition: all 0.3s;
-    box-sizing: border-box;
-    position: absolute;
-    height: 3px;
-    width: 100%;
-    background-color: black;
+    background: #d2ecf8;
+    border-radius: 15px;
+    display: inline-block;
+    height: 100vh;
+    width: 20em;
+    opacity: 0;
+    transition: opacity 250ms ease-in-out;
 }
 
 .arrow {
-    position: fixed;
+    cursor: pointer;
+    position: absolute;
+    z-index: 2;
     border-right: 5px solid black;
     border-bottom: 5px solid black;
     width: 20px;
     height: 20px;
-    margin-top: 40px;
-
-    transform: translateX(0) rotate(135deg);
-    transition: transform 250ms ease-in-out;
+    top: 20px;
+    left: 20px;
+    transform: rotate(135deg);
+    transition: all 250ms ease-in-out;
 }
 
-.openSidebarMenu:checked~.sidebarIconToggle>.arrow {
-    transition: all 0.3s ease-in-out;
-    transform: translateX(-300px) rotate(-45deg);
+.notificationIcon {
+    position: absolute;
+    right: 15px;
+    font-size: 0.8em;
+    padding: 2px 8px;
+    border-radius: 50%;
+    background-color: rgb(255, 140, 140);
+    color: white;
+    display: block;
+    transform: rotate(-135deg);
+    transition: all 250ms ease-in-out;
 }
 
+.chatbox {
+    margin: 1rem auto;
+    width: 80%;
+    height: 75vh;
+    background-color: white;
+    border-radius: 10px;
+    max-width: 100%;
+}
 
-#scoreText {
+#chatboxSend {
+    margin-top: 2em;
     text-align: center;
-    font-family: 'Trebuchet MS', sans-serif;
-
 }
 
-#scores {
-    text-align: center;
-    font-size: 50px;
+#chatText, #chatSubmit {
+    border-radius: 0.5em;
+    border: none;
+    padding: 0.5vw;
 }
 
-
-@media only screen and (max-width: 600px) {
-    body {
-        background-color: lightblue;
-    }
+#chatSubmit:hover {
+    background-color: lightGreen;
 }
 
-h1 {
-    position: relative;
+#chatboxReceive{
+    padding: 0 10px;
+    height: 100%;
+    overflow-y: scroll;
+    word-wrap: break-word
 }
 
+#chatboxReceive::-webkit-scrollbar {
+    width: 0.5em;
+}
+
+#chatboxReceive::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+/*
+* ROLE SELECT BUTTONS
+*/
+
+.teamForm {
+    position: absolute;
+    width: 50vw;
+    height: 50vh;
+    top: 30%;
+    left: 25%;
+    z-index: 1;
+}
+
+/*
+* TIMER BAR
+*/
+
+#timerBar {
+    width: 100%;
+    height: 10px;
+    border-radius: 0 5px 5px 0;
+    background-color: red;
+    opacity: 0;
+    bottom: 0;
+    position: fixed;
+    display: none;
+    transition: width 1s linear, opacity 1s linear;
+}
+
+/*
+* SETTINGS
+*/
+
+/* settings button */
 .set {
     width: 60px;
     position: absolute;
-    top: 20px;
+    top: 23px;
     transform: translate(0, -50%);
     cursor: pointer;
 }
 
+/* container for settings window */
 .setBox {
     position: fixed;
     left: 0;
@@ -264,20 +301,15 @@ h1 {
     display: none;
 }
 
-.setTit {
-    text-align: center;
-    font-size: 40px;
-    font-weight: bold;
-    padding: 50px 0;
-    padding-bottom: 20px;
-}
-
 .setSubTit {
     text-align: center;
-    font-size: 20px;
+    font-size: 1.5em;
     font-weight: bold;
+    margin-top: 5vh;
+    margin-bottom: 1.5em;
 }
 
+/* individual settings */
 .setItem {
     display: flex;
     align-items: center;
@@ -296,12 +328,51 @@ h1 {
     text-align: left;
 }
 
+.navList {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    padding-left: 5px;
+}
+
+.barIndicator {
+    position: absolute;
+    height: 4px;
+    transition: .4s;
+    height: 5px;
+    z-index: 1;
+    border-radius: 8px 8px 0 0;
+    left: 0;
+    bottom: 0;
+}
+
+.optionPointer {
+    display: inline-flex;
+    position: relative;
+    overflow: hidden;
+    height: 30px;
+    margin: 5px;
+    border-radius: 5px;
+    max-width: 100%;
+    background-color: rgb(255, 129, 129);
+}
+
+.navItem {
+    cursor: pointer;
+    text-decoration: none;
+    z-index: 1;
+    position: relative;
+}
+
 .setItemRange {
     width: 200px;
 }
+
 .setItemRangeVal{
     width: 50px;
 }
+
 input[type=range] {
     -webkit-appearance: none;
     background: black;
@@ -317,10 +388,68 @@ input[type=range]::-webkit-slider-thumb {
     border: solid 1px #ddd;
 }
 
+/* back button */
 .back {
     position: absolute;
     width: 30px;
     top: 10px;
     left: 10px;
     cursor: pointer;
+}
+
+/* honestly the mobile part needs a big rework :/ */
+/*For mobile*/
+@media only screen and (max-width: 600px) {
+
+    body {
+        background-color: lightblue;
+    }
+
+    #board {
+        width: 77%;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        grid-template-rows: auto;
+        column-gap: 1vh;
+        row-gap: 1vw;
+        grid-auto-columns: auto;
+        grid-auto-rows: auto;
+        transition: transform 250ms ease-in-out;
+        justify-content: center;
+    }
+
+    .card:nth-last-child(1){
+        grid-column: 2;
+    }
+
+    .card {
+        width: 100px;
+        height: 50px;
+        margin: 5px;
+    }
+
+    .card p {
+        font-size: 15px;
+    }
+
+    #blueMember,
+    #redMember {
+        font-size: 0.8em;
+        width: 100%;
+        display: inline-block;
+    }
+
+    #scores {
+        font-size: 3em;
+    }
+
+    #joinBlueSm,
+    #joinRedSm,
+    #joinBlueSpy,
+    #joinRedSpy {
+        width: 40vw;
+        line-height: 1.2;
+        font-size: 1em;
+    }
+
 }

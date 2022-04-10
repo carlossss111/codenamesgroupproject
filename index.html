@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
@@ -6,11 +5,61 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Team 18's Codenames Project"/>
-    <link rel="shortcut icon" type="image/jpg" href="TODO"/>
+    <link rel="shortcut icon" href="#">
+    <script src="https://cdn.tailwindcss.com"></script>
     <link href="src/web/main.css" type="text/css" rel="stylesheet" />
     <title>Nottingham Codenames</title>
 </head>
-<body style="font-size: 60px;">
-    <a href="./pages/game.html?#">to game</a>
+<body class='bg-[#ffdede]'>
+    <div class="mx-auto">
+        <p style="text-align: right;">Ver. 1.3.0</p>
+        <h1 class="text-7xl text-center font-extrabold leading-9 pt-10 mt-10 uppercase">Codenames</h1>
+        <div class="mx-auto flex flex-col items-center space-y-10 pt-20">
+            <a href="./pages/setup.html?#0">
+                <button class="bg-[#ff6c6c] w-80 h-20 shadow-md rounded-xl text-2xl font-bold hover:animate-bounce hover:opacity-70 hover:text-amber-400">
+                    Single Player
+                </button>
+            </a>
+            <a href="./pages/setup.html?#1">
+                <button class="bg-[#ff6c6c] shadow-md w-80 h-20 rounded-xl text-2xl font-bold hover:animate-bounce hover:opacity-70 hover:text-amber-400">
+                    Host Multiplayer
+                </button>
+            </a>
+            <a href="./pages/setup.html?#2">
+                <button class="bg-[#ff6c6c] shadow-md w-80 h-20 rounded-xl text-2xl font-bold hover:animate-bounce hover:opacity-70 hover:text-amber-400">
+                    Join Multiplayer
+                </button>
+            </a>
+            <button class="bg-[#ff6c6c] w-80 h-20 rounded-xl text-2xl shadow-md font-bold hover:animate-bounce hover:opacity-70 hover:text-amber-400" onclick="showObserverText()">
+                Observer mode
+            </button>
+            <a href="./pages/instructions.html">
+                <button class="bg-[#ff6c6c] shadow-md w-80 h-20 rounded-xl text-2xl font-bold hover:animate-bounce hover:opacity-70 hover:text-amber-400">
+                    How to play
+                </button>
+            </a>
+        </div>
+    </div>
+    <div id="observerText">
+        <p style="font-size: 1.5em; font-weight: bold; line-height: 1; margin-top: 10vw; margin-bottom: 0.5em;">To observe all-AI games:</p>
+        <p>Choose "Single Player"</p>
+        <p>Configure "Difficulty" to change AI accuracy ("Hard" means highest)</p>
+        <p>Skip choosing role for yourself, press "START"</p>
+        <br>
+        <p style="font-size: 1.5em; font-weight: bold; line-height: 1; margin-bottom: 0.5em;">To observe games with human player:</p>
+        <p>Choose "Join Multiplayer"</p>
+        <p>Enter the room id you want to join</p>
+        <p>Skip choosing role for yourself, wait for the host to start game</p>
+        <img src="rsc/images/back.png" id="hideObserver" alt="" srcset="" onclick="hideObserverText()">
+    </div>
+
+    <script>
+        function showObserverText() {
+            document.getElementById("observerText").style.display = "block";
+        }
+        function hideObserverText() {
+            document.getElementById("observerText").style.display = "none";
+        }
+    </script>
 </body>
 </html>

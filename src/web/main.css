@@ -1,29 +1,81 @@
-*
-{
+/*
+* BACKGROUND
+*/
+* {
     margin: 0;
     padding: 0;
     outline: 0;
     font-family: 'Trebuchet MS', 'Lucida Sans Unicode', Arial, sans-serif;
 }
 
-/*general*/
-
-body
-{
+body {
     background-color: #ffdede;
+    overflow-x: hidden; /*no scrolling */
+    /*overflow-y: hidden; */ /* TODO: */
 }
 
-h1
-{
+/*
+* OBSERVER MODE
+*/
+#observerText {
     text-align: center;
-    font-family: 'Russo One', sans-serif;
-    text-transform: uppercase;
-    font-size:5rem;
-    margin:0.3em;
+    font-size: 3vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 100;
+    width: 100vw;
+    height: 100vh;
+    background: #ffdede;
+    display: none;
 }
 
-.mainContainer
-{
-    height:100vh;
-    width:75%;
+#hideObserver {
+    cursor: pointer;
+    display: block;
+    margin: 3em auto;
+}
+
+/*
+* BUTTONS
+*/
+button {
+    cursor: pointer;
+}
+
+/*
+* SETUP PAGE
+*/
+
+#roomNameHost, 
+#yourNameHost, 
+#roomNameJoin, 
+#yourNameJoin, 
+#difficulty, 
+#isBomb, 
+#timerLength {
+    float: right;
+    font-size: 0.75em;
+    text-align: center;
+    border: none;
+    border-bottom: 1px solid gray;
+    background: transparent;
+}
+
+#backMenu, 
+#confirm {
+    width: 6em;
+    height: 2em;
+    font-size: 1em;
+    text-align: center;
+    background: transparent;
+    border-radius: 0.5em;
+}
+
+#backMenu:hover {
+    background-color: #ff5050;
+}
+
+#confirm:hover {
+    background-color: #3399ff;
 }
