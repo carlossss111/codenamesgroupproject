@@ -64,11 +64,12 @@
     <div>
         <h1>How to play</h1>
         <p>The game is split between two teams, red and blue, over a 5x5 board of word cards and the objective is to be the first to get to 9 points. Each team has a spy and a spymaster.</p>
+        <p>Picking one of a team's card will add 1 point to that team. Picking a "neutral" card (card in brown) will not add any point. Picking a "bomb" card (card in black) or the timer runs out will end the game and your team loses.</p>
 
         <h2>Spymaster</h2>
         <ul>
             <li>You will see the team-colour of every card on the board.</li>
-            <li>Enter a clue word that relates to a number of cards on the board.</li>
+            <li>Enter a clue word that relates to a number of cards on the board. (Try to make it related to your team's cards rather than other cards)</li>
             <li>The clue cannot be the same as a word on the board.</li>
             <li>Enter the number of related cards and now it becomes your spy's turn.</li>
         </ul>
@@ -79,15 +80,20 @@
 
         <h2>Spy</h2>
         <ul>
-            <li>You will the board without team-colours. You will get the spymaster's word clue and number of related cards.</li>
+            <li>You will get a board without team-colours. You will get the spymaster's word clue and number of related cards.</li>
             <li>Pick the right cards relating to the word clue.</li>
             <li>e.g. If you get the clue "ocean-2" then the 2 cards "surf" and "water" might be correct.</li>
-            <li>Your turn ends and the other team's turn begins when you either find all the correct cards or when you first pick a wrong card.</li>
+            <li>Your turn ends and the other team's turn begins when you either find a given number of correct cards or pick a card not belonging to your team.</li>
         </ul>
         <p class="space">The spy's board looks like this:</p>
         <span>
             <img src="../rsc/images/spy_screen.png"/>
         </span>
     </div>
+
+    <a href="../index.html">
+        <img id="hideInstructions" src="../rsc/images/back.png" alt="" srcset="">
+    </a>
+
 </body>
 </html>

@@ -1058,28 +1058,26 @@ const indicator = document.querySelector('.barIndicator');
 const items = document.querySelectorAll('.navItem');
 
 function handleIndicator(el) {
-  indicator.style.width = `${el.offsetWidth}px`;
-  indicator.style.left = `${el.offsetLeft}px`;
-  indicator.style.backgroundColor = "red";
+    indicator.style.width = `${el.offsetWidth}px`;
+    indicator.style.left = `${el.offsetLeft}px`;
+    indicator.style.backgroundColor = "red";
 }
 
 items.forEach((item, index) => {
-  item.addEventListener('click', (e) => { handleIndicator(e.target)});
+    item.addEventListener('click', (e) => {handleIndicator(e.target)});
 });
-
 
 //Font Settings functions
 document.getElementById("font").onchange = function () {
     let val = this.value;
     document.getElementById("fontVal").innerText = val;
-    var arr = document.getElementsByClassName('card');
-    for(i=0;i<arr.length;i++)
-    {
-        if(val<=20) arr[i].style.fontSize = "0.5vw";
-        else if(val<=40) arr[i].style.fontSize = "1vw";
-        else if(val<=60) arr[i].style.fontSize = "1.5vw";
-        else if(val<=80) arr[i].style.fontSize = "2vw";
-        else arr[i].style.fontSize = "2.5vw";
+    var words = document.querySelectorAll(".card p");
+    for (let i = 0; i < words.length; i++) {
+        if (val <= 20) words[i].style.fontSize = "0.5em";
+        else if (val <= 40) words[i].style.fontSize = "0.75em";
+        else if (val <= 60) words[i].style.fontSize = "1em";
+        else if (val <= 80) words[i].style.fontSize = "1.25em";
+        else words[i].style.fontSize = "1.5em";
     }
 }
 
@@ -1087,62 +1085,62 @@ document.getElementById("font").onchange = function () {
 function Deuteranopiafunction() {
     var cols = document.getElementsByClassName('blueTeam');
     for(i = 0; i < cols.length; i++) {
-      cols[i].style.backgroundColor = "#3399ff";
+        cols[i].style.backgroundColor = "#3399ff";
     }
 
     var cols = document.getElementsByClassName('redTeam');
     for(i = 0; i < cols.length; i++) {
-      cols[i].style.backgroundColor = "#A27800";
+        cols[i].style.backgroundColor = "#A27800";
     }
 
     var cols = document.getElementsByClassName('neutral');
     for(i = 0; i < cols.length; i++) {
-      cols[i].style.backgroundColor = "#D9B08C";
+        cols[i].style.backgroundColor = "#D9B08C";
     }
 }
 
 function Tritanopiafunction() {
     var cols = document.getElementsByClassName('blueTeam');
     for(i = 0; i < cols.length; i++) {
-      cols[i].style.backgroundColor = "#00A5B1";
+        cols[i].style.backgroundColor = "#00A5B1";
     }
 
     var cols = document.getElementsByClassName('neutral');
     for(i = 0; i < cols.length; i++) {
-      cols[i].style.backgroundColor = "#D7ACB9";
+        cols[i].style.backgroundColor = "#D7ACB9";
     }
 }
 
 function Protanopiafunction() {
     var cols = document.getElementsByClassName('blueTeam');
     for(i = 0; i < cols.length; i++) {
-      cols[i].style.backgroundColor = "#6792FA";
+        cols[i].style.backgroundColor = "#6792FA";
     }
 
     var cols = document.getElementsByClassName('redTeam');
     for(i = 0; i < cols.length; i++) {
-      cols[i].style.backgroundColor = "#998E65";
+        cols[i].style.backgroundColor = "#998E65";
     }
 
     var cols = document.getElementsByClassName('neutral');
     for(i = 0; i < cols.length; i++) {
-      cols[i].style.backgroundColor = "#C4B78D";
+        cols[i].style.backgroundColor = "#C4B78D";
     }
 }
 
 function normalColours() {
     var cols = document.getElementsByClassName('blueTeam');
     for(i = 0; i < cols.length; i++) {
-      cols[i].style.backgroundColor = "#3399ff";
+        cols[i].style.backgroundColor = "#3399ff";
     }
 
     var cols = document.getElementsByClassName('redTeam');
     for(i = 0; i < cols.length; i++) {
-      cols[i].style.backgroundColor = "#ff5050";
+        cols[i].style.backgroundColor = "#ff5050";
     }
 
     var cols = document.getElementsByClassName('neutral');
     for(i = 0; i < cols.length; i++) {
-      cols[i].style.backgroundColor = "tan";
+        cols[i].style.backgroundColor = "tan";
     }
 }

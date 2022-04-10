@@ -30,10 +30,12 @@ body {
     display: none;
 }
 
-#hideObserver {
+#hideObserver,
+#hideInstructions {
     cursor: pointer;
     display: block;
     margin: 3em auto;
+    width: 45px;
 }
 
 /*
