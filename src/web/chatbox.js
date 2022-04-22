@@ -12,7 +12,6 @@ class Chatbox extends Observer {
     */
     constructor() {
         super();
-        document.getElementById("chatboxSend").addEventListener("submit", this.sendChat);      
     }
 
     /**
@@ -29,7 +28,7 @@ class Chatbox extends Observer {
             "team" : board.player.team,
             "role" : board.player.role
         });
-        document.getElementById("chatboxSend").reset();
+        document.getElementById("chatText").value = '';
         return {chatText};
     }
 
@@ -69,3 +68,16 @@ class Chatbox extends Observer {
 //MAIN
 var chatbox = new Chatbox();
 server.registerObserver(chatbox);
+document.getElementById("chatSubmit").onclick = function() {chatbox.sendChat();};
+document.getElementById("chatText").addEventListener("keyup", function(event) {
+    if (event.key == "Enter") {
+        event.preventDefault();
+        document.getElementById("chatSubmit").click();
+    }
+});
+document.getElementById("clue").addEventListener("keyup", function(event) {
+    if (event.key === "Enter") {
+        event.preventDefault();
+        document.getElementById("clueButton").click();
+    }
+});

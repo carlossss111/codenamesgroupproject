@@ -76,7 +76,8 @@
     </div>
 
     <script>
-        var choice = parent.document.URL.charAt(parent.document.URL.length-1);
+        const params = new URLSearchParams(window.location.search)
+        var choice = params.get("choice");
         var roomId = "roomNameHost";
         var yourId = "yourNameHost";
 
@@ -107,7 +108,7 @@
                 }
             }
             if (nickname == '') nickname = autoGenName("player");
-            for (let char of ['?','#','!','@','$','%','&','*','^',"(AI)"]) {
+            for (let char of ['?','&','=',"(AI)"]) {
                 if (room.includes(char) || nickname.includes(char)) {
                     alert("Illegal room id or username!");
                     return;
@@ -117,9 +118,9 @@
                 var isBomb = document.getElementById("isBomb").value;
                 var timer = document.getElementById("timerLength").value;
                 var difficulty = document.getElementById("difficulty").value;
-                window.location.href = "game.html?#"+choice+"!"+room+"@"+nickname+"$"+isBomb+"&"+timer+"*"+difficulty+"^";
+                window.location.href = "game.html?choice="+choice+"&room="+room+"&nickname="+nickname+"&isBomb="+isBomb+"&timer="+timer+"&difficulty="+difficulty;
             } else {
-                window.location.href = "game.html?#"+choice+"!"+room+"@"+nickname+"$";
+                window.location.href = "game.html?choice="+choice+"&room="+room+"&nickname="+nickname;
             }
         }
     </script>

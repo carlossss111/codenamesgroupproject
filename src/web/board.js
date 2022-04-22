@@ -614,11 +614,11 @@ class BoardState extends Observer {
             for (let j = 0; j < this.cards[0].length; j++) {
                 if (clue.toLowerCase() == this.cards[i][j].word) {
                     alert("Clue cannot be the same as board words!");
-                    document.getElementById("clueForm").reset();
+                    document.getElementById("clue").value = '';
                     return;
                 } else if (!vocabulary.includes(clue.toLowerCase()) && this.isAISpy()) {
                     alert("Word not recognized by AI spy. Please try again.");
-                    document.getElementById("clueForm").reset();
+                    document.getElementById("clue").value = '';
                     return;
                 }
             }
@@ -934,7 +934,7 @@ class BoardState extends Observer {
                     if (choice == 0 && this.totalHintsLeft > 0)
                         document.getElementById("hintButton").style.display = "inline-block";
                     if (this.player.role == "spymaster")
-                        document.getElementById("clueForm").reset();
+                        document.getElementById("clue").value = '';
                 }
                 break;
 
@@ -954,9 +954,11 @@ class BoardState extends Observer {
 
             case "restartGame":
                 //host restart game
-                link = link.slice(0, -1) + numOfPeople;
+                if (!params.has("people"))
+                    var link = window.location.href + "&people=" + numOfPeople;
+                else
+                    var link = window.location.href.slice(0, -1) + numOfPeople;
                 window.location.replace(link);
-                window.location.reload();
                 break;
 
             case "hostQuit":
@@ -979,11 +981,11 @@ var board = BoardState.getInstance();
 server.registerObserver(board);
 console.log(server.observers);
 
-var link = parent.document.URL;
-var choice = link.charAt(link.indexOf('#')+1);
-board.room = link.substring(link.indexOf('!')+1, link.indexOf('@'));
+const params = new URLSearchParams(window.location.search)
+var choice = params.get("choice");
+board.room = params.get("room");
 document.getElementById("room").innerHTML = "Room: " + board.room;
-var nickname = link.substring(link.indexOf('@')+1, link.indexOf('$')).replace('_', ' ');
+var nickname = params.get("nickname").replace('_', ' ');
 
 var vocabulary;
 var tmpName = "";
@@ -993,9 +995,9 @@ var numOfPeople = 1;
 var isSidebarOpen = false;
 
 if (choice != 2) {
-    var isBombCard = link.substring(link.indexOf('$')+1, link.indexOf('&'));
-    let timer = link.substring(link.indexOf('&')+1, link.indexOf('*'));
-    var difficulty = link.substring(link.indexOf('*')+1, link.indexOf('^'));
+    var isBombCard = params.get("isBomb");
+    let timer = params.get("timer");
+    var difficulty = params.get("difficulty");
     console.log(difficulty);
     if (isBombCard == 'y') isBombCard = true;
     else isBombCard = false;
@@ -1017,17 +1019,13 @@ if (choice != 0) {
     document.getElementById("hintText").style.display = "none";
     document.getElementById("hintButton").style.display = "none";
 }
-if (link.charAt(link.length-2) == '|') {
+
+if (params.has("people")) {
     joinRoom(true);
-    numOfPeople = parseInt(link.charAt(link.length-1), 10);
+    numOfPeople = parseInt(params.get("people"), 10);
     document.getElementById("numOfPeople").innerHTML = numOfPeople;
 } else {
-    href = window.location.pathname;
-    if(href.search("runner.html") == -1){ //special case so the test script is not broken
-        joinRoom(false);
-        link = link + '|' + numOfPeople;
-        window.location.replace(link);
-    }
+    joinRoom(false);
 }
 
 document.getElementById("welcomeName").innerHTML = nickname;

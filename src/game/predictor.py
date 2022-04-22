@@ -37,7 +37,7 @@ class Predictor_spy:
             : The clue given by teammate
         target_num: int
             : The target number given by teammate
-        level: int
+        level: str
             : The accuracy level for AI spy
         relevant_vectors_path: str
             : The path to the dictionary of relevant vectors

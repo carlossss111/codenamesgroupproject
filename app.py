@@ -1,7 +1,7 @@
 import time
 import sys
 import numpy as np
-from flask import Flask, session, copy_current_request_context, request
+from flask import Flask, session, copy_current_request_context
 from flask_socketio import SocketIO, emit, disconnect, join_room, leave_room
 from threading import Lock
 from src.game.generateBoard import *

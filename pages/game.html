@@ -58,7 +58,7 @@
             </span>
         </div>
 
-        <form class="clueBox" id="clueForm">
+        <div class="clueBox" id="clueForm">
             <!-- Clue box and options -->
             <input type="text" id="clue" placeholder="Enter clue"></input>
             <select id="maxClues">
@@ -75,7 +75,7 @@
             <button id="clueButton">Give Clue</button>
             <button id="endTurn">End Turn</button>
             <button id="hintButton">Hint</button>
-        </form>
+        </div>
 
         <!-- Gameover Box -->
         <div id="gameOver" style="display: none;">
@@ -102,7 +102,7 @@
 
     <!-- Team Selection -->
     <div id="teamBox" class="teamForm pt-10">
-        <form style="text-align: center;" class="flex flex-col items-center space-y-10" >
+        <div style="text-align: center;" class="flex flex-col items-center space-y-10" >
             <div class="flex flex-row space-x-10">
                 <button type="submit" id="joinBlueSm" class="-rotate-6 bg-slate-50 shadow-md hover:bg-blue-300 hover:text-white hover:animate-pulse w-80 h-20 p-5 rounded-xl text-2xl font-bold">Join Blue Spymaster</button>
                 <button type="submit" id="joinRedSm" class="rotate-6 bg-slate-50 shadow-md hover:bg-rose-300 hover:text-white hover:animate-pulse w-80 h-20 p-5 rounded-xl text-2xl font-bold">Join Red Spymaster</button>
@@ -114,7 +114,7 @@
                 <button type="submit" id="joinBlueSpy" class="rotate-6 bg-slate-50 shadow-md hover:bg-blue-300 hover:text-white hover:animate-pulse w-80 h-20 p-5 rounded-xl text-2xl font-bold">Join Blue Spy</button>
                 <button type="submit" id="joinRedSpy" class="-rotate-6 bg-slate-50 shadow-md hover:bg-rose-300 hover:text-white hover:animate-pulse w-80 h-20 p-5 rounded-xl text-2xl font-bold">Join Red Spy</button>
             </div>
-        </form>        
+        </div>        
     </div>
     <!-- End of Team Selection-->
 
@@ -209,10 +209,10 @@
         <div class="chatbox">
             <div id="chatboxReceive"></div>  
         </div>
-        <form id="chatboxSend">
+        <div id="chatboxSend">
             <input id="chatText" type="text"></input>
             <button id="chatSubmit" type="submit" class='border-0 shadow-sm bg-sky-300 hover:bg-sky-200 hover:text-gray-500'>Send</button>
-        </form>
+        </div>
     </div>
     <!-- End of Page Side -->
 
