@@ -31,8 +31,8 @@ class SpyAI:
         """
         Parameters
         ----------
-        board: json
-            : The current board state
+        board: list
+            : The list of current board cards
         clue: str
             : The clue given by teammate
         target_num: int
@@ -124,8 +124,8 @@ class SpymasterAI:
             : The path to the dictionary of relevant words
         relevant_vectors_path: str
             : The path to the dictionary of relevant vectors
-        board: json
-            : The current board state
+        board: list
+            : The list of current board cards
         threshold: float
             : The threshold before which the similarity is 0, 
               words having cosine similarity less than threshold could seen as not related
