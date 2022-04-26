@@ -18,7 +18,7 @@ def cos_sim(u, v):
     return cos_sim
 
 
-class Predictor_spy:
+class SpyAI:
     """
     Generate a list of guesses
     """
@@ -107,9 +107,9 @@ class Predictor_spy:
         return guesses
 
 
-class Predictor_sm:
+class SpymasterAI:
     """
-    Generate clues and list of target words
+    Generate a clue and list of target words
     """
     def __init__(self,
                  relevant_words_path,

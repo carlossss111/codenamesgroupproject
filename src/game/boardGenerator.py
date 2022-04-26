@@ -1,19 +1,21 @@
 import numpy as np
 
 
-class generateBoard:
+class BoardGenerator:
     """
-    Generate a random board
+    Generate a random game board
     """
-    def __init__(self, in_file, isBombCard):
+    def __init__(self, in_file, is_bomb_card):
         """
         Parameters
         ----------
         in_file: str
             The path to the possible board words
+        is_bomb_card: boolean:
+            If the bomb card is set
         """
         self.in_file = in_file
-        self.isBombCard = isBombCard
+        self.is_bomb_card = is_bomb_card
         self.board = self.generate_board()
 
     def generate_board(self):
@@ -40,7 +42,7 @@ class generateBoard:
             elif i < 24:
                 type = "neutral"
             else:
-                if self.isBombCard:
+                if self.is_bomb_card:
                     type = "bombCard"
                 else:
                     type = "neutral"
@@ -53,7 +55,10 @@ class generateBoard:
         return board
 
 
-def getVocabulary():
+"""
+Get vocabulary for the AI spymaster
+"""
+def get_vocabulary():
     with open("rsc/data/word_dict", 'r') as f:
         words = [line.rstrip() for line in f]
         return words

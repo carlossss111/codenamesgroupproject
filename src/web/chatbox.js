@@ -7,17 +7,17 @@
 class Chatbox extends Observer {
 
     /**
-    * Adds an event listener to the HTML node with id="chatboxSend" 
-    * so that it calls the sendChat function.
-    */
+     * Adds an event listener to the HTML node with id="chatboxSend" 
+     * so that it calls the sendChat function.
+     */
     constructor() {
         super();
     }
 
     /**
-    * Sends the chat to the server using the Server Class.
-    * Called with event listener in the constructor.
-    */
+     * Sends the chat to the server using the Server Class.
+     * Called with event listener in the constructor.
+     */
     sendChat() {
         var chatText = document.getElementById("chatText").value;
         var message = nickname + ": " + chatText;
@@ -33,10 +33,10 @@ class Chatbox extends Observer {
     }
 
     /**
-    * Prints chat messages from the server onto the screen.
-    * Called whenever a "chat" message is received from the server.
-    * (Observer Class Override!)
-    */
+     * Prints chat messages from the server onto the screen.
+     * Called whenever a "chat" message is received from the server.
+     * (Observer Class Override!)
+     */
     update(eventName, args) {
         if (eventName != "chat") return;
 

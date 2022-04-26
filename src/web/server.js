@@ -19,7 +19,7 @@ var socket;
  * The receiveFromServer() sends back a string with the response in a similiar format
  * and alerts the update function of every observer using the observer pattern.
  */
-class Server{
+class Server {
     //list of observers waiting for server updates
     observers = [];
 
@@ -33,7 +33,12 @@ class Server{
         this.receiveFromServer();
     }
 
-    //send data to server
+    /**
+     * Send data to server
+     * @param {string} eventName the name of data event
+     * @param {JSON} data the data of event
+     * @returns name of event and its data
+     */
     sendToServer(eventName, data){
         console.log("MESSAGE SENT:");
         console.log(data);
@@ -41,7 +46,9 @@ class Server{
         return {eventName, data};
     }
 
-    //receive data from server and update oberservers
+    /**
+     * Receive data from server and update oberservers
+     */
     receiveFromServer(){
         socket.onAny((eventName, args) => {
             console.log("MESSAGE RECEIVED:");
@@ -52,7 +59,9 @@ class Server{
         });
     }
 
-    //connection setup and listener
+    /**
+     * Connection and listener setup
+     */
     connectedToServer(){
         //connect to the socket
         socket = io(`http://${IP_ADDRESS}:${SERVER_PORT}`);
@@ -62,7 +71,9 @@ class Server{
         });    
     }
 
-    //disconnection listener
+    /**
+     * Disconnecting listener
+     */
     disconnectedFromServer(){
         socket.on("disconnect", () => {  
             console.log("Disconnected from Server");
@@ -70,20 +81,23 @@ class Server{
         });
     }
 
-    //observer pattern, add to list
+    /**
+     * Observer pattern, add to list
+     * @param {Observer} newObserver the observer to be added to list
+     */
     registerObserver(newObserver){
         this.observers.push(newObserver);
     }
 }
 
 /**
-* **Abstract Class**
-*
-* The update method is called by the Server class as part of the observer
-* pattern whenever there is a message from the server. It's content
-* should change depending on the type of Observer.
-*/
-class Observer{
+ * **Abstract Class**
+ *
+ * The update method is called by the Server class as part of the observer
+ * pattern whenever there is a message from the server. It's content
+ * should change depending on the type of Observer.
+ */
+class Observer {
     update(eventName, args){
         throw new Error("The update method has been called in the Observer Superclass!");
     }
