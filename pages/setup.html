@@ -5,11 +5,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Team 18's Codenames Project"/>
-    <link rel="shortcut icon" href="#">
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/3637/3637532.png">
     <link href="../src/web/main.css" type="text/css" rel="stylesheet" />
     <script src="../src/web/randomId.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <title>Nottingham Codenames</title>
+    <title>Codenames | Setup</title>
 </head>
 <body>
     <div class='bg-[#ffdede] shadow-md mb-12'>
@@ -76,10 +76,13 @@
     </div>
 
     <script>
-        var choice = parent.document.URL.charAt(parent.document.URL.length-1);
+        // Parse attributes from query string in URL
+        const params = new URLSearchParams(window.location.search)
+        var choice = params.get("choice");
         var roomId = "roomNameHost";
         var yourId = "yourNameHost";
 
+        // Adjust layout according to different game mode
         if (choice == 0) {
             document.getElementById("joinMenu").style.display = "none";
             document.getElementById("nameRoom").style.display = "none";
@@ -96,6 +99,9 @@
             yourId = "yourNameJoin";
         }
 
+        /**
+         * Direct to another page and transfer data in URL
+         */
         function confirmSetting() {
             var room = document.getElementById(roomId).value.replace(' ', '_');
             var nickname = document.getElementById(yourId).value.replace(' ', '_');
@@ -107,7 +113,7 @@
                 }
             }
             if (nickname == '') nickname = autoGenName("player");
-            for (let char of ['?','#','!','@','$','%','&','*','^',"(AI)"]) {
+            for (let char of ['?','&','=',"(AI)"]) {
                 if (room.includes(char) || nickname.includes(char)) {
                     alert("Illegal room id or username!");
                     return;
@@ -117,9 +123,9 @@
                 var isBomb = document.getElementById("isBomb").value;
                 var timer = document.getElementById("timerLength").value;
                 var difficulty = document.getElementById("difficulty").value;
-                window.location.href = "game.html?#"+choice+"!"+room+"@"+nickname+"$"+isBomb+"&"+timer+"*"+difficulty+"^";
+                window.location.href = "game.html?choice="+choice+"&room="+room+"&nickname="+nickname+"&isBomb="+isBomb+"&timer="+timer+"&difficulty="+difficulty;
             } else {
-                window.location.href = "game.html?#"+choice+"!"+room+"@"+nickname+"$";
+                window.location.href = "game.html?choice="+choice+"&room="+room+"&nickname="+nickname;
             }
         }
     </script>

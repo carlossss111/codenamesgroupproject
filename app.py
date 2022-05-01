@@ -1,17 +1,17 @@
 import time
 import sys
 import numpy as np
-from flask import Flask, session, copy_current_request_context, request
+from flask import Flask, session, copy_current_request_context
 from flask_socketio import SocketIO, emit, disconnect, join_room, leave_room
 from threading import Lock
-from src.game.generateBoard import *
+from src.game.boardGenerator import *
 from src.game.predictor import *
 
 
 async_mode = None
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
-socket_ = SocketIO(app, async_mode=async_mode, cors_allowed_origins='*') #todo: remove CORS policy when hosted on uni server
+socket_ = SocketIO(app, async_mode=async_mode, cors_allowed_origins='*')
 thread = None
 thread_lock = Lock()
 room_path = "rsc/data/rooms"
@@ -30,30 +30,30 @@ def on_join(data):
     room = data['room']
     name = data['name']
     choice = data['choice']
-    isJoined = data['isJoined']
+    is_joined = data['isJoined']
 
     with open(room_path, "r+") as f:
         rooms = [line.rstrip() for line in f]
         print("Current rooms:", rooms)
-        if room in rooms and choice != '2' and not isJoined:
+        if room in rooms and choice != '2' and not is_joined:
             print("Room exist!")
             emit('roomError', "The room name is taken by others, please try again.")
         elif room not in rooms and choice == '2':
             print("Room not exist!")
             emit('roomError', "The room name doesn't exist, please try again.")
         else:
-            if choice != '2' and not isJoined:
+            if choice != '2' and not is_joined:
                 f.write(room + '\n')
-            if choice == '2' and not isJoined:
+            if choice == '2' and not is_joined:
                 emit('syncRequest', "request sync", room=room)
             join_room(room)
             protocol = 'sendRoomInfo'
-            messageToSend = {
+            message_to_send = {
                 'Protocol': protocol,
                 'message': name + ' has entered room ' + room,
                 'name': name
             }
-            emit(protocol, messageToSend, room=room)
+            emit(protocol, message_to_send, room=room)
 
 
 """
@@ -65,17 +65,17 @@ def on_quit(data):
     name = data['name']
     team = data['team']
     choice = data['choice']
-    numOfPeople = data['numOfPeople'] - 1
+    num_of_people = data['numOfPeople'] - 1
     leave_room(room)
 
-    emit('syncPeople', numOfPeople, room=room)
-    messageToSend = {
+    emit('syncPeople', num_of_people, room=room)
+    message_to_send = {
         'Protocol': 'chat',
         'message': name + ' has quit room ' + room,
         'team': team,
         'role': "spy"
     }
-    emit('chat', messageToSend, room=room)
+    emit('chat', message_to_send, room=room)
     
     if choice != '2':
         with open(room_path, "r+") as f:
@@ -85,32 +85,32 @@ def on_quit(data):
                 if r.rstrip() != room:
                     f.write(r)
             f.truncate()
-        messageToSend = {
+        message_to_send = {
             'Protocol': 'hostQuit'
         }
-        emit('hostQuit', messageToSend, room=room)
+        emit('hostQuit', message_to_send, room=room)
 
 
 """
-create a initial game board
+Create a initial game board
 """
 @socket_.on("createInitialBoardState", namespace='/')
 def index(settings):
     print("Initial game board received!")
-    game = generateBoard("rsc/data/codenames_words", settings["BombCard"])
+    game = BoardGenerator("rsc/data/codenames_words", settings["BombCard"])
     board = game.board
     room = settings["room"]
     timer = settings["TimerLength"]
 
     protocol = 'sendInitialBoardState'
-    messageToSend = {
-        'Protocol': protocol, \
-        'board': board, \
-        'timerLength': timer, \
-        'vocabulary': getVocabulary()
+    message_to_send = {
+        'Protocol': protocol,
+        'board': board,
+        'timerLength': timer,
+        'vocabulary': get_vocabulary()
     }
     # send to client
-    emit(protocol, messageToSend, room=room)
+    emit(protocol, message_to_send, room=room)
 
 
 """
@@ -118,19 +118,19 @@ Chat Protocol
 Forwards message sent from a client to all other clients.
 """
 @socket_.on('chat', namespace='/')
-def chat_broadcast_message(messageReceived):
+def chat_broadcast(message_received):
     print("Chat Message Received!")
-    room = messageReceived['room']
+    room = message_received['room']
     # define protocol and message
     protocol = 'chat'
-    messageToSend = {
+    message_to_send = {
         'Protocol': protocol,
-        'message': messageReceived['message'],
-        'team' : messageReceived['team'],
-        'role' : messageReceived['role']
+        'message': message_received['message'],
+        'team' : message_received['team'],
+        'role' : message_received['role']
     }
     # send to client
-    emit(protocol, messageToSend, room=room)
+    emit(protocol, message_to_send, room=room)
 
 
 """
@@ -139,65 +139,65 @@ Forwards clue sent from a spymaster client to all other clients.
 Changes the turn.
 """
 @socket_.on('forwardClue', namespace='/')
-def clue_broadcast_message(messageReceived):
+def clue_broadcast(message_received):
     print("Clue Received!")
 
     # reassign values
-    turn = messageReceived['turn']
-    nextTurn = {"team": turn['team'], "role": "spy"}
-    room = messageReceived['room']
+    turn = message_received['turn']
+    next_turn = {"team": turn['team'], "role": "spy"}
+    room = message_received['room']
 
     # define protocol and message
     protocol = 'forwardClue'
-    messageToSend = {
-        'Protocol': protocol, \
-        'clue': messageReceived['clue'], \
-        'numberOfGuesses': messageReceived['numberOfGuesses'], \
-        'turn': nextTurn \
+    message_to_send = {
+        'Protocol': protocol,
+        'clue': message_received['clue'],
+        'numberOfGuesses': message_received['numberOfGuesses'],
+        'turn': next_turn
     }
     # send to client
-    emit(protocol, messageToSend, room=room)
+    emit(protocol, message_to_send, room=room)
 
 
 """
 Generate a clue and target number (AI)
 """
 @socket_.on("generateClue", namespace='/')
-def clue_broadcast_message_AI(messageReceived):
-    board = list(chain.from_iterable(messageReceived["board"]["cards"]))
-    team = messageReceived["board"]["turn"]["team"]
+def clue_broadcast_AI(message_received):
+    board = list(chain.from_iterable(message_received["board"]["cards"]))
+    team = message_received["board"]["turn"]["team"]
 
-    spymaster = Predictor_sm(relevant_words_path=relevant_words_path,
+    spymaster = SpymasterAI(relevant_words_path=relevant_words_path,
                           relevant_vectors_path=relevant_vectors_path,
                           board=board,
                           turn=team)
     clue, targets = spymaster.run()
 
-    nextTurn = {"team": team, "role": "spy"}
-    room = messageReceived['board']['room']
+    next_turn = {"team": team, "role": "spy"}
+    room = message_received['board']['room']
     numGuesses = max(len(targets), 1)
 
     time.sleep(minimum_time_spymaster_think)
     protocol = 'forwardClue'
-    messageToSend = {
+    message_to_send = {
         'Protocol' : protocol,
         'clue' : clue,
         'numberOfGuesses' : numGuesses,
-        'turn' : nextTurn
+        'turn' : next_turn
     }
-    emit(protocol, messageToSend, room=room)
+    emit(protocol, message_to_send, room=room)
 
 
 """
-Generate a hint
+Generate a hint (AI)
 """
 @socket_.on("hint", namespace='/')
-def hint_broadcast(messageReceived):
-    board = list(chain.from_iterable(messageReceived["board"]["cards"]))
-    team = messageReceived["board"]["turn"]["team"]
-    role = messageReceived["board"]["player"]["role"]
+def hint_broadcast_AI(message_received):
+    board = list(chain.from_iterable(message_received["board"]["cards"]))
+    team = message_received["board"]["turn"]["team"]
+    role = message_received["board"]["player"]["role"]
 
-    spymaster = Predictor_sm(relevant_words_path=relevant_words_path,
+    spymaster = SpymasterAI(relevant_words_path=relevant_words_path,
                           relevant_vectors_path=relevant_vectors_path,
                           board=board,
                           turn=team)
@@ -205,39 +205,39 @@ def hint_broadcast(messageReceived):
 
     if len(targets) == 0:
         protocol = "hintError"
-        messageToSend = "Too few words to give a hint!"
+        message_to_send = "Too few words to give a hint!"
         
     elif role == "spy":
         protocol = "spyHint"
-        messageToSend = {
+        message_to_send = {
             'Protocol' : protocol,
             'hint' : targets[0],
         }
     else:
         protocol = "spymasterHint"
-        messageToSend = {
+        message_to_send = {
             'Protocol' : protocol,
             'hint' : targets,
         }
-    emit(protocol, messageToSend)
+    emit(protocol, message_to_send)
 
 
 """
 Generate a list of guesses (AI)
 """
 @socket_.on('generateGuess', namespace='/')
-def guess(messageReceived):
-    board = list(chain.from_iterable(messageReceived["board"]["cards"]))
-    clue = messageReceived["board"]["clueWord"]
-    target_num = messageReceived["board"]["numOfGuesses"]
-    turn = messageReceived["board"]["turn"]
-    team = messageReceived["board"]["turn"]["team"]
-    level = messageReceived["AIDifficulty"]
-    room = messageReceived['board']['room']
-    redScore = messageReceived["board"]["redScore"]
-    blueScore = messageReceived["board"]["blueScore"]
+def guess_broadcast_AI(message_received):
+    board = list(chain.from_iterable(message_received["board"]["cards"]))
+    clue = message_received["board"]["clueWord"]
+    target_num = message_received["board"]["numOfGuesses"]
+    turn = message_received["board"]["turn"]
+    team = message_received["board"]["turn"]["team"]
+    level = message_received["AIDifficulty"]
+    room = message_received['board']['room']
+    red_score = message_received["board"]["redScore"]
+    blue_score = message_received["board"]["blueScore"]
 
-    spy = Predictor_spy(relevant_vectors_path=relevant_vectors_path,
+    spy = SpyAI(relevant_vectors_path=relevant_vectors_path,
                     board=board,
                     clue=clue,
                     target_num=target_num,
@@ -245,181 +245,199 @@ def guess(messageReceived):
     guesses = spy.run()
 
     if (team == "blue"):
-        nextTurn = {"team": "red", "role": "spymaster"}
+        next_turn = {"team": "red", "role": "spymaster"}
     else:
-        nextTurn = {"team": "blue", "role": "spymaster"}
+        next_turn = {"team": "blue", "role": "spymaster"}
     
     protocol = 'receiveBoardState'
-    bombPicked = False
-    turnOver = False
-    maxGuess = len(guesses)
-    guessNum = 0
+    bomb_picked = False
+    turn_over = False
+    max_guess = len(guesses)
+    guess_num = 0
     time.sleep(minimum_time_spy_think)
     
     for card in board:
-        if card["word"] in guesses and not turnOver:
+        if card["word"] in guesses and not turn_over:
             card["isRevealed"] = True
-            guessNum += 1
+            guess_num += 1
 
             if card["colour"] == "redTeam":
-                redScore += 1
+                red_score += 1
                 if team == "blue":
-                    turnOver = True
-                    turn = nextTurn
+                    turn_over = True
+                    turn = next_turn
             elif card["colour"] == "blueTeam":
-                blueScore += 1
+                blue_score += 1
                 if team == "red":
-                    turnOver = True
-                    turn = nextTurn
+                    turn_over = True
+                    turn = next_turn
             elif card["colour"] == "bombCard":
-                bombPicked = True
-                turnOver = True
-                turn = nextTurn
+                bomb_picked = True
+                turn_over = True
+                turn = next_turn
             else:
-                turnOver = True
-                turn = nextTurn
+                turn_over = True
+                turn = next_turn
 
-            if guessNum == maxGuess:
-                turnOver = True
-                turn = nextTurn
+            if guess_num == max_guess:
+                turn_over = True
+                turn = next_turn
 
             time.sleep(minimum_time_spy_pick_a_card)
-            messageToSend = {
-                'Protocol': protocol, \
-                'clue': clue, \
-                'numberOfGuesses': target_num, \
-                'redScore': redScore, \
-                'blueScore': blueScore, \
-                'turn': turn, \
-                'turnOver': turnOver, \
-                'bombPicked': bombPicked, \
-                'cards': np.reshape(board,(5,5)).tolist() \
+            message_to_send = {
+                'Protocol': protocol,
+                'clue': clue,
+                'numberOfGuesses': target_num,
+                'redScore': red_score,
+                'blueScore': blue_score,
+                'turn': turn,
+                'turnOver': turn_over,
+                'bombPicked': bomb_picked,
+                'cards': np.reshape(board,(5,5)).tolist()
             }
-            emit(protocol, messageToSend, room=room)
+            emit(protocol, message_to_send, room=room)
 
 
 """
-send/receive BoardState Protocol
+Player pick a card, send BoardState to all clients
 """
 @socket_.on('sendBoardState', namespace='/')
-def boardstate_broadcast_message(boardReceived):
+def guess_broadcast(board_received):
     print("Board State Received!")
 
-    numOfGuesses = int(boardReceived['numberOfGuesses']) - 1
-    turn = boardReceived['turn']
-    redScore = boardReceived['redScore']
-    blueScore = boardReceived['blueScore']
-    isTurnOver = False
-    bombPicked = False
+    num_of_guesses = int(board_received['numberOfGuesses']) - 1
+    turn = board_received['turn']
+    red_score = board_received['redScore']
+    blue_score = board_received['blueScore']
+    is_turn_over = False
+    bomb_picked = False
 
-    if boardReceived['endTurn']:
+    if board_received['endTurn']:
         colour = 'unknown'
     else:
-        cardI = int(boardReceived['cardChosen'].split(',')[0])
-        cardJ = int(boardReceived['cardChosen'].split(',')[1])
-        cardSelected = boardReceived['cards'][cardI][cardJ]
-        cardSelected['isRevealed'] = True
-        colour = cardSelected['colour']
+        cardI = int(board_received['cardChosen'].split(',')[0])
+        cardJ = int(board_received['cardChosen'].split(',')[1])
+        card_selected = board_received['cards'][cardI][cardJ]
+        card_selected['isRevealed'] = True
+        colour = card_selected['colour']
         if colour == 'redTeam':
-            redScore += 1
+            red_score += 1
         elif colour == 'blueTeam':
-            blueScore += 1
+            blue_score += 1
         elif colour == 'bombCard':
-            bombPicked = True
+            bomb_picked = True
 
-    if numOfGuesses == 0 or colour[:len(colour)-4] != turn['team']:
-        isTurnOver = True
+    if num_of_guesses == 0 or colour[:len(colour)-4] != turn['team']:
+        is_turn_over = True
         if turn['team'] == 'blue':
-            nextTurn = {"team": "red", "role": "spymaster"}
+            next_turn = {"team": "red", "role": "spymaster"}
         else:
-            nextTurn = {"team": "blue", "role": "spymaster"}
+            next_turn = {"team": "blue", "role": "spymaster"}
     else:
-        nextTurn = {"team": turn['team'], "role": "spy"}
+        next_turn = {"team": turn['team'], "role": "spy"}
 
-    room = boardReceived['room']
+    room = board_received['room']
 
     # define protocol and message
     protocol = 'receiveBoardState'
-    messageToSend = {
-        'Protocol': protocol, \
-        'clue': boardReceived['clue'], \
-        'numberOfGuesses': numOfGuesses, \
-        'redScore': redScore, \
-        'blueScore': blueScore, \
-        'turn': nextTurn, \
-        'turnOver': isTurnOver, \
-        'bombPicked': bombPicked, \
-        'cards': boardReceived['cards'] \
+    message_to_send = {
+        'Protocol': protocol,
+        'clue': board_received['clue'],
+        'numberOfGuesses': num_of_guesses,
+        'redScore': red_score,
+        'blueScore': blue_score,
+        'turn': next_turn,
+        'turnOver': is_turn_over,
+        'bombPicked': bomb_picked,
+        'cards': board_received['cards']
     }
     # send to client
-    emit(protocol, messageToSend, room=room)
+    emit(protocol, message_to_send, room=room)
 
 
+"""
+Player choose a role, send role configuration to all clients
+"""
 @socket_.on('chooseRole', namespace='/')
-def update_role(roleReceived):
-    room = roleReceived['room']
+def update_role(role_received):
+    room = role_received['room']
     protocol = 'receiveRoomInfo'
-    messageToSend = {
+    message_to_send = {
         'Protocol': protocol,
-        'blueSpy' : roleReceived["blueSpy"],
-        'blueSm' : roleReceived["blueSm"],
-        'redSpy' : roleReceived["redSpy"],
-        'redSm' : roleReceived["redSm"],
-        'numOfPeople' : roleReceived["numOfPeople"]
+        'blueSpy' : role_received["blueSpy"],
+        'blueSm' : role_received["blueSm"],
+        'redSpy' : role_received["redSpy"],
+        'redSm' : role_received["redSm"],
+        'numOfPeople' : role_received["numOfPeople"]
     }
-    emit(protocol, messageToSend, room=room)
+    emit(protocol, message_to_send, room=room)
 
 
+"""
+New player join a room, update room and role information
+"""
 @socket_.on('syncRoomInfo', namespace='/')
 def sync_role(sync):
     room = sync['room']
-    numOfPeople = sync['numOfPeople']
+    num_of_people = sync['numOfPeople']
     protocol = 'receiveRoomInfo'
-    messageToSend = {
+    message_to_send = {
         'Protocol': protocol,
         'blueSpy' : sync["blueSpy"],
         'blueSm' : sync["blueSm"],
         'redSpy' : sync["redSpy"],
         'redSm' : sync["redSm"],
-        'numOfPeople' : numOfPeople
+        'numOfPeople' : num_of_people
     }
-    emit(protocol, messageToSend, room=room)
+    emit(protocol, message_to_send, room=room)
 
 
+"""
+Update new turn to all clients
+"""
 @socket_.on('updateTurn', namespace='/')
 def update_turn(turn):
     room = turn['room']
     protocol = 'changeTurn'
-    messageToSend = {
+    message_to_send = {
         'Protocol': protocol,
         'currentTurn': turn["currentTurn"]
     }
-    emit(protocol, messageToSend, room=room)
+    emit(protocol, message_to_send, room=room)
 
 
+"""
+Send game over state to all clients
+"""
 @socket_.on('endGame', namespace='/')
-def game_over(winTeam):
-    room = winTeam['room']
+def game_over(win_team):
+    room = win_team['room']
     protocol = 'gameOver'
-    messageToSend = {
+    message_to_send = {
         'Protocol': protocol,
-        'winTeam': winTeam['winner']
+        'winTeam': win_team['winner']
     }
-    emit(protocol, messageToSend, room=room)
+    emit(protocol, message_to_send, room=room)
 
 
+"""
+Send restart game message to all clients
+"""
 @socket_.on('restart', namespace='/')
-def restart(message):
+def restart_game(message):
     room = message['room']
     protocol = 'restartGame'
-    messageToSend = {
+    message_to_send = {
         'Protocol': protocol
     }
-    emit(protocol, messageToSend, room=room)
+    emit(protocol, message_to_send, room=room)
 
 
+"""
+Disconnect user from the server
+"""
 @socket_.on('disconnect_request', namespace='/test')
-def disconnect_request():
+def disconnect_server():
     @copy_current_request_context
     def can_disconnect():
         disconnect()
@@ -430,21 +448,28 @@ def disconnect_request():
          callback=can_disconnect)
 
 
-@socket_.on('template', namespace='/') #i needed to write this for the python tests because I was having trouble
+"""
+For python tests
+"""
+@socket_.on('template', namespace='/')
 def template_test(data):
     print("Received: " + data)
     emit("template", data)
 
 
+"""
+Clean file storing current room id
+"""
 def clean_room():
     rooms = open(room_path, "w")
     rooms.close()
 
 
-clean_room()
-
-#starts the server (by default on port 5000)
-if __name__ == '__main__': 
-    servPort = 5000
-    if (len(sys.argv) > 1): servPort = sys.argv[1]
-    socket_.run(app, debug=True, port=servPort)
+"""
+Starts the server (by default on port 5000)
+"""
+if __name__ == '__main__':
+    clean_room()
+    serv_port = 5000
+    if (len(sys.argv) > 1): serv_port = sys.argv[1]
+    socket_.run(app, debug=True, port=serv_port)

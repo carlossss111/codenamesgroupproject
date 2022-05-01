@@ -18,7 +18,7 @@ def cos_sim(u, v):
     return cos_sim
 
 
-class Predictor_spy:
+class SpyAI:
     """
     Generate a list of guesses
     """
@@ -31,13 +31,13 @@ class Predictor_spy:
         """
         Parameters
         ----------
-        board: json
-            : The current board state
+        board: list
+            : The list of current board cards
         clue: str
             : The clue given by teammate
         target_num: int
             : The target number given by teammate
-        level: int
+        level: str
             : The accuracy level for AI spy
         relevant_vectors_path: str
             : The path to the dictionary of relevant vectors
@@ -107,9 +107,9 @@ class Predictor_spy:
         return guesses
 
 
-class Predictor_sm:
+class SpymasterAI:
     """
-    Generate clues and list of target words
+    Generate a clue and list of target words
     """
     def __init__(self,
                  relevant_words_path,
@@ -124,8 +124,8 @@ class Predictor_sm:
             : The path to the dictionary of relevant words
         relevant_vectors_path: str
             : The path to the dictionary of relevant vectors
-        board: json
-            : The current board state
+        board: list
+            : The list of current board cards
         threshold: float
             : The threshold before which the similarity is 0, 
               words having cosine similarity less than threshold could seen as not related

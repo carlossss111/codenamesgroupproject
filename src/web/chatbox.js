@@ -7,18 +7,17 @@
 class Chatbox extends Observer {
 
     /**
-    * Adds an event listener to the HTML node with id="chatboxSend" 
-    * so that it calls the sendChat function.
-    */
+     * Adds an event listener to the HTML node with id="chatboxSend" 
+     * so that it calls the sendChat function.
+     */
     constructor() {
         super();
-        document.getElementById("chatboxSend").addEventListener("submit", this.sendChat);      
     }
 
     /**
-    * Sends the chat to the server using the Server Class.
-    * Called with event listener in the constructor.
-    */
+     * Sends the chat to the server using the Server Class.
+     * Called with event listener in the constructor.
+     */
     sendChat() {
         var chatText = document.getElementById("chatText").value;
         var message = nickname + ": " + chatText;
@@ -29,15 +28,15 @@ class Chatbox extends Observer {
             "team" : board.player.team,
             "role" : board.player.role
         });
-        document.getElementById("chatboxSend").reset();
+        document.getElementById("chatText").value = '';
         return {chatText};
     }
 
     /**
-    * Prints chat messages from the server onto the screen.
-    * Called whenever a "chat" message is received from the server.
-    * (Observer Class Override!)
-    */
+     * Prints chat messages from the server onto the screen.
+     * Called whenever a "chat" message is received from the server.
+     * (Observer Class Override!)
+     */
     update(eventName, args) {
         if (eventName != "chat") return;
 
@@ -69,3 +68,16 @@ class Chatbox extends Observer {
 //MAIN
 var chatbox = new Chatbox();
 server.registerObserver(chatbox);
+document.getElementById("chatSubmit").onclick = function() {chatbox.sendChat();};
+document.getElementById("chatText").addEventListener("keyup", function(event) {
+    if (event.key == "Enter") {
+        event.preventDefault();
+        document.getElementById("chatSubmit").click();
+    }
+});
+document.getElementById("clue").addEventListener("keyup", function(event) {
+    if (event.key === "Enter") {
+        event.preventDefault();
+        document.getElementById("clueButton").click();
+    }
+});

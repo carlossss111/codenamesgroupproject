@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Team 18's Codenames Project"/>
-    <link rel="shortcut icon" href="#">
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/3637/3637532.png">
     <link href="../src/web/main.css" type="text/css" rel="stylesheet" />
     <link href="../src/web/game.css" type="text/css" rel="stylesheet" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -17,10 +17,7 @@
     <script src="../src/web/server.js"></script>
     <script src="../src/web/chatbox.js" defer></script>
     <script src="../src/web/audio.js" defer></script>
-    <title>Nottingham Codenames</title>
-
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-
+    <title>Codenames | Game</title>
 </head>
 <body>
     <!-- Page Head -->
@@ -58,7 +55,7 @@
             </span>
         </div>
 
-        <form class="clueBox" id="clueForm">
+        <div class="clueBox" id="clueForm">
             <!-- Clue box and options -->
             <input type="text" id="clue" placeholder="Enter clue"></input>
             <select id="maxClues">
@@ -75,7 +72,7 @@
             <button id="clueButton">Give Clue</button>
             <button id="endTurn">End Turn</button>
             <button id="hintButton">Hint</button>
-        </form>
+        </div>
 
         <!-- Gameover Box -->
         <div id="gameOver" style="display: none;">
@@ -102,7 +99,7 @@
 
     <!-- Team Selection -->
     <div id="teamBox" class="teamForm pt-10">
-        <form style="text-align: center;" class="flex flex-col items-center space-y-10" >
+        <div style="text-align: center;" class="flex flex-col items-center space-y-10" >
             <div class="flex flex-row space-x-10">
                 <button type="submit" id="joinBlueSm" class="-rotate-6 bg-slate-50 shadow-md hover:bg-blue-300 hover:text-white hover:animate-pulse w-80 h-20 p-5 rounded-xl text-2xl font-bold">Join Blue Spymaster</button>
                 <button type="submit" id="joinRedSm" class="rotate-6 bg-slate-50 shadow-md hover:bg-rose-300 hover:text-white hover:animate-pulse w-80 h-20 p-5 rounded-xl text-2xl font-bold">Join Red Spymaster</button>
@@ -114,7 +111,7 @@
                 <button type="submit" id="joinBlueSpy" class="rotate-6 bg-slate-50 shadow-md hover:bg-blue-300 hover:text-white hover:animate-pulse w-80 h-20 p-5 rounded-xl text-2xl font-bold">Join Blue Spy</button>
                 <button type="submit" id="joinRedSpy" class="-rotate-6 bg-slate-50 shadow-md hover:bg-rose-300 hover:text-white hover:animate-pulse w-80 h-20 p-5 rounded-xl text-2xl font-bold">Join Red Spy</button>
             </div>
-        </form>        
+        </div>        
     </div>
     <!-- End of Team Selection-->
 
@@ -167,7 +164,7 @@
         <div class="setItem">
             <img class="setItemIcon" src="../rsc/images/font.png" alt="" srcset="">
             <div class="setItemDesc">
-                Font
+                Font Size
             </div>
             <input value="50" id="font" class="setItemRange" type="range">
             <div id="fontVal" class="setItemRangeVal">
@@ -179,9 +176,9 @@
         <div class="setItem">
             <nav class = "optionPointer">
                 <ul class="navList"> 
-                    <li><a onclick="Deuteranopiafunction()" class="navItem" >Deuteranopia</a></li>
-                    <li><a onclick="Tritanopiafunction()" class="navItem" >Tritanopia</a></li>
-                    <li><a onclick="Protanopiafunction()" class="navItem" >Protanopia</a></li>
+                    <li><a onclick="deuteranopiafunction()" class="navItem" >Deuteranopia</a></li>
+                    <li><a onclick="tritanopiafunction()" class="navItem" >Tritanopia</a></li>
+                    <li><a onclick="protanopiafunction()" class="navItem" >Protanopia</a></li>
                     <li><a onclick="normalColours()" class="navItem" >Normal</a></li>
                 </ul>
                 <span class="barIndicator"></span>
@@ -209,10 +206,10 @@
         <div class="chatbox">
             <div id="chatboxReceive"></div>  
         </div>
-        <form id="chatboxSend">
+        <div id="chatboxSend">
             <input id="chatText" type="text"></input>
             <button id="chatSubmit" type="submit" class='border-0 shadow-sm bg-sky-300 hover:bg-sky-200 hover:text-gray-500'>Send</button>
-        </form>
+        </div>
     </div>
     <!-- End of Page Side -->
 
