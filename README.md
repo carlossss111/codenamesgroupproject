@@ -15,7 +15,7 @@ If there are no error messages, the server is running with the correct dependenc
 
 Then load _index.html_ into a browser of your choice and the game should be playable with AI. Multiple browser windows can also be opened to simulate multiplayer.
 
-For running the production WSGI server please refer to _Software Manual_ part of our [Final Report](/docs/)
+For running the production WSGI server please refer to _Software Manual_ part of our [Final Report](/docs/).
 
 ### Stable Version (online)
 A stable version of the application is available for immediate use at http://3.83.45.21/games/team18_project/
