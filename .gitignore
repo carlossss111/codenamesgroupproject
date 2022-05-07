@@ -7,6 +7,9 @@ __pycache__/
 #temp file
 /rsc/data/rooms
 
+#server only
+/pages/server.html
+
 #testing
 #run `npm install mocha chai --save-dev` from the /test/js directory to get the below
 /test/js/node_modules/ 
